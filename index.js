@@ -12,6 +12,7 @@ class App {
     constructor (tableName, rowCount, colCount){
         let table = new Table (tableName, {rowCount: rowCount, colCount: colCount});
         document.querySelector("."+tableName).append(table);
+        table.focus();
     }
     
 }
