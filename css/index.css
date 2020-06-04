@@ -1,0 +1,17 @@
+* {
+    box-sizing: border-box;
+    font-family: Helvetica,Verdana,Arial,sans-serif;
+}
+body {
+    width: 100%;
+    max-width: 1800px;
+    margin: 0 auto;
+    background-color: lightslategrey
+  }
+.header > h2 {
+    padding-left: 1%;
+    background-color: lightgray;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
