@@ -9,6 +9,7 @@ td {
     border: 1px solid #888;
     width: 80px;
     padding: 0px;
+    cursor: pointer;
 }
 tr:first-child td, td:first-child{
     background-color: #ccc;
@@ -20,34 +21,19 @@ tr:first-child td, td:first-child{
 b-cell {
     border: 0px;
     width: 100%;
+    height: 20px;
     margin-left: 2px;
     padding: 0px;
     cursor: cell;
     float: left;
+/*     background-color: lightyellow; */
 }
 b-cursor {
     border: 2px solid rgb(79, 180, 175);
-    margin: -2px;
+    margin: 0px;
     margin-left: -3px;
     width: 104%;
     height: 100%;
-    padding-left: 1px;
     background-color: rgb(163, 224, 222);
     float: left;
-}
-#editor {
-    width: 100%;
-    height: 100%;
-    float: left;
-}
-b-input:hover {
-    background-color: #eee;
-}
-
-b-input:focus {
-    background-color: #ccf;
-}
-
-b-input:not(:focus) {
-    text-align: right;
 }

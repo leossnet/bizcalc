@@ -27,8 +27,8 @@ class Table extends HTMLTableElement{
             for (let j=0; j<params.colCount+1; j++) {
                 let letter = String.fromCharCode("A".charCodeAt(0)+j-1);
                 if ( i&&j ) {
-                    let cell = new Cell( this, i, letter, this.editor, this.calculator );
-                    cell.value = 0;
+                    let cell = new Cell( this, i, letter, this.calculator );
+                    // cell.value = 0;
                     this.cells.set(letter+i, cell);
                     row.insertCell(-1).append(this.cells.get(letter+i));
                 }
@@ -38,7 +38,7 @@ class Table extends HTMLTableElement{
 
         this.addEventListener("keydown", this.handlerKey);
         this.addEventListener("keydown", this.handlerKeyF2);
-        this.addEventListener("focus", this.handlerFocus);
+        // this.addEventListener("focus", this.handlerFocus);
         this.setCursor("A1");
     }
 
@@ -48,6 +48,10 @@ class Table extends HTMLTableElement{
      */
     getCell(cellName) {
         return this.cells.get(cellName);
+    }
+
+    get cursor() {
+        return this.#cursor;
     }
 
     /**
@@ -80,31 +84,32 @@ class Table extends HTMLTableElement{
         this.setCursor(currentCell.getCellName(newCol, newRow));
     }
 
-    /**
+   /**
      * Обработка нажатий на клавиши стрелок
      * @param {KeyEvent} event 
      */
     handlerKey(event) {
         let deltaRow=0, deltaCol=0;
+        let currentCell = this.#cursor.cell;
         switch(event.key) {
             case "ArrowUp" : 
                 // переход на первую строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
-                    deltaRow = 1 - this.#cursor.cell.rowNumber;
+                    deltaRow = 1 - currentCell.rowNumber;
                 else deltaRow -= 1;
                 break;
             case "ArrowDown" :
                 // переход на последнюю строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
-                    deltaRow = this.rowCount - this.#cursor.cell.rowNumber;
+                    deltaRow = this.rowCount - currentCell.rowNumber;
                 else deltaRow += 1;
                 break;
             case "ArrowLeft" :
                 // переход на первую колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey )
-                    deltaCol = 1 - this.#cursor.cell.colNumber;
+                    deltaCol = 1 - currentCell.colNumber;
                 // переход в конец верхней строки при нахождении курсора в первой ачейке строки
-                else if ( this.#cursor.cell.colNumber == 1 ) {
+                else if ( currentCell.colNumber == 1 ) {
                     deltaCol += this.colCount;
                     deltaRow -= 1;
                 }
@@ -113,9 +118,9 @@ class Table extends HTMLTableElement{
             case "ArrowRight" :
                 // переход на последнюю колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey)
-                    deltaCol = this.colCount - this.#cursor.cell.colNumber;
+                    deltaCol = this.colCount - currentCell.colNumber;
                 // переход в начало нижней строки при нахождении курсора в последней ачейке строки
-                else if ( this.#cursor.cell.colNumber == this.colCount ) {
+                else if ( currentCell.colNumber == this.colCount ) {
                     deltaCol -= this.colCount;
                     deltaRow += 1;
                 }
@@ -123,13 +128,13 @@ class Table extends HTMLTableElement{
                 break;
             case "Home" :
                 // переход на первую колонку 
-                deltaCol = 1 - this.#cursor.cell.colNumber;
-                if ( event.ctrlKey ) deltaRow = 1 - this.#cursor.cell.rowNumber;
+                deltaCol = 1 - currentCell.colNumber;
+                if ( event.ctrlKey ) deltaRow = 1 - currentCell.rowNumber;
                 break;
             case "End" :
                 // переход на последнюю колонку
-                deltaCol = this.colCount - this.#cursor.cell.colNumber;
-                if ( event.ctrlKey ) deltaRow = this.rowCount - this.#cursor.cell.rowNumber;
+                deltaCol = this.colCount - currentCell.colNumber;
+                if ( event.ctrlKey ) deltaRow = this.rowCount - currentCell.rowNumber;
                 break;
 
             }
@@ -141,20 +146,27 @@ class Table extends HTMLTableElement{
      * @param {KeyEvent} event 
      */
     handlerKeyF2(event) {
-        let cellName = this.#cursor.cell.name;
+        let currentCellName = this.#cursor.cell.name;
         switch(event.key) {
             case "F2" : 
-                this.#cursor.editor.beginEditing();
+                this.#cursor.beginEditing();
                 break;
             case "Escape" : 
-                this.#cursor.editor.escapeEditing();
-                this.setCursor(cellName);
+            this.#cursor.escapeEditing();
+                this.setCursor(currentCellName);
                 break;
             case "Enter" : 
-                if ( this.#cursor.editor.isEditing ) {
-                    this.#cursor.editor.endEditing();
-                    this.setCursor(cellName);
+                if ( this.#cursor.isEditing ) {
+                    this.#cursor.endEditing();
+                    this.setCursor(currentCellName);
                 }
+                break;
+            default: 
+                if (this.#cursor.isEditing) {
+                    this.#cursor.addKey(event.key);
+                    this.#cursor.focus();
+                }
+                console.log(event);
                 break;
         }
     }
@@ -163,9 +175,9 @@ class Table extends HTMLTableElement{
      * Обработка события получения фокуса таблицей
      * @param {FocusEvent} event 
      */
-    handlerFocus(event) {
-        console.log(event);
-    }
+    // handlerFocus(event) {
+    //     console.log(event);
+    // }
 
 }
 

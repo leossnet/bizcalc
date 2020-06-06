@@ -4,7 +4,6 @@
 class Cell extends HTMLElement { 
     #table;
     #cell = {};
-    #editor;
     #calculator;
     #deltaA = "A".charCodeAt(0)-1;
 
@@ -13,13 +12,11 @@ class Cell extends HTMLElement {
      * @param {Object} table объект таблицы, к которому добавляется текущая ячейка
      * @param {String|Number} rowName имя строки ячейки
      * @param {String} colName имя колонки ячейки
-     * @param {Object} editor объект редактора ячеек
      * @param {Object} calculator объект расчетчика значений ячеек
      */
-    constructor(table, rowName, colName, editor, calculator) {
+    constructor(table, rowName, colName, calculator) {
         super();
         this.#table = table;
-        this.#editor = editor;
         this.#calculator = calculator;
 
         this.#cell = {
@@ -96,8 +93,11 @@ class Cell extends HTMLElement {
      */
     set value(value){
         if ( value || value.toString().charAt(0) === '=') {
-            this.#cell.formula = value.toString().substring(1);
-            this.#cell.value = this.#calculator.calc(this.#cell.formula);
+            // this.#cell.formula = value.toString().substring(1);
+            // this.#cell.value = this.#calculator.calc(this.#cell.formula);
+            this.#cell.value = value;
+            this.#cell.formula = String(value);
+
             this.#cell.isFormula = true;
         }
         else {

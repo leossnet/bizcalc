@@ -5,7 +5,7 @@ class Cursor extends HTMLElement{
     #cell;
     #cellValue;
     #table;
-    #editor;
+    #isEditing;
 
     /**
      * Конструктор курсора таблицы
@@ -14,8 +14,8 @@ class Cursor extends HTMLElement{
     constructor(table) {
         super();
         this.#table = table;
-        this.#editor = new Editor(this);
-        this.addEventListener("keydown", this.handlerKey);
+        this.#isEditing = false;
+        // this.addEventListener("keydown", this.handlerKey);
     }
 
     /**
@@ -43,11 +43,65 @@ class Cursor extends HTMLElement{
         return this.#cellValue;
     }
 
+    set value (value) {
+        this.#cellValue = value;
+        this.innerHTML = value;
+    }
+
     /**
-     * Получение объекта редактора курсора текущей ячейки 
+     * Проверка на нахождение редактора в режимер редактирования
      */
-    get editor() {
-        return this.#editor;
+    get isEditing() {
+        return this.#isEditing;
+    }
+
+    addKey(key) {
+        this.value += key;
+        console.log(key);
+    }
+
+    /**
+     * Начало редактирования содержимого курсора ячейки
+     */
+    beginEditing() {
+        this.hidden = false;
+        this.innerHTML = "";
+        this.#isEditing = true;
+        this.tabIndex = 0;
+        this.focus();
+        console.log("begin editing...");
+    }
+
+    /**
+     * Завершение редактирования содержимого курсора ячейки с сохранением сделанных изменений
+     */
+    endEditing() {
+        this.#isEditing = false;
+        this.innerHTML = this.value;
+        console.log(this);
+        console.log("end editing. value='"+this.value+"'");
+        this.hidden = true;
+        this.#table.focus();
+    }
+
+    /**
+     * Отмена редактирования содержимого курсора ячейки без сохранения сделанных изменений
+     */    
+    escapeEditing() {
+        this.hidden = true;
+        this.#isEditing = false;
+        this.#table.focus();
+        console.log("escape editing");
+    }
+
+    /**
+     * Обработка нажатия клавиш при нахождении в режиме редактирования
+     * @param {KeyEvent} event
+     */
+    handlerKey(event) {
+        this.value += this.value+event.key;
+        this.focus();
+        console.log(event);
     }
 
     /**
@@ -56,8 +110,6 @@ class Cursor extends HTMLElement{
     get table() {
         return this.#table;
     }
-
-
 }
 
 // регистрация нового html-элемента

@@ -6,7 +6,8 @@ const Types = {
     Number: "Число" ,
     Operator: "Оператор" ,
     LeftBracket: "Левая скобка" , 
-    RightBracket: "Правая скобка"  
+    RightBracket: "Правая скобка",
+    Text: "Текст"
 };
 
 /**
@@ -114,8 +115,6 @@ class Calculator {
                 tokens.push ( { type: Types.Number, value: Number(tokenCode) } ); 
             else if ( tokenCode.match(/^[A-Z]+[1-9]+/g) !== null )
                 tokens.push ( { type: Types.Cell, value: self.cells.get(tokenCode) } );
-            else 
-                throw new Error(`"Непонятный элемент ${tokenCode}`);
         });
         return tokens;
     }

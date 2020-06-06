@@ -2,7 +2,7 @@
  * Основной класс клиентского приложения
  */
 class App {
-
+    #table;
     /**
      * Конструктор клиентского приложения
      * @param {String} tableName наименование css-класса таблицы
@@ -10,10 +10,11 @@ class App {
      * @param {Number} colCount число колонок таблицы
      */
     constructor (tableName, rowCount, colCount){
-        let table = new Table (tableName, {rowCount: rowCount, colCount: colCount});
-        document.querySelector("."+tableName).append(table);
-        table.focus();
+        this.#table = new Table (tableName, {rowCount: rowCount, colCount: colCount});
+        document.querySelector("."+tableName).append(this.#table);
+        this.#table.focus();
     }
     
+ 
 }
 
