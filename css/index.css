@@ -6,7 +6,7 @@ body {
     width: 100%;
     max-width: 1800px;
     margin: 0 auto;
-    background-color: lightslategrey
+    background-color: rgb(145, 145, 145)
   }
 .header > h2 {
     padding-left: 1%;

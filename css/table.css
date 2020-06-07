@@ -6,12 +6,15 @@ table {
     overflow: auto;
 }
 td {
+    font-size: 10;
     border: 1px solid #aaa;
     width: 80px;
     padding: 0px;
     cursor: pointer;
 }
-tr:first-child td, td:first-child{
+th {
+    font-size: 10;
+    border: 1px solid #aaa;
     background-color: #ccc;
     padding: 1px 3px;
     font-weight: bold;
@@ -39,7 +42,6 @@ b-cursor {
     float: left;
 }
 .edit {
-    font-size: 10;
     border: 1px solid green;
     background-color: rgb(239, 252, 239);
     margin: 0px;

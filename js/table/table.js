@@ -16,29 +16,54 @@ class Table extends HTMLTableElement{
         this.colCount = params.colCount;
         this.rowCount = params.rowCount;
         this.cells = new Map();
+        this.headers = [];
         this.calculator = new Calculator(this.cells);
         this.#cursor = new Cursor(this);
         this.tabIndex = -1;
         this.focus();
-    
-        // генерация html-таблицы
-        for (let i=0; i<params.rowCount+1; i++) {
-            let row = this.insertRow(-1);
-            for (let j=0; j<params.colCount+1; j++) {
-                let letter = String.fromCharCode("A".charCodeAt(0)+j-1);
-                if ( i&&j ) {
-                    let cell = new Cell( this, i, letter, this.calculator );
-                    // cell.value = 0;
-                    this.cells.set(letter+i, cell);
-                    row.insertCell(-1).append(this.cells.get(letter+i));
-                }
-                else row.insertCell(-1).innerHTML = i||letter;
-            }
-        }
+        this.generateTable(params);
 
         this.addEventListener("keydown", this.handlerKeyMoving);
         this.addEventListener("keydown", this.handlerKeyEditing);
         this.setCursor("A1");
+    }
+
+    /**
+     * Герерация html-таблицы по заданным в конструкторе Table параметрам
+     * @param {Object} params - набор параметром, упакованных в объект
+     */
+    generateTable(params) {
+        // генерация шапки таблицы
+        let tHead = document.createElement("tHead");
+        let hRow = tHead.insertRow(-1);
+        this.headers.push("");
+        let th = document.createElement("th");
+        th.innerHTML = "";
+        hRow.append(th);
+        for (let i = 0; i < params.colCount; i++) {
+            let letter = String.fromCharCode("A".charCodeAt(0) + i);
+            this.headers.push(letter);
+            let th = document.createElement("th");
+            th.innerHTML = letter;
+            hRow.append(th);
+        }
+        this.append(tHead);
+        
+        // генерация содержимого таблицы
+        let tBody = document.createElement("tBody");
+        for (let i = 1; i < params.rowCount + 1; i++) {
+            let row = tBody.insertRow(-1);
+            let th = document.createElement("th");
+            th.innerHTML = i;
+            row.append(th);
+            for (let j = 1; j <= params.colCount; j++) {
+                let letter = this.headers[j];
+                let cell = new Cell(this, i, letter, this.calculator);
+                this.cells.set(letter + i, cell);
+                row.insertCell(-1).append(cell);
+            }
+        }
+        this.append(tBody);
     }
 
     /**
@@ -117,8 +142,10 @@ class Table extends HTMLTableElement{
                 }
                 else deltaCol -= 1;
                 break;
+            case "Tab" :
+                this.focus();
             case "ArrowRight" :
-                if ( this.#cursor.edit ) this.#cursor.endEditing();
+                    if ( this.#cursor.edit ) this.#cursor.endEditing();
                 // переход на последнюю колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey)
                     deltaCol = this.colCount - currentCell.colNumber;
