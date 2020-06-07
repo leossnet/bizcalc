@@ -18,7 +18,7 @@ class Table extends HTMLTableElement{
         this.cells = new Map();
         this.calculator = new Calculator(this.cells);
         this.#cursor = new Cursor(this);
-        this.tabIndex = 1;
+        this.tabIndex = -1;
         this.focus();
     
         // генерация html-таблицы
@@ -36,9 +36,8 @@ class Table extends HTMLTableElement{
             }
         }
 
-        this.addEventListener("keydown", this.handlerKey);
-        this.addEventListener("keydown", this.handlerKeyF2);
-        // this.addEventListener("focus", this.handlerFocus);
+        this.addEventListener("keydown", this.handlerKeyMoving);
+        this.addEventListener("keydown", this.handlerKeyEditing);
         this.setCursor("A1");
     }
 
@@ -71,8 +70,8 @@ class Table extends HTMLTableElement{
      * @param {*} deltaRow 
      * @param {*} deltaCol 
      */
-    moveCursor(deltaRow, deltaCol) {
-        let currentCell = this.#cursor.cell;
+    moveCursor(deltaRow, deltaCol, cellName) {
+        let currentCell = cellName ? this.getCell(cellName) : this.#cursor.cell;
         let newCol = currentCell.colNumber;
         let newRow = currentCell.rowNumber;
 
@@ -88,17 +87,19 @@ class Table extends HTMLTableElement{
      * Обработка нажатий на клавиши стрелок
      * @param {KeyEvent} event 
      */
-    handlerKey(event) {
+    handlerKeyMoving(event) {
         let deltaRow=0, deltaCol=0;
         let currentCell = this.#cursor.cell;
         switch(event.key) {
             case "ArrowUp" : 
-                // переход на первую строку при нажатой клавише Ctrl
+                if ( this.#cursor.edit ) this.#cursor.endEditing();
+            // переход на первую строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
                     deltaRow = 1 - currentCell.rowNumber;
                 else deltaRow -= 1;
                 break;
             case "ArrowDown" :
+                if ( this.#cursor.edit ) this.#cursor.endEditing();
                 // переход на последнюю строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
                     deltaRow = this.rowCount - currentCell.rowNumber;
@@ -106,6 +107,7 @@ class Table extends HTMLTableElement{
                 break;
             case "ArrowLeft" :
                 // переход на первую колонку при нажатой клавише Ctrl
+                if ( this.#cursor.edit ) this.#cursor.endEditing();
                 if ( event.ctrlKey )
                     deltaCol = 1 - currentCell.colNumber;
                 // переход в конец верхней строки при нахождении курсора в первой ачейке строки
@@ -116,6 +118,7 @@ class Table extends HTMLTableElement{
                 else deltaCol -= 1;
                 break;
             case "ArrowRight" :
+                if ( this.#cursor.edit ) this.#cursor.endEditing();
                 // переход на последнюю колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey)
                     deltaCol = this.colCount - currentCell.colNumber;
@@ -127,11 +130,13 @@ class Table extends HTMLTableElement{
                 else deltaCol += 1;
                 break;
             case "Home" :
+                if ( this.#cursor.edit ) this.#cursor.endEditing();
                 // переход на первую колонку 
                 deltaCol = 1 - currentCell.colNumber;
                 if ( event.ctrlKey ) deltaRow = 1 - currentCell.rowNumber;
                 break;
             case "End" :
+                if ( this.#cursor.edit ) this.#cursor.endEditing();
                 // переход на последнюю колонку
                 deltaCol = this.colCount - currentCell.colNumber;
                 if ( event.ctrlKey ) deltaRow = this.rowCount - currentCell.rowNumber;
@@ -145,39 +150,43 @@ class Table extends HTMLTableElement{
      * Обработка событий нажатия клавиш включения/отключения режима редактирования ячейки
      * @param {KeyEvent} event 
      */
-    handlerKeyF2(event) {
+    handlerKeyEditing(keyEvent) {
         let currentCellName = this.#cursor.cell.name;
         switch(event.key) {
             case "F2" : 
                 this.#cursor.beginEditing();
                 break;
             case "Escape" : 
-            this.#cursor.escapeEditing();
+                this.#cursor.escapeEditing();
                 this.setCursor(currentCellName);
                 break;
             case "Enter" : 
-                if ( this.#cursor.isEditing ) {
+                if ( this.#cursor.edit ) {
                     this.#cursor.endEditing();
-                    this.setCursor(currentCellName);
+                    this.moveCursor(1, 0, currentCellName);
+                }
+                break;
+            case "Delete" :
+                this.#cursor.value = "";
+                break;
+            case "Backspace" :
+                if ( this.#cursor.edit ) {
+                    this.#cursor.removeLastKey();
+                    // this.#cursor.focus();
                 }
                 break;
             default: 
-                if (this.#cursor.isEditing) {
-                    this.#cursor.addKey(event.key);
-                    this.#cursor.focus();
+                if ( this.#cursor.isPrintKey(event.keyCode) && !this.#cursor.edit ) {
+                    this.#cursor.beginEditing();
+                    this.#cursor.addKey(keyEvent);
                 }
-                console.log(event);
+                else if ( this.#cursor.edit ) {
+                    this.#cursor.addKey(keyEvent);
+                    // this.#cursor.focus();
+                }
                 break;
         }
     }
-
-    /**
-     * Обработка события получения фокуса таблицей
-     * @param {FocusEvent} event 
-     */
-    // handlerFocus(event) {
-    //     console.log(event);
-    // }
 
 }
 

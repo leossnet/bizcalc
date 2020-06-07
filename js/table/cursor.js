@@ -5,7 +5,16 @@ class Cursor extends HTMLElement{
     #cell;
     #cellValue;
     #table;
-    #isEditing;
+    #edit;
+    #keyPrintCodes = [
+        48,49,50,51,52,53,54,55,56,57, // цифры основной клавиатуры
+        65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,  // латинские буквы
+        96,97,98,99,100,101,102,103,104,105, // цифры цифрового блока
+        106,107,109,110,111, // прочие символы цифрового блока
+        186,187,188,189,190,191,192, // прочие символы и русские буквы
+        219,220,221,222 // прочие символы и русские буквы
+    ];
+    #oldValue;
 
     /**
      * Конструктор курсора таблицы
@@ -14,7 +23,8 @@ class Cursor extends HTMLElement{
     constructor(table) {
         super();
         this.#table = table;
-        this.#isEditing = false;
+        this.#edit = false;
+        this.tabIndex = -1;
         // this.addEventListener("keydown", this.handlerKey);
     }
 
@@ -51,24 +61,55 @@ class Cursor extends HTMLElement{
     /**
      * Проверка на нахождение редактора в режимер редактирования
      */
-    get isEditing() {
-        return this.#isEditing;
+    get edit() {
+        return this.#edit;
     }
 
-    addKey(key) {
-        this.value += key;
-        console.log(key);
+    /**
+     * Установка/снятие режима редактирования значения текущей ячейки
+     */
+    set edit(isEdit) {
+        this.#edit = isEdit;
+        if ( isEdit ) {
+            this.classList.add("edit");
+        }
+        else {
+            this.classList.remove("edit");
+            this.#table.focus();
+        }
+    }
+
+    /**
+     * Проверка на вхождение кода символа в перечень печатаемых символов
+     * @param {Number} keyCode 
+     */
+    isPrintKey(keyCode) {
+        return this.#keyPrintCodes.includes(keyCode);
+    }
+
+    /**
+     * Добавление символа к значению текущей ячейки таблицы
+     * @param {EventKey} keyEvent 
+     */
+    addKey(keyEvent) {
+        if ( this.isPrintKey(keyEvent.keyCode) ) this.value += keyEvent.key;
+    }
+
+    /**
+     * Удаление крайнего справа символа значения ячейки
+     */
+    removeLastKey() {
+        let valString = String(this.value);
+        if ( valString.length ) this.value = valString.substring(0, valString.length-1);
+        console.log("backspace. value ='"+this.value+"'");
     }
 
     /**
      * Начало редактирования содержимого курсора ячейки
      */
     beginEditing() {
-        this.hidden = false;
-        this.innerHTML = "";
-        this.#isEditing = true;
-        this.tabIndex = 0;
-        this.focus();
+        this.edit = true;
+        this.#oldValue = this.#cellValue;
         console.log("begin editing...");
     }
 
@@ -76,33 +117,19 @@ class Cursor extends HTMLElement{
      * Завершение редактирования содержимого курсора ячейки с сохранением сделанных изменений
      */
     endEditing() {
-        this.#isEditing = false;
-        this.innerHTML = this.value;
-        console.log(this);
+        this.edit = false;
         console.log("end editing. value='"+this.value+"'");
-        this.hidden = true;
-        this.#table.focus();
     }
 
     /**
      * Отмена редактирования содержимого курсора ячейки без сохранения сделанных изменений
      */    
     escapeEditing() {
-        this.hidden = true;
-        this.#isEditing = false;
-        this.#table.focus();
-        console.log("escape editing");
+        this.edit = false;
+        this.value = this.#oldValue;
+        console.log("escape editing. value='"+this.value+"'");
     }
 
-    /**
-     * Обработка нажатия клавиш при нахождении в режиме редактирования
-     * @param {KeyEvent} event
-     */
-    handlerKey(event) {
-        this.value += this.value+event.key;
-        this.focus();
-        console.log(event);
-    }
 
     /**
      * Получение объекта таблицы, на которой размещен курсор 

@@ -31,7 +31,6 @@ class Cell extends HTMLElement {
         };
 
         this.addEventListener("click", this.hardlerClick );
-        this.addEventListener("keydown", this.handlerKey);
     }
 
     /**
@@ -121,14 +120,6 @@ class Cell extends HTMLElement {
      */
     hardlerClick(event) {
         this.#table.setCursor(this.#cell.name);
-    }
-
-    /**
-     * Обработка нажатия клавиш 
-     * @param {KeyEvent} event событие клавиатуры
-     */
-    handlerKey(event) {
-        console.log(event);
     }
 }
 
