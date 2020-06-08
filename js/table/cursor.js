@@ -3,7 +3,8 @@
  */
 class Cursor extends HTMLElement{
     #cell;
-    #cellValue;
+    #editValue;
+    #initValue;
     #table;
     #edit;
     #printKeyCodes = new Set ([
@@ -14,7 +15,6 @@ class Cursor extends HTMLElement{
         186,187,188,189,190,191,192, // прочие символы и русские буквы
         219,220,221,222 // прочие символы и русские буквы
     ]);
-    #oldValue;
 
     /**
      * Конструктор курсора таблицы
@@ -25,7 +25,6 @@ class Cursor extends HTMLElement{
         this.#table = table;
         this.#edit = false;
         this.tabIndex = -1;
-        // this.addEventListener("keydown", this.handlerKey);
     }
 
     /**
@@ -33,10 +32,9 @@ class Cursor extends HTMLElement{
      */
     set cell(cell){
         this.#cell = cell;
-        this.#cellValue = this.#cell.value;
         this.#cell.innerHTML = "";
-        this.innerHTML = this.#cellValue;
         this.#cell.append(this);
+        this.value = cell.value;
     }
 
     /**
@@ -50,11 +48,11 @@ class Cursor extends HTMLElement{
      * Получение значения ячейки, на которой расположен курсов
      */
     get value() {
-        return this.#cellValue;
+        return this.#editValue;
     }
 
     set value (value) {
-        this.#cellValue = value;
+        this.#editValue = value;
         this.innerHTML = value;
     }
 
@@ -92,16 +90,19 @@ class Cursor extends HTMLElement{
      * @param {EventKey} keyEvent 
      */
     addKey(keyEvent) {
-        if ( this.isPrintKey(keyEvent.keyCode) ) this.value += keyEvent.key;
+        if ( this.isPrintKey(keyEvent.keyCode) ) {
+            this.value += keyEvent.key;
+        }
     }
 
     /**
      * Удаление крайнего справа символа значения ячейки
      */
     removeLastKey() {
-        let valString = String(this.value);
-        if ( valString.length ) this.value = valString.substring(0, valString.length-1);
-        console.log("backspace. value ='"+this.value+"'");
+        let strValue = String(this.value);
+        if ( strValue.length ) {
+            this.value = strValue.substring(0, strValue.length-1);
+        }
     }
 
     /**
@@ -109,8 +110,16 @@ class Cursor extends HTMLElement{
      */
     beginEditing() {
         this.edit = true;
-        this.#oldValue = this.#cellValue;
-        console.log("begin editing...");
+        this.#initValue = this.#editValue;
+    }
+
+    /**
+     * Начало ввода данных в текущую ячейку с удалением ранее введенного значения
+     */
+    beginInput() {
+        this.edit = true;
+        this.#initValue = this.#editValue;
+        this.value = "";
     }
 
     /**
@@ -118,7 +127,7 @@ class Cursor extends HTMLElement{
      */
     endEditing() {
         this.edit = false;
-        console.log("end editing. value='"+this.value+"'");
+        this.#cell.value = this.value;
     }
 
     /**
@@ -126,10 +135,15 @@ class Cursor extends HTMLElement{
      */    
     escapeEditing() {
         this.edit = false;
-        this.value = this.#oldValue;
-        console.log("escape editing. value='"+this.value+"'");
+        this.value = this.#initValue;
     }
 
+    /**
+     * Удаление содержимого текущей ячейки 
+     */    
+    clearValue() {
+        this.#cell.value = "";
+    }
 
     /**
      * Получение объекта таблицы, на которой размещен курсор 

@@ -22,10 +22,11 @@ class Table extends HTMLTableElement{
         this.tabIndex = -1;
         this.focus();
         this.generateTable(params);
+        this.setCursor("A1");
 
+        // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
         this.addEventListener("keydown", this.handlerKeyEditing);
-        this.setCursor("A1");
     }
 
     /**
@@ -48,7 +49,7 @@ class Table extends HTMLTableElement{
             hRow.append(th);
         }
         this.append(tHead);
-        
+
         // генерация содержимого таблицы
         let tBody = document.createElement("tBody");
         for (let i = 1; i < params.rowCount + 1; i++) {
@@ -58,7 +59,8 @@ class Table extends HTMLTableElement{
             row.append(th);
             for (let j = 1; j <= params.colCount; j++) {
                 let letter = this.headers[j];
-                let cell = new Cell(this, i, letter, this.calculator);
+                let cell = new Cell(this, i, letter);
+                cell.id = letter + i;
                 this.cells.set(letter + i, cell);
                 row.insertCell(-1).append(cell);
             }
@@ -74,26 +76,22 @@ class Table extends HTMLTableElement{
         return this.cells.get(cellName);
     }
 
-    get cursor() {
-        return this.#cursor;
-    }
-
     /**
      * Установление курсора в позицию ячейки с именем cellName
      * @param {String} cellName 
      */
     setCursor(cellName) {
-        if  ( this.#cursor.cell ) {
-            let oldCell = this.#cursor.cell;
-            oldCell.value = this.#cursor.value;
-        }
+        let oldCell;
+        if  ( this.#cursor.cell ) oldCell = this.#cursor.cell;
         this.#cursor.cell = this.getCell(cellName);
+        if ( oldCell ) oldCell.refresh();
     }
 
     /**
      * Перемещение курсора со сдвигом на количество строк и колонок относительно текущей позиции
-     * @param {*} deltaRow 
-     * @param {*} deltaCol 
+     * @param {Number} deltaRow - количество строк смещения 
+     * @param {Number} deltaCol - количество колонок смещения
+     * @param {String} cellName - имя ячейки, относительно которой производится перемещение курсора
      */
     moveCursor(deltaRow, deltaCol, cellName) {
         let currentCell = cellName ? this.getCell(cellName) : this.#cursor.cell;
@@ -122,6 +120,7 @@ class Table extends HTMLTableElement{
                 if ( event.ctrlKey ) 
                     deltaRow = 1 - currentCell.rowNumber;
                 else deltaRow -= 1;
+                this.moveCursor(deltaRow, deltaCol);
                 break;
             case "ArrowDown" :
                 if ( this.#cursor.edit ) this.#cursor.endEditing();
@@ -129,6 +128,7 @@ class Table extends HTMLTableElement{
                 if ( event.ctrlKey ) 
                     deltaRow = this.rowCount - currentCell.rowNumber;
                 else deltaRow += 1;
+                this.moveCursor(deltaRow, deltaCol);
                 break;
             case "ArrowLeft" :
                 // переход на первую колонку при нажатой клавише Ctrl
@@ -141,6 +141,7 @@ class Table extends HTMLTableElement{
                     deltaRow -= 1;
                 }
                 else deltaCol -= 1;
+                this.moveCursor(deltaRow, deltaCol);
                 break;
             case "Tab" :
                 this.focus();
@@ -155,22 +156,24 @@ class Table extends HTMLTableElement{
                     deltaRow += 1;
                 }
                 else deltaCol += 1;
+                this.moveCursor(deltaRow, deltaCol);
                 break;
             case "Home" :
                 if ( this.#cursor.edit ) this.#cursor.endEditing();
                 // переход на первую колонку 
                 deltaCol = 1 - currentCell.colNumber;
                 if ( event.ctrlKey ) deltaRow = 1 - currentCell.rowNumber;
+                this.moveCursor(deltaRow, deltaCol);
                 break;
             case "End" :
                 if ( this.#cursor.edit ) this.#cursor.endEditing();
                 // переход на последнюю колонку
                 deltaCol = this.colCount - currentCell.colNumber;
                 if ( event.ctrlKey ) deltaRow = this.rowCount - currentCell.rowNumber;
+                this.moveCursor(deltaRow, deltaCol);
                 break;
 
             }
-        this.moveCursor(deltaRow, deltaCol);
     }
 
     /**
@@ -194,27 +197,21 @@ class Table extends HTMLTableElement{
                 }
                 break;
             case "Delete" :
-                this.#cursor.value = "";
+                this.#cursor.clearValue();
                 break;
             case "Backspace" :
                 if ( this.#cursor.edit ) {
                     this.#cursor.removeLastKey();
-                    // this.#cursor.focus();
                 }
                 break;
             default: 
-                if ( this.#cursor.isPrintKey(event.keyCode) && !this.#cursor.edit ) {
-                    this.#cursor.beginEditing();
+                if ( this.#cursor.isPrintKey(event.keyCode) ) {
+                    if ( !this.#cursor.edit ) this.#cursor.beginInput();
                     this.#cursor.addKey(keyEvent);
-                }
-                else if ( this.#cursor.edit ) {
-                    this.#cursor.addKey(keyEvent);
-                    // this.#cursor.focus();
                 }
                 break;
         }
     }
-
 }
 
 // регистрация нового html-элемента
