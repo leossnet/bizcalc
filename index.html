@@ -3,29 +3,21 @@
 <head>
     <title>Простой Excel</title>
     <meta charset="utf-8">
-
     <link rel="stylesheet" href="css/index.css"><link>
     <link rel="stylesheet" href="css/table.css"><link>
-
     <script src="index.js"></script>
     <script src="js/table/table.js"></script>
     <script src="js/table/cell.js"></script>
     <script src="js/table/cursor.js"></script>
     <script src="js/calculator.js"></script>
-
 </head>
 <body>
-    <div>Кнопки</div>
-    <div>
-        <input type="text">
-    </div>
-<!--     <div class="header">
-        <h2>Простой Excel</h2>
-    </div>
- -->
-    <div class="demo-table"></div>
+    <div id="bizcalc"></div>
     <script>
-        let app = new App ("demo-table", 20, 10);
+        let app = new App ( "bizcalc", { 
+            rowCount: 20, 
+            colCount: 10 
+        });
     </script>
 </body>
 </html>
