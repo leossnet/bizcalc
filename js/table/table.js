@@ -2,7 +2,9 @@
  * Класс, расширяющий функциональность базового класса таблицы
  */
 class Table extends HTMLTableElement{
-    #cursor; 
+    #table = {};
+    #cursor;
+    #tdata;
 
     /**
      * Конструктор таблицы 
@@ -11,18 +13,21 @@ class Table extends HTMLTableElement{
      */
     constructor (rootClass, params) {
         super();
-        this.tableName = rootClass;
-        this.id = "b-table";
-        this.colCount = params.colCount;
-        this.rowCount = params.rowCount;
-        this.cells = new Map();
+        this.#table = {
+            id: "b-table",
+            name: rootClass,
+            colCount: params.colCount,
+            rowCount: params.rowCount
+        };
         this.headers = [];
-        this.calculator = new Calculator(this.cells);
+        this.#tdata = new TableData();
         this.#cursor = new Cursor(this);
         this.tabIndex = -1;
-        this.focus();
+
+        // генерация внешнего вида таблицы
         this.generateTable(params);
         this.setCursor("A1");
+        this.focus();
 
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
@@ -41,7 +46,7 @@ class Table extends HTMLTableElement{
         let th = document.createElement("th");
         th.innerHTML = "";
         hRow.append(th);
-        for (let i = 0; i < params.colCount; i++) {
+        for (let i = 0; i < this.#table.colCount; i++) {
             let letter = String.fromCharCode("A".charCodeAt(0) + i);
             this.headers.push(letter);
             let th = document.createElement("th");
@@ -52,16 +57,16 @@ class Table extends HTMLTableElement{
 
         // генерация содержимого таблицы
         let tBody = document.createElement("tBody");
-        for (let i = 1; i < params.rowCount + 1; i++) {
+        for (let i = 1; i < this.#table.rowCount + 1; i++) {
             let row = tBody.insertRow(-1);
             let th = document.createElement("th");
             th.innerHTML = i;
             row.append(th);
-            for (let j = 1; j <= params.colCount; j++) {
+            for (let j = 1; j <= this.#table.colCount; j++) {
                 let letter = this.headers[j];
                 let cell = new Cell(this, i, letter);
                 cell.id = letter + i;
-                this.cells.set(letter + i, cell);
+                this.#tdata.set(letter + i, cell);
                 row.insertCell(-1).append(cell);
             }
         }
@@ -69,11 +74,18 @@ class Table extends HTMLTableElement{
     }
 
     /**
+     * Получение объекта данных таблицы
+     */
+    get tabledata() {
+        return this.#tdata;
+    }
+
+    /**
      * Получение объекта ячейки по имени ячейки
      * @param {String} cellName имя ячейки в формате А1
      */
     getCell(cellName) {
-        return this.cells.get(cellName);
+        return this.#tdata.get(cellName);
     }
 
     /**
@@ -83,8 +95,9 @@ class Table extends HTMLTableElement{
     setCursor(cellName) {
         let oldCell;
         if  ( this.#cursor.cell ) oldCell = this.#cursor.cell;
-        this.#cursor.cell = this.getCell(cellName);
-        if ( oldCell ) oldCell.refresh();
+        let newCell = this.getCell(cellName);
+        this.#cursor.cell = newCell;
+        if ( oldCell && oldCell !== newCell) oldCell.refresh();
     }
 
     /**
@@ -98,9 +111,9 @@ class Table extends HTMLTableElement{
         let newCol = currentCell.colNumber;
         let newRow = currentCell.rowNumber;
 
-        if ( deltaRow > 0 ) newRow += Math.min(deltaRow, this.rowCount-newRow);
+        if ( deltaRow > 0 ) newRow += Math.min(deltaRow, this.#table.rowCount-newRow);
         else newRow += Math.max(deltaRow, 1-newRow);
-        if ( deltaCol > 0 ) newCol += Math.min(deltaCol, this.colCount-newCol);
+        if ( deltaCol > 0 ) newCol += Math.min(deltaCol, this.#table.colCount-newCol);
         else newCol += Math.max(deltaCol, 1-newCol);
 
         this.setCursor(currentCell.getCellName(newCol, newRow));
@@ -126,7 +139,7 @@ class Table extends HTMLTableElement{
                 if ( this.#cursor.edit ) this.#cursor.endEditing();
                 // переход на последнюю строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
-                    deltaRow = this.rowCount - currentCell.rowNumber;
+                    deltaRow = this.#table.rowCount - currentCell.rowNumber;
                 else deltaRow += 1;
                 this.moveCursor(deltaRow, deltaCol);
                 break;
@@ -137,7 +150,7 @@ class Table extends HTMLTableElement{
                     deltaCol = 1 - currentCell.colNumber;
                 // переход в конец верхней строки при нахождении курсора в первой ачейке строки
                 else if ( currentCell.colNumber == 1 ) {
-                    deltaCol += this.colCount;
+                    deltaCol += this.#table.colCount;
                     deltaRow -= 1;
                 }
                 else deltaCol -= 1;
@@ -149,10 +162,10 @@ class Table extends HTMLTableElement{
                     if ( this.#cursor.edit ) this.#cursor.endEditing();
                 // переход на последнюю колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey)
-                    deltaCol = this.colCount - currentCell.colNumber;
+                    deltaCol = this.#table.colCount - currentCell.colNumber;
                 // переход в начало нижней строки при нахождении курсора в последней ачейке строки
-                else if ( currentCell.colNumber == this.colCount ) {
-                    deltaCol -= this.colCount;
+                else if ( currentCell.colNumber == this.#table.colCount ) {
+                    deltaCol -= this.#table.colCount;
                     deltaRow += 1;
                 }
                 else deltaCol += 1;
@@ -168,8 +181,8 @@ class Table extends HTMLTableElement{
             case "End" :
                 if ( this.#cursor.edit ) this.#cursor.endEditing();
                 // переход на последнюю колонку
-                deltaCol = this.colCount - currentCell.colNumber;
-                if ( event.ctrlKey ) deltaRow = this.rowCount - currentCell.rowNumber;
+                deltaCol = this.#table.colCount - currentCell.colNumber;
+                if ( event.ctrlKey ) deltaRow = this.#table.rowCount - currentCell.rowNumber;
                 this.moveCursor(deltaRow, deltaCol);
                 break;
 
@@ -198,6 +211,7 @@ class Table extends HTMLTableElement{
                 break;
             case "Delete" :
                 this.#cursor.clearValue();
+                this.#tdata.calc();
                 break;
             case "Backspace" :
                 if ( this.#cursor.edit ) {

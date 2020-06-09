@@ -3,6 +3,7 @@
  */
 class Cell extends HTMLElement { 
     #table;
+    #tdata;
     #cell = {};
     #deltaA = "A".charCodeAt(0)-1;
 
@@ -15,6 +16,7 @@ class Cell extends HTMLElement {
     constructor(table, rowName, colName) {
         super();
         this.#table = table;
+        this.#tdata = this.#table.tabledata;
 
         this.#cell = {
             name: colName+String(rowName),
@@ -22,12 +24,12 @@ class Cell extends HTMLElement {
             colName: colName,
             rowNumber: Number.parseInt(rowName),
             colNumber: colName.charCodeAt(0) - this.#deltaA,
-            value: "",
+            value: null,
             formula : "",
             isFormula: false
         };
 
-        this.addEventListener("click", this.hardlerClick );
+        this.addEventListener("click", this.handlerClick );
     }
 
     /**
@@ -92,11 +94,13 @@ class Cell extends HTMLElement {
             this.#cell.value = value;
             this.#cell.formula = String(value);
             this.#cell.isFormula = true;
+            this.#tdata.setTokens(this.#cell.name, this.#cell.formula);
         }
         else {
-            this.#cell.value = value;
+            this.#cell.value = Number(value);
             this.#cell.formula = String(value);
             this.#cell.isFormula = false;
+            this.#tdata.setValue(this.#cell.name, this.#cell.value);
         }
         this.refresh();
     }
@@ -109,7 +113,7 @@ class Cell extends HTMLElement {
      * Обработка нажатия мыши
      * @param {MouseEvent} event событие мыши
      */
-    hardlerClick(event) {
+    handlerClick(event) {
         this.#table.setCursor(this.#cell.name);
     }
 }

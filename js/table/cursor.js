@@ -73,7 +73,7 @@ class Cursor extends HTMLElement{
         }
         else {
             this.classList.remove("edit");
-            this.#table.focus();
+            // this.#table.focus();
         }
     }
 
@@ -111,6 +111,7 @@ class Cursor extends HTMLElement{
     beginEditing() {
         this.edit = true;
         this.#initValue = this.#editValue;
+        this.focus();
     }
 
     /**
@@ -120,6 +121,7 @@ class Cursor extends HTMLElement{
         this.edit = true;
         this.#initValue = this.#editValue;
         this.value = "";
+        this.focus();
     }
 
     /**
@@ -128,6 +130,7 @@ class Cursor extends HTMLElement{
     endEditing() {
         this.edit = false;
         this.#cell.value = this.value;
+        this.#table.focus();
     }
 
     /**
@@ -136,6 +139,7 @@ class Cursor extends HTMLElement{
     escapeEditing() {
         this.edit = false;
         this.value = this.#initValue;
+        this.#table.focus();
     }
 
     /**
@@ -148,9 +152,9 @@ class Cursor extends HTMLElement{
     /**
      * Получение объекта таблицы, на которой размещен курсор 
      */
-    get table() {
-        return this.#table;
-    }
+//     get table() {
+//         return this.#table;
+//     }
 }
 
 // регистрация нового html-элемента
