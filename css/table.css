@@ -32,6 +32,15 @@ b-cell {
     cursor: cell;
     float: left;
 }
+[type="number"] {
+    color: darkgreen;
+}
+[type="formula"] {
+    color: darkblue;
+}
+[type="string"] {
+    color: brown;
+}
 b-cursor {
     font-size: 10;
     border: 1px solid green;

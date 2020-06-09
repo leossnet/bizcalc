@@ -2,9 +2,10 @@
  * Объект с типами значений ячейки
  */
 const ValueTypes = {
-    Number: "Число" ,
-    Formula: "Формула",
-    Строка: "Строка"
+    Number: "number" ,
+    Formula: "formula",
+    String: "string",
+    None: "none"
 };
 
 /**
@@ -38,12 +39,12 @@ class Cell extends HTMLElement {
 
         this.#data = {
             value: null,
-            type: ValueTypes.String,
+            type: ValueTypes.None,
             number: 0,
             formula : "",
             string: ""
         };
-
+        this.setAttribute("type", this.#data.type);
         this.addEventListener("click", this.handlerClick );
     }
 
@@ -123,17 +124,20 @@ class Cell extends HTMLElement {
             this.#data.number = Number(value);
             this.#tdata.setValue(cellName, this.#data.number);
             this.#data.value = value;
+            this.setAttribute("type", this.#data.type);
         }
         else if ( value.toString().charAt(0) === '=' ) {
             this.#data.type = ValueTypes.Formula;
             this.#data.formula = value;
             this.#tdata.setTokens(cellName, this.#data.formula);
             this.#data.value = this.#tdata.calc(cellName);
+            this.setAttribute("type", this.#data.type);
         }
         else {
             this.#data.type = ValueTypes.String;
             this.#data.string = value;
             this.#data.value = value;
+            this.setAttribute("type", this.#data.type);
         }
         this.refresh();
     }
