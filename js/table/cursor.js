@@ -77,20 +77,20 @@ class Cursor extends HTMLElement{
     set value (value) {
         this.#editValue = value;
         this.innerHTML = value;
-        this.setInput();
+        // this.setInput();
     }
 
     /**
      * Проверка на нахождение редактора в режимер редактирования
      */
-    get edit() {
+    get isEdit() {
         return this.#isEdit;
     }
 
     /**
      * Установка/снятие режима редактирования значения текущей ячейки
      */
-    set edit(isEdit) {
+    set isEdit(isEdit) {
         this.#isEdit = isEdit;
         if ( isEdit ) {
             this.classList.add("edit");
@@ -147,7 +147,7 @@ class Cursor extends HTMLElement{
      * Начало редактирования содержимого курсора ячейки
      */
     beginEditing() {
-        this.edit = true;
+        this.isEdit = true;
         this.#initValue = this.#editValue;
         this.focus();
     }

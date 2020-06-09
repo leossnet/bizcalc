@@ -213,7 +213,6 @@ class Table extends HTMLTableElement{
             case "Delete" :
                 this.#cursor.clearValue();
                 this.setCursor(currentCellName);
-                this.#tdata.calc();
                 break;
             case "Backspace" :
                 if ( this.#cursor.isEdit ) {
