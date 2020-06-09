@@ -28,13 +28,14 @@ const Operators = {
  * Класс калькулятора, вычисляющего простые выражения с числами и ячейками электронных таблиц
  */
 class Calculator {
+    #tdata;
 
     /**
      * Конструктор калькулятора
      * @param {Map} cells хеш ячеек, содержащих формулы, в которых другие ячейки ссылаются на первичные значения
      */
-    constructor(cells) {
-        this.cells = cells;
+    constructor(tableData) {
+        this.#tdata = tableData;
         this.separators = Object.keys(Operators).join("")+"()"; // запоминает строку разделителей вида "+-*/^()""
         this.sepPattern = `[${this.escape(this.separators)}]`; // формирует шаблон разделитетей вида "[\+\-\*\/\^\(\)]"
     }
@@ -56,7 +57,7 @@ class Calculator {
                 operands.push(token);
             }
             else if ( token.type == Types.Cell ){
-                operands.push(token);
+                operands.push(self.#tdata.getNumberToken(token));
             }
             else if ( token.type == Types.Operator ) {
                 self.calcExpression(operands, operators, token.priority);
@@ -84,7 +85,8 @@ class Calculator {
         while ( operators.length && ( operators[operators.length-1].priority ) >= minPriority ) {
             let rightOperand = operands.pop().value;
             let leftOperand = operands.pop().value;
-            let result = operators.pop().calc(leftOperand, rightOperand);
+            let operator = operators.pop();
+            let result = operator.calc(leftOperand, rightOperand);
             operands.push( { type: Types.Number, value: result } );
         }
     }
@@ -114,8 +116,9 @@ class Calculator {
             else if ( tokenCode.match(/^\d+[.]?\d*/g) !== null ) 
                 tokens.push ( { type: Types.Number, value: Number(tokenCode) } ); 
             else if ( tokenCode.match(/^[A-Z]+[1-9]+/g) !== null )
-                tokens.push ( { type: Types.Cell, value: self.cells.get(tokenCode) } );
+                tokens.push ( { type: Types.Cell, value: tokenCode } );
         });
+        // console.log(tokens);
         return tokens;
     }
 
@@ -128,38 +131,4 @@ class Calculator {
     }
 }
 
-
-
-/**
- * Тестирование класса Calculator
- */
-let flag = false;
-if (flag) {
-    console.time("Calculator");
-    let formula = "-((AA1+21)*3+1,5)*2";
-    // let formula = "(15.1+A1)";
-    console.log(formula);
-    let res = 0;
-    let tkz = new Calculator(new Map([["AA1", 100],["A2", 20], ["A3", 30]]));
-    let tokens = tkz.getTokens(formula)
-    let count = 10000;
-    
-    for (let i=0; i<count; i++) {
-        res = tkz.calc(tokens);
-    }
-    console.log(res);
-    console.timeEnd("Calculator");
-    
-    console.time("Parser");
-    for (let i=0; i<count; i++) {
-        formula.replace(/\s+/g, "")                // очистка от пробельных символов
-        .replace(/,/g, ".")                                     // заменяет запятую на точку (для чисел)
-        .replace(/^\-/g, "0-")                                  // подставляет отсутсующий 0 для знака "-" в начале строки
-        .replace(/\(\-/g, "(0-")                                // подставляет отсутсующий 0 для знака "-" в середине строки
-        .replace(/[\+\-\*\/\^\(\)]/g, "&$&&")     // вставка знака & перед разделителями
-        .split("&")                                             // разбиение на токены по знаку &
-        .filter(item => item != "");                            // удаление из массива пустых элементов
-    }
-    console.timeEnd("Parser");
-}
 

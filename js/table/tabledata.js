@@ -14,15 +14,7 @@ class TableData {
         this.#cells = new Map();
         this.#tokens = new Map();
         this.#values = new Map();
-        this.#calculator = new Calculator(this.#values);
-    }
-
-    set (cellName, cell) {
-        this.#cells.set(cellName, cell);
-    }
-
-    get (cellName) {
-        return this.#cells.get(cellName);
+        this.#calculator = new Calculator(this);
     }
 
     /**
@@ -31,28 +23,78 @@ class TableData {
     calc() {
         this.#tokens.forEach((value, key, map)  => {
             let val = this.#calculator.calc(value);
-            this.#cells.get(key).refresh();
-            console.log("calc value:"+val);
+            let cell = this.#cells.get(key);
+            cell.value = val;
+            cell.refresh();
         });
     }
 
+    /**
+     * Расчет значения ячейки, содержащей формулу
+     * @param {String} cellName - имя ячейки
+     */
+    calc (cellName) {
+        return this.#calculator.calc(this.getTokens(cellName));
+    }
+
+    /**
+     * Добавление ячейки в модель данных таблицы
+     * @param {String} cellName - имя ячейки
+     * @param {Object} cell - объект ячейки
+     */
+    setCell (cellName, cell) {
+        this.#cells.set(cellName, cell);
+    }
+
+    /**
+     * Получение объекта ячейки по имени ячейки
+     * @param {String} cellName 
+     */
+    getCell (cellName) {
+        return this.#cells.get(cellName);
+    }
+
+    /**
+     * Преобразование токена ячейки в токен его значения
+     * @param {Object} token объект токена 
+     */
+    getNumberToken (token) {
+        return { type: Types.Number, value: this.getValue(token.value) };        
+    }
+
+    /**
+     * Получение массива токенов формулы для ячейки
+     * @param {Strgin} cellName  - имя ячейки
+     */
+    getTokens(cellName) {
+        return this.#tokens.get(cellName);
+    }
+
+    /**
+     * Добавление в модель таблицы разобранную на токены формулу ячейки
+     * @param {String} cellName 
+     * @param {Array} formula 
+     */
     setTokens(cellName, formula) {
         let f = formula.substring(1).toUpperCase();
-        this.#tokens.set(cellName, this.#calculator.getTokens(f));
-        this.calc();
-        console.log(this.#tokens);
+        this.#tokens.set(cellName.toUpperCase(), this.#calculator.getTokens(f));
     }
 
+    /**
+     * Добавление в модель таблицы числового значения первичной ячейки
+     * @param {String} cellName 
+     * @param {Number} value 
+     */
     setValue(cellName, value) {
         this.#values.set(cellName, value);
-        this.calc();
-        console.log(this.#tokens);
     }
 
-    refreshValue() {
-        for (let cell of this.#cells.values) {
-
-        }
+    /**
+     * Получение числового значения первичной ячейки
+     * @param {String} cellName 
+     */
+    getValue(cellName) {
+        return this.#values.get(cellName);;
     }
 
 }

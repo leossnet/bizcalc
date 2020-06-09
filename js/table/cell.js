@@ -1,9 +1,19 @@
 /**
+ * Объект с типами значений ячейки
+ */
+const ValueTypes = {
+    Number: "Число" ,
+    Formula: "Формула",
+    Строка: "Строка"
+};
+
+/**
  * Класс, реализующий функционал ячейки таблицы
  */
 class Cell extends HTMLElement { 
     #table;
     #tdata;
+    #data;
     #cell = {};
     #deltaA = "A".charCodeAt(0)-1;
 
@@ -24,9 +34,14 @@ class Cell extends HTMLElement {
             colName: colName,
             rowNumber: Number.parseInt(rowName),
             colNumber: colName.charCodeAt(0) - this.#deltaA,
+        };
+
+        this.#data = {
             value: null,
+            type: ValueTypes.String,
+            number: 0,
             formula : "",
-            isFormula: false
+            string: ""
         };
 
         this.addEventListener("click", this.handlerClick );
@@ -76,37 +91,55 @@ class Cell extends HTMLElement {
      * Получение значения ячейки в числовом формате для числа и текстовом для строки
      */
     get value() {
-        return this.#cell.value;
+        return this.#data.value;
+    }
+
+    get type() {
+        return this.#data.type;
+    }
+    
+    get number() {
+        return this.#data.number;
     }
 
     /**
      * Получение формулы ячейки, для первичного взначения возврат этого значения в текстовом виде
      */
     get formula() {
-        return this.#cell.formula;
+        return this.#data.formula;
+    }
+
+    get string() {
+        return this.#data.string;
     }
 
     /**
      * Установка нового значения ячейки
      */
     set value(value){
-        if ( value && value.toString().charAt(0) === '=') {
-            this.#cell.value = value;
-            this.#cell.formula = String(value);
-            this.#cell.isFormula = true;
-            this.#tdata.setTokens(this.#cell.name, this.#cell.formula);
+        let cellName = this.#cell.name;
+        if ( Number(value) ) {
+            this.#data.type = ValueTypes.Number;
+            this.#data.number = Number(value);
+            this.#tdata.setValue(cellName, this.#data.number);
+            this.#data.value = value;
+        }
+        else if ( value.toString().charAt(0) === '=' ) {
+            this.#data.type = ValueTypes.Formula;
+            this.#data.formula = value;
+            this.#tdata.setTokens(cellName, this.#data.formula);
+            this.#data.value = this.#tdata.calc(cellName);
         }
         else {
-            this.#cell.value = Number(value);
-            this.#cell.formula = String(value);
-            this.#cell.isFormula = false;
-            this.#tdata.setValue(this.#cell.name, this.#cell.value);
+            this.#data.type = ValueTypes.String;
+            this.#data.string = value;
+            this.#data.value = value;
         }
         this.refresh();
     }
 
     refresh() {
-        this.innerHTML = this.#cell.value;
+        this.innerHTML = this.#data.value;
     }
 
     /**

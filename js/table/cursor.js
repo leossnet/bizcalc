@@ -16,6 +16,7 @@ class Cursor extends HTMLElement{
     #initValue;
     #table;
     #isEdit;
+    #tInput; // поле редактирования содержимого ячейки над таблицей
 
     /**
      * Конструктор курсора таблицы
@@ -25,6 +26,8 @@ class Cursor extends HTMLElement{
         super();
         this.#table = table;
         this.#isEdit = false;
+        this.#tInput = document.querySelector("#bizcalcInput");
+
         this.tabIndex = -1;
     }
 
@@ -36,6 +39,22 @@ class Cursor extends HTMLElement{
         this.#cell.innerHTML = "";
         this.#cell.append(this);
         this.value = cell.value;
+        // this.setInput(cell);
+    }
+
+    setInput() {
+        let input = this.#tInput.value;
+        switch(this.#cell.type) {
+            case ValueTypes.Formula : 
+                input = this.#cell.formula;
+            break;
+            case ValueTypes.Number :
+                input = this.#cell.number;
+            break;
+            case ValueTypes.String :
+                input = this.#cell.string;
+            break;
+        }
     }
 
     /**
@@ -55,6 +74,7 @@ class Cursor extends HTMLElement{
     set value (value) {
         this.#editValue = value;
         this.innerHTML = value;
+        this.setInput();
     }
 
     /**
@@ -94,6 +114,8 @@ class Cursor extends HTMLElement{
         if ( this.isPrintKey(keyEvent.keyCode) ) {
             this.value += keyEvent.key;
         }
+        this.setInput();
+        // this.#tInput.value = this.value;
     }
 
     /**
@@ -104,6 +126,18 @@ class Cursor extends HTMLElement{
         if ( strValue.length ) {
             this.value = strValue.substring(0, strValue.length-1);
         }
+        this.setInput();
+        // this.#tInput.value = this.value;
+    }
+
+    /**
+     * Удаление содержимого текущей ячейки 
+     */    
+    clearValue() {
+        this.value = "";
+        this.#cell.value = "";
+        this.setInput();
+        // this.#tInput.value = this.value;
     }
 
     /**
@@ -141,13 +175,6 @@ class Cursor extends HTMLElement{
         this.isEdit = false;
         this.value = this.#initValue;
         this.#table.focus();
-    }
-
-    /**
-     * Удаление содержимого текущей ячейки 
-     */    
-    clearValue() {
-        this.#cell.value = "";
     }
 
     /**

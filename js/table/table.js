@@ -66,7 +66,7 @@ class Table extends HTMLTableElement{
                 let letter = this.headers[j];
                 let cell = new Cell(this, i, letter);
                 cell.id = letter + i;
-                this.#tdata.set(letter + i, cell);
+                this.#tdata.setCell(letter + i, cell);
                 row.insertCell(-1).append(cell);
             }
         }
@@ -85,7 +85,7 @@ class Table extends HTMLTableElement{
      * @param {String} cellName имя ячейки в формате А1
      */
     getCell(cellName) {
-        return this.#tdata.get(cellName);
+        return this.#tdata.getCell(cellName);
     }
 
     /**
@@ -211,6 +211,7 @@ class Table extends HTMLTableElement{
                 break;
             case "Delete" :
                 this.#cursor.clearValue();
+                this.setCursor(currentCellName);
                 this.#tdata.calc();
                 break;
             case "Backspace" :

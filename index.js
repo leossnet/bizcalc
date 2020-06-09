@@ -15,7 +15,7 @@ class App {
     constructor (appName, param) {
         this.#root = document.querySelector("#"+appName);
 
-        this.appendElement(this.#butPanel, "label", appName+"Label", "Кнопки");
+        // this.appendElement(this.#butPanel, "label", appName+"Label", "Кнопки");
         this.appendElement(this.#editFormula, "input", appName+"Input");
 
         this.#table = new Table (appName, { rowCount: param.rowCount, colCount: param.colCount });
@@ -31,11 +31,11 @@ class App {
      * @param {String} elemId - id элемента
      * @param {String} elemInner - содержимое элемента (опционально)
      */
-    appendElement(root, elemName, elemId, elemInner) {
-        root = document.createElement(elemName);
-        root.id = elemId;
-        if ( elemInner ) root.innerHTML = elemInner;
-        this.#root.append (root);
+    appendElement(element, elemName, elemId, elemInner) {
+        element = document.createElement(elemName);
+        element.id = elemId;
+        if ( elemInner ) element.innerHTML = elemInner;
+        this.#root.append (element);
     }
 }
 
