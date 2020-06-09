@@ -39,20 +39,23 @@ class Cursor extends HTMLElement{
         this.#cell.innerHTML = "";
         this.#cell.append(this);
         this.value = cell.value;
-        // this.setInput(cell);
+        this.setInput(cell);
     }
 
     setInput() {
-        let input = this.#tInput.value;
+        let input = this.#tInput;
         switch(this.#cell.type) {
             case ValueTypes.Formula : 
-                input = this.#cell.formula;
+                input.value = this.#cell.formula;
             break;
             case ValueTypes.Number :
-                input = this.#cell.number;
+                input.value = this.#cell.number;
             break;
             case ValueTypes.String :
-                input = this.#cell.string;
+                input.value = this.#cell.string;
+            break;
+            default :
+                input.value = "";
             break;
         }
     }
@@ -115,7 +118,7 @@ class Cursor extends HTMLElement{
             this.value += keyEvent.key;
         }
         this.setInput();
-        // this.#tInput.value = this.value;
+        this.#tInput.value = this.value;
     }
 
     /**
@@ -127,7 +130,7 @@ class Cursor extends HTMLElement{
             this.value = strValue.substring(0, strValue.length-1);
         }
         this.setInput();
-        // this.#tInput.value = this.value;
+        this.#tInput.value = this.value;
     }
 
     /**
@@ -137,7 +140,7 @@ class Cursor extends HTMLElement{
         this.value = "";
         this.#cell.value = "";
         this.setInput();
-        // this.#tInput.value = this.value;
+        this.#tInput.value = this.value;
     }
 
     /**
