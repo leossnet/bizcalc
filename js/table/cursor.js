@@ -2,11 +2,6 @@
  * Класс, реализующий курсор активной ячейки таблицы
  */
 class Cursor extends HTMLElement{
-    #cell;
-    #editValue;
-    #initValue;
-    #table;
-    #edit;
     #printKeyCodes = new Set ([
         48,49,50,51,52,53,54,55,56,57, // цифры основной клавиатуры
         65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,  // латинские буквы
@@ -16,6 +11,12 @@ class Cursor extends HTMLElement{
         219,220,221,222 // прочие символы и русские буквы
     ]);
 
+    #cell;
+    #editValue;
+    #initValue;
+    #table;
+    #isEdit;
+
     /**
      * Конструктор курсора таблицы
      * @param {Table} table 
@@ -23,7 +24,7 @@ class Cursor extends HTMLElement{
     constructor(table) {
         super();
         this.#table = table;
-        this.#edit = false;
+        this.#isEdit = false;
         this.tabIndex = -1;
     }
 
@@ -60,14 +61,14 @@ class Cursor extends HTMLElement{
      * Проверка на нахождение редактора в режимер редактирования
      */
     get edit() {
-        return this.#edit;
+        return this.#isEdit;
     }
 
     /**
      * Установка/снятие режима редактирования значения текущей ячейки
      */
     set edit(isEdit) {
-        this.#edit = isEdit;
+        this.#isEdit = isEdit;
         if ( isEdit ) {
             this.classList.add("edit");
         }
@@ -118,7 +119,7 @@ class Cursor extends HTMLElement{
      * Начало ввода данных в текущую ячейку с удалением ранее введенного значения
      */
     beginInput() {
-        this.edit = true;
+        this.isEdit = true;
         this.#initValue = this.#editValue;
         this.value = "";
         this.focus();
@@ -128,7 +129,7 @@ class Cursor extends HTMLElement{
      * Завершение редактирования содержимого курсора ячейки с сохранением сделанных изменений
      */
     endEditing() {
-        this.edit = false;
+        this.isEdit = false;
         this.#cell.value = this.value;
         this.#table.focus();
     }
@@ -137,7 +138,7 @@ class Cursor extends HTMLElement{
      * Отмена редактирования содержимого курсора ячейки без сохранения сделанных изменений
      */    
     escapeEditing() {
-        this.edit = false;
+        this.isEdit = false;
         this.value = this.#initValue;
         this.#table.focus();
     }

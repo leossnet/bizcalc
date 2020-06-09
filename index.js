@@ -19,6 +19,7 @@ class App {
         this.appendElement(this.#editFormula, "input", appName+"Input");
 
         this.#table = new Table (appName, { rowCount: param.rowCount, colCount: param.colCount });
+        this.#table.id = appName+"Table";
         this.#root.append(this.#table);
         this.#table.focus();
     }

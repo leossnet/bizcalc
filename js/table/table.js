@@ -128,7 +128,7 @@ class Table extends HTMLTableElement{
         let currentCell = this.#cursor.cell;
         switch(event.key) {
             case "ArrowUp" : 
-                if ( this.#cursor.edit ) this.#cursor.endEditing();
+                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
             // переход на первую строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
                     deltaRow = 1 - currentCell.rowNumber;
@@ -136,7 +136,7 @@ class Table extends HTMLTableElement{
                 this.moveCursor(deltaRow, deltaCol);
                 break;
             case "ArrowDown" :
-                if ( this.#cursor.edit ) this.#cursor.endEditing();
+                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на последнюю строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
                     deltaRow = this.#table.rowCount - currentCell.rowNumber;
@@ -145,7 +145,7 @@ class Table extends HTMLTableElement{
                 break;
             case "ArrowLeft" :
                 // переход на первую колонку при нажатой клавише Ctrl
-                if ( this.#cursor.edit ) this.#cursor.endEditing();
+                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 if ( event.ctrlKey )
                     deltaCol = 1 - currentCell.colNumber;
                 // переход в конец верхней строки при нахождении курсора в первой ачейке строки
@@ -159,7 +159,7 @@ class Table extends HTMLTableElement{
             case "Tab" :
                 this.focus();
             case "ArrowRight" :
-                    if ( this.#cursor.edit ) this.#cursor.endEditing();
+                    if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на последнюю колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey)
                     deltaCol = this.#table.colCount - currentCell.colNumber;
@@ -172,14 +172,14 @@ class Table extends HTMLTableElement{
                 this.moveCursor(deltaRow, deltaCol);
                 break;
             case "Home" :
-                if ( this.#cursor.edit ) this.#cursor.endEditing();
+                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на первую колонку 
                 deltaCol = 1 - currentCell.colNumber;
                 if ( event.ctrlKey ) deltaRow = 1 - currentCell.rowNumber;
                 this.moveCursor(deltaRow, deltaCol);
                 break;
             case "End" :
-                if ( this.#cursor.edit ) this.#cursor.endEditing();
+                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на последнюю колонку
                 deltaCol = this.#table.colCount - currentCell.colNumber;
                 if ( event.ctrlKey ) deltaRow = this.#table.rowCount - currentCell.rowNumber;
@@ -204,7 +204,7 @@ class Table extends HTMLTableElement{
                 this.setCursor(currentCellName);
                 break;
             case "Enter" : 
-                if ( this.#cursor.edit ) {
+                if ( this.#cursor.isEdit ) {
                     this.#cursor.endEditing();
                     this.moveCursor(1, 0, currentCellName);
                 }
@@ -214,13 +214,13 @@ class Table extends HTMLTableElement{
                 this.#tdata.calc();
                 break;
             case "Backspace" :
-                if ( this.#cursor.edit ) {
+                if ( this.#cursor.isEdit ) {
                     this.#cursor.removeLastKey();
                 }
                 break;
             default: 
                 if ( this.#cursor.isPrintKey(event.keyCode) ) {
-                    if ( !this.#cursor.edit ) this.#cursor.beginInput();
+                    if ( !this.#cursor.isEdit ) this.#cursor.beginInput();
                     this.#cursor.addKey(keyEvent);
                 }
                 break;
