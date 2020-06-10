@@ -55,10 +55,10 @@ class Calculator {
                 operands.push(token);
             }
             else if ( token.type == Types.Cell ){
-                if ( self.#tdata.hasValue(token.value) ) {
+                if ( self.#tdata.isNumber(token.value) ) {
                     operands.push(self.#tdata.getNumberToken(token));
                 }
-                else if ( self.#tdata.hasTokens(token.value) ) {
+                else if ( self.#tdata.isFormula(token.value) ) {
                     let formula = self.#tdata.getTokens(token.value);
                     operands.push(new Token(Types.Number, {value: self.calc(formula)} ));
                 }
@@ -95,45 +95,6 @@ class Calculator {
             operands.push( { type: Types.Number, value: result } );
         }
     }
-
-    /**
-     * Разбирает формулу на токены 
-     * @param {Sring} formula строка с формулой
-     */
-    // getTokens(formula){
-    //     let self = this;
-    //     let tokens = [];
-    //     let tokenCodes = formula.replace(/\s+/g, "")                // очистка от пробельных символов
-    //         .replace(/,/g, ".")                                     // заменяет запятую на точку (для чисел)
-    //         .replace(/^\-/g, "0-")                                  // подставляет отсутсующий 0 для знака "-" в начале строки
-    //         .replace(/\(\-/g, "(0-")                                // подставляет отсутсующий 0 для знака "-" в середине строки
-    //         .replace(new RegExp (this.sepPattern, "g"), "&$&&")     // вставка знака & перед разделителями
-    //         .split("&")                                             // разбиение на токены по знаку &
-    //         .filter(item => item != "");                            // удаление из массива пустых элементов
-        
-    //     tokenCodes.forEach(function (tokenCode){
-    //         if ( tokenCode in Operators ) 
-    //             tokens.push( { type: Types.Operator, calc: Operators[tokenCode].calc, priority: Operators[tokenCode].priority } );
-    //         else if ( tokenCode === "(" )  
-    //             tokens.push ( { type: Types.LeftBracket, value: tokenCode } );
-    //         else if ( tokenCode === ")" ) 
-    //             tokens.push ( { type: Types.RightBracket, value: tokenCode } );
-    //         else if ( tokenCode.match(/^\d+[.]?\d*/g) !== null ) 
-    //             tokens.push ( { type: Types.Number, value: Number(tokenCode) } ); 
-    //         else if ( tokenCode.match(/^[A-Z]+[1-9]+/g) !== null )
-    //             tokens.push ( { type: Types.Cell, value: tokenCode } );
-    //     });
-    //     // console.log(tokens);
-    //     return tokens;
-    // }
-
-    /**
-     * Экранирование обратным слешем специальных символов
-     * @param {String} str 
-     */
-    // escape(str) {
-    //     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    // }
 }
 
 

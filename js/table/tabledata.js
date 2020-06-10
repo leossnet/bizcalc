@@ -54,11 +54,11 @@ class TableData {
         return this.#cells.get(cellName);
     }
 
-    hasValue(cellName) {
+    isNumber(cellName) {
         return this.#values.has(cellName);
     }
 
-    hasTokens(cellName) {
+    isFormula(cellName) {
         return this.#tokens.has(cellName);
     }
 
