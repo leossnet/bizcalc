@@ -43,6 +43,7 @@ class Cursor extends HTMLElement{
     }
 
     setInput() {
+        console.log(this.#cell);
         let input = this.#tInput;
         switch(this.#cell.type) {
             case ValueTypes.Formula : 
@@ -149,7 +150,25 @@ class Cursor extends HTMLElement{
     beginEditing() {
         this.isEdit = true;
         this.#initValue = this.#editValue;
+        this.setEditValue(this.#cell);
         this.focus();
+    }
+
+    setEditValue(cell) {
+        switch(cell.type) {
+            case ValueTypes.Formula : 
+                this.value = cell.formula;
+                break;
+            case ValueTypes.Number :
+                this.value = cell.number;
+                break;
+            case ValueTypes.String :
+                this.value = cell.string;
+                break;
+            default :
+                this.value = "";
+                break;
+        }
     }
 
     /**
