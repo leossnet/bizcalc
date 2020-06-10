@@ -54,12 +54,20 @@ class TableData {
         return this.#cells.get(cellName);
     }
 
+    hasValue(cellName) {
+        return this.#values.has(cellName);
+    }
+
+    hasTokens(cellName) {
+        return this.#tokens.has(cellName);
+    }
+
     /**
      * Преобразование токена ячейки в токен его значения
      * @param {Object} token объект токена 
      */
     getNumberToken (token) {
-        return { type: Types.Number, value: this.getValue(token.value) };        
+        return new Token (Types.Number, { value: this.getValue(token.value) } );
     }
 
     /**
@@ -77,7 +85,7 @@ class TableData {
      */
     setTokens(cellName, formula) {
         let f = formula.substring(1).toUpperCase();
-        this.#tokens.set(cellName.toUpperCase(), this.#calculator.getTokens(f));
+        this.#tokens.set(cellName.toUpperCase(), Token.getTokens(f));
     }
 
     /**

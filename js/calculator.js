@@ -36,8 +36,6 @@ class Calculator {
      */
     constructor(tableData) {
         this.#tdata = tableData;
-        this.separators = Object.keys(Operators).join("")+"()"; // запоминает строку разделителей вида "+-*/^()""
-        this.sepPattern = `[${this.escape(this.separators)}]`; // формирует шаблон разделитетей вида "[\+\-\*\/\^\(\)]"
     }
 
     /**
@@ -49,7 +47,7 @@ class Calculator {
      */
     calc(formula){
         let self = this;
-        let tokens = Array.isArray(formula) ? formula : self.getTokens(formula);
+        let tokens = Array.isArray(formula) ? formula : Token.getTokens(formula);
         let operators = [];
         let operands = [];
         tokens.forEach(function (token) {
@@ -57,7 +55,14 @@ class Calculator {
                 operands.push(token);
             }
             else if ( token.type == Types.Cell ){
-                operands.push(self.#tdata.getNumberToken(token));
+                if ( self.#tdata.hasValue(token.value) ) {
+                    operands.push(self.#tdata.getNumberToken(token));
+                }
+                else if ( self.#tdata.hasTokens(token.value) ) {
+                    let formula = self.#tdata.getTokens(token.value);
+                    operands.push(new Token(Types.Number, {value: self.calc(formula)} ));
+                }
+                else operands.push(NaN);
             }
             else if ( token.type == Types.Operator ) {
                 self.calcExpression(operands, operators, token.priority);
@@ -95,40 +100,120 @@ class Calculator {
      * Разбирает формулу на токены 
      * @param {Sring} formula строка с формулой
      */
-    getTokens(formula){
-        let self = this;
+    // getTokens(formula){
+    //     let self = this;
+    //     let tokens = [];
+    //     let tokenCodes = formula.replace(/\s+/g, "")                // очистка от пробельных символов
+    //         .replace(/,/g, ".")                                     // заменяет запятую на точку (для чисел)
+    //         .replace(/^\-/g, "0-")                                  // подставляет отсутсующий 0 для знака "-" в начале строки
+    //         .replace(/\(\-/g, "(0-")                                // подставляет отсутсующий 0 для знака "-" в середине строки
+    //         .replace(new RegExp (this.sepPattern, "g"), "&$&&")     // вставка знака & перед разделителями
+    //         .split("&")                                             // разбиение на токены по знаку &
+    //         .filter(item => item != "");                            // удаление из массива пустых элементов
+        
+    //     tokenCodes.forEach(function (tokenCode){
+    //         if ( tokenCode in Operators ) 
+    //             tokens.push( { type: Types.Operator, calc: Operators[tokenCode].calc, priority: Operators[tokenCode].priority } );
+    //         else if ( tokenCode === "(" )  
+    //             tokens.push ( { type: Types.LeftBracket, value: tokenCode } );
+    //         else if ( tokenCode === ")" ) 
+    //             tokens.push ( { type: Types.RightBracket, value: tokenCode } );
+    //         else if ( tokenCode.match(/^\d+[.]?\d*/g) !== null ) 
+    //             tokens.push ( { type: Types.Number, value: Number(tokenCode) } ); 
+    //         else if ( tokenCode.match(/^[A-Z]+[1-9]+/g) !== null )
+    //             tokens.push ( { type: Types.Cell, value: tokenCode } );
+    //     });
+    //     // console.log(tokens);
+    //     return tokens;
+    // }
+
+    /**
+     * Экранирование обратным слешем специальных символов
+     * @param {String} str 
+     */
+    // escape(str) {
+    //     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    // }
+}
+
+
+/**
+ * Вспомогательный класс для наглядного определения токена формулы
+ */
+class Token {
+
+    static separators = Object.keys(Operators).join("")+"()"; // запоминает строку разделителей вида "+-*/^()""
+    static sepPattern = `[${Token.escape(Token.separators)}]`; // формирует шаблон разделитетей вида "[\+\-\*\/\^\(\)]"
+
+    #type;
+    #value;
+    #calc;
+    #priority;
+
+
+    /**
+     * Конструктор токена, в котором обязательным параметром задается тип токена, 
+     * а прочие параметры устанавливаются в зависимости от типа
+     * @param {Types} type 
+     * @param {Array} params 
+     */
+    constructor(type, params){
+        this.#type = type;
+        this.#value = params.value;
+        this.#calc = params.calc;
+        this.#priority = params.priority;
+    }
+
+    get type() {
+        return this.#type;
+    }
+
+    get value() {
+        return this.#value;
+    }
+
+    get calc() {
+        return this.#calc;
+    }
+
+    get priority() {
+        return this.#priority;
+    }
+
+    /**
+     * Разбирает формулу на токены 
+     * @param {Sring} formula строка с формулой
+     */
+    static getTokens(formula){
         let tokens = [];
         let tokenCodes = formula.replace(/\s+/g, "")                // очистка от пробельных символов
             .replace(/,/g, ".")                                     // заменяет запятую на точку (для чисел)
             .replace(/^\-/g, "0-")                                  // подставляет отсутсующий 0 для знака "-" в начале строки
             .replace(/\(\-/g, "(0-")                                // подставляет отсутсующий 0 для знака "-" в середине строки
-            .replace(new RegExp (this.sepPattern, "g"), "&$&&")     // вставка знака & перед разделителями
+            .replace(new RegExp (Token.sepPattern, "g"), "&$&&")     // вставка знака & перед разделителями
             .split("&")                                             // разбиение на токены по знаку &
             .filter(item => item != "");                            // удаление из массива пустых элементов
         
         tokenCodes.forEach(function (tokenCode){
             if ( tokenCode in Operators ) 
-                tokens.push( { type: Types.Operator, calc: Operators[tokenCode].calc, priority: Operators[tokenCode].priority } );
+                tokens.push( new Token ( Types.Operator, { calc: Operators[tokenCode].calc, priority: Operators[tokenCode].priority } ));
             else if ( tokenCode === "(" )  
-                tokens.push ( { type: Types.LeftBracket, value: tokenCode } );
+                tokens.push ( new Token ( Types.LeftBracket, { value: tokenCode } ));
             else if ( tokenCode === ")" ) 
-                tokens.push ( { type: Types.RightBracket, value: tokenCode } );
+                tokens.push ( new Token ( Types.RightBracket, { value: tokenCode } ));
             else if ( tokenCode.match(/^\d+[.]?\d*/g) !== null ) 
-                tokens.push ( { type: Types.Number, value: Number(tokenCode) } ); 
+                tokens.push ( new Token ( Types.Number, { value: Number(tokenCode) } )); 
             else if ( tokenCode.match(/^[A-Z]+[1-9]+/g) !== null )
-                tokens.push ( { type: Types.Cell, value: tokenCode } );
+                tokens.push ( new Token ( Types.Cell, { value: tokenCode } ));
         });
-        // console.log(tokens);
         return tokens;
     }
 
     /**
      * Экранирование обратным слешем специальных символов
      * @param {String} str 
-     */
-    escape(str) {
+     */    
+    static escape(str) {
         return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    }
+    }    
 }
-
-
