@@ -98,7 +98,7 @@ class Table extends HTMLTableElement{
         let newCell = this.getCell(cellName);
         this.#cursor.cell = newCell;
         if ( oldCell && oldCell !== newCell) oldCell.refresh();
-        this.#cursor.setInput();
+        // this.#cursor.setInput();
     }
 
     /**

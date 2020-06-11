@@ -27,7 +27,6 @@ class Cursor extends HTMLElement{
         this.#table = table;
         this.#isEdit = false;
         this.#tInput = document.querySelector("#bizcalcInput");
-
         this.tabIndex = -1;
     }
 
@@ -39,27 +38,9 @@ class Cursor extends HTMLElement{
         this.#cell.innerHTML = "";
         this.#cell.append(this);
         this.value = cell.value;
-        this.setInput(cell);
+        this.setEditableValue(this.#tInput);
     }
 
-    setInput() {
-        console.log(this.#cell);
-        let input = this.#tInput;
-        switch(this.#cell.type) {
-            case ValueTypes.Formula : 
-                input.value = this.#cell.formula;
-            break;
-            case ValueTypes.Number :
-                input.value = this.#cell.number;
-            break;
-            case ValueTypes.String :
-                input.value = this.#cell.string;
-            break;
-            default :
-                input.value = "";
-            break;
-        }
-    }
 
     /**
      * Получение объекта ячейки Cell, на которой расположен курсор
@@ -75,10 +56,12 @@ class Cursor extends HTMLElement{
         return this.#editValue;
     }
 
+    /**
+     * Установление нового значения курсора
+     */
     set value (value) {
         this.#editValue = value;
         this.innerHTML = value;
-        // this.setInput();
     }
 
     /**
@@ -118,7 +101,8 @@ class Cursor extends HTMLElement{
         if ( this.isPrintKey(keyEvent.keyCode) ) {
             this.value += keyEvent.key;
         }
-        this.setInput();
+        // this.setInput();
+        this.setEditableValue(this.#tInput);
         this.#tInput.value = this.value;
     }
 
@@ -130,7 +114,8 @@ class Cursor extends HTMLElement{
         if ( strValue.length ) {
             this.value = strValue.substring(0, strValue.length-1);
         }
-        this.setInput();
+        // this.setInput();
+        this.setEditableValue(this.#tInput);
         this.#tInput.value = this.value;
     }
 
@@ -140,7 +125,8 @@ class Cursor extends HTMLElement{
     clearValue() {
         this.value = "";
         this.#cell.value = "";
-        this.setInput();
+        // this.setInput();
+        this.setEditableValue(this.#tInput);
         this.#tInput.value = this.value;
     }
 
@@ -150,26 +136,31 @@ class Cursor extends HTMLElement{
     beginEditing() {
         this.isEdit = true;
         this.#initValue = this.#editValue;
-        this.setEditValue(this.#cell);
+        // this.setEditValue(this.#cell);
+        this.setEditableValue(this);
         this.focus();
     }
 
-    setEditValue(cell) {
-        switch(cell.type) {
+    /**
+     * Передача html-элементу значения для редактирования или отображения
+     * @param {HTMLElement} target 
+     */
+    setEditableValue(targetElement) {
+        switch(this.#cell.type) {
             case ValueTypes.Formula : 
-                this.value = cell.formula;
+                targetElement.value = this.#cell.formula;
                 break;
             case ValueTypes.Number :
-                this.value = cell.number;
+                targetElement.value = this.#cell.number;
                 break;
             case ValueTypes.String :
-                this.value = cell.string;
+                targetElement.value = this.#cell.string;
                 break;
             default :
-                this.value = "";
+                targetElement.value = "";
                 break;
         }
-    }
+    }    
 
     /**
      * Начало ввода данных в текущую ячейку с удалением ранее введенного значения
@@ -199,12 +190,6 @@ class Cursor extends HTMLElement{
         this.#table.focus();
     }
 
-    /**
-     * Получение объекта таблицы, на которой размещен курсор 
-     */
-//     get table() {
-//         return this.#table;
-//     }
 }
 
 // регистрация нового html-элемента
