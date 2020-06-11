@@ -124,13 +124,14 @@ class Cell extends HTMLElement {
             this.#data.number = Number(value);
             this.#tdata.setValue(cellName, this.#data.number);
             this.#data.value = value;
+            this.#tdata.calcAllCells();
             this.setAttribute("type", this.#data.type);
         }
         else if ( value.toString().charAt(0) === '=' ) {
             this.#data.type = ValueTypes.Formula;
             this.#data.formula = value;
             this.#tdata.setTokens(cellName, this.#data.formula);
-            this.#data.value = this.#tdata.calc(cellName);
+            this.#data.value = this.#tdata.calcCell(cellName);
             this.setAttribute("type", this.#data.type);
         }
         else {
@@ -138,6 +139,13 @@ class Cell extends HTMLElement {
             this.#data.string = value;
             this.#data.value = value;
             this.setAttribute("type", this.#data.type);
+        }
+        this.refresh();
+    }
+
+    refreshValue() {
+        if ( this.type == ValueTypes.Formula ) {
+            this.#data.value = this.#tdata.calcCell(this.name);
         }
         this.refresh();
     }

@@ -92,7 +92,7 @@ class Calculator {
             let leftOperand = operands.pop().value;
             let operator = operators.pop();
             let result = operator.calc(leftOperand, rightOperand);
-            operands.push( { type: Types.Number, value: result } );
+            operands.push(new Token ( Types.Number, { value: result } ));
         }
     }
 }
@@ -125,18 +125,33 @@ class Token {
         this.#priority = params.priority;
     }
 
+    /**
+     * Получение типа токена
+     */
     get type() {
         return this.#type;
     }
 
+    /**
+     * Получение значения токена
+     * Применимо для токенов со всеми типами, кроме Types.Operator
+     */
     get value() {
         return this.#value;
     }
 
+    /**
+     * Получение функции, соответствующей оператору токена
+     * Применимо только для токена с типом Types.Operator
+     */
     get calc() {
         return this.#calc;
     }
 
+    /**
+     * Получение приоритета оператора токена
+     * Применимо только для токена с типом Types.Operator
+     */
     get priority() {
         return this.#priority;
     }

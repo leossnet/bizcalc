@@ -18,22 +18,19 @@ class TableData {
     }
 
     /**
-     * Пересчет значений электронной таблицы
+     * Пересчет значений формульных ячеек электронной таблицы
      */
-    calc() {
-        this.#tokens.forEach((value, key, map)  => {
-            let val = this.#calculator.calc(value);
-            let cell = this.#cells.get(key);
-            cell.value = val;
-            cell.refresh();
-        });
+    calcAllCells() {
+        for (let cellName of this.#tokens.keys()) {
+            this.getCell(cellName).refreshValue();
+        }
     }
 
     /**
      * Расчет значения ячейки, содержащей формулу
      * @param {String} cellName - имя ячейки
      */
-    calc (cellName) {
+    calcCell (cellName) {
         return this.#calculator.calc(this.getTokens(cellName));
     }
 
