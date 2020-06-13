@@ -4,9 +4,9 @@
 class App {
     #root;
     #components;
-    #butPanel;
-    #editFormula;
-    #table;
+    // #butPanel;
+    // #editFormula;
+    // #table;
 
     /**
      * Конструктор клиентского приложения

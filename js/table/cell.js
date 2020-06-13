@@ -119,7 +119,15 @@ class Cell extends HTMLElement {
      */
     set value(value){
         let cellName = this.#cell.name;
-        if ( Number(value) ) {
+        if ( value === undefined || Number(value) === 0 ) {
+            this.#data.type = ValueTypes.Number;
+            this.#data.number = 0;
+            this.#tdata.setValue(cellName, this.#data.number);
+            this.#data.value = ( value === undefined ) ? "" : 0;
+            this.#tdata.calcAllCells();
+            this.setAttribute("type", this.#data.type);
+        }
+        else if ( Number(value) ) {
             this.#data.type = ValueTypes.Number;
             this.#data.number = Number(value);
             this.#tdata.setValue(cellName, this.#data.number);

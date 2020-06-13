@@ -104,7 +104,6 @@ class Cursor extends HTMLElement{
         if ( this.isPrintKey(keyEvent.keyCode) ) {
             this.value += keyEvent.key;
         }
-        // this.setInput();
         this.setEditableValue(this.#tInput);
         this.#tInput.value = this.value;
     }
@@ -117,7 +116,6 @@ class Cursor extends HTMLElement{
         if ( strValue.length ) {
             this.value = strValue.substring(0, strValue.length-1);
         }
-        // this.setInput();
         this.setEditableValue(this.#tInput);
         this.#tInput.value = this.value;
     }
@@ -127,8 +125,7 @@ class Cursor extends HTMLElement{
      */    
     clearValue() {
         this.value = "";
-        this.#cell.value = "";
-        // this.setInput();
+        this.#cell.value = undefined;
         this.setEditableValue(this.#tInput);
         this.#tInput.value = this.value;
     }
@@ -139,7 +136,6 @@ class Cursor extends HTMLElement{
     beginEditing() {
         this.isEdit = true;
         this.#initValue = this.#editValue;
-        // this.setEditValue(this.#cell);
         this.setEditableValue(this);
         this.focus();
     }
