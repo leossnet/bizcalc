@@ -11,6 +11,7 @@ class Cursor extends HTMLElement{
         219,220,221,222 // прочие символы и русские буквы
     ]);
 
+    #app;
     #cell;
     #editValue;
     #initValue;
@@ -20,13 +21,15 @@ class Cursor extends HTMLElement{
 
     /**
      * Конструктор курсора таблицы
-     * @param {Table} table 
+     * @param {Object} table 
      */
-    constructor(table) {
+    constructor(app, table) {
         super();
+        this.#app = app;
         this.#table = table;
         this.#isEdit = false;
-        this.#tInput = document.querySelector("#bizcalcInput");
+        this.#tInput = document.querySelector("#bizcalcEditor");
+        // this.#tInput = this.#app.getComponent("editor");
         this.tabIndex = -1;
     }
 

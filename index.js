@@ -2,7 +2,8 @@
  * Основной класс клиентского приложения
  */
 class App {
-    #root; 
+    #root;
+    #components;
     #butPanel;
     #editFormula;
     #table;
@@ -14,26 +15,32 @@ class App {
      */
     constructor (appSelector, param) {
         this.#root = document.querySelector(appSelector);
+        this.#components = new Map();
 
         // this.appendElement(this.#butPanel, "label", appSelector+"Label", "Кнопки");
-        this.appendElement(this.#editFormula, "input", this.#root.id+"Input");
 
-        this.#table = new Table (this.#root, { rowCount: param.rowCount, colCount: param.colCount });
-        this.#table.focus();
+        this.addComponent("editor", new Editor(this.#root, {}));
+
+        this.addComponent("table", new Table (this.#root, { 
+            rowCount: param.rowCount, colCount: param.colCount, isFocus: true 
+        }));
     }
 
     /**
-     * Добавление нового компонента в приложение 
-     * @param {Object} root узел приложения
-     * @param {String} elemName - имя элемента
-     * @param {String} elemId - id элемента
-     * @param {String} elemInner - содержимое элемента (опционально)
+     * Регистрация нового компонента в приложении
+     * @param {String} componentName - имя компонента
+     * @param {Object} component - объект компонента
      */
-    appendElement(element, elemName, elemId, elemInner) {
-        element = document.createElement(elemName);
-        element.id = elemId;
-        if ( elemInner ) element.innerHTML = elemInner;
-        this.#root.append (element);
+    addComponent(componentName, component) {
+        this.#components.set(componentName, component);
+    }
+
+    /**
+     * Получение зарегистрированного компонента по его имени
+     * @param {String} componentName 
+     */
+    getComponent(componentName) {
+        return this.#components.get(componentName);
     }
 }
 

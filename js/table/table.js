@@ -2,6 +2,7 @@
  * Класс, расширяющий функциональность базового класса таблицы
  */
 class Table extends HTMLTableElement{
+    #app;
     #table = {};
     #cursor;
     #tdata;
@@ -11,22 +12,24 @@ class Table extends HTMLTableElement{
      * @param {String} rootElement родительский элемент c class='rootElement', в котором размещается таблица
      * @param {Объект} params набор параметров инициализации таблицы
      */
-    constructor (rootElement, params) {
+    constructor (app, params) {
         super();
-        this.id = rootElement.id+"Table";
+        this.#app = app;
+        this.id = app.id+"Table";
         this.#table = {
             colCount: params.colCount,
             rowCount: params.rowCount
         };
         this.headers = [];
         this.#tdata = new TableData();
-        this.#cursor = new Cursor(this);
+        this.#cursor = new Cursor(app, this);
         this.tabIndex = -1;
 
         // генерация внешнего вида таблицы
         this.generateTable(params);
         this.setCursor("A1");
-        rootElement.append(this);
+        app.append(this);
+        if ( params.isFocus ) this.focus();
 
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
