@@ -8,14 +8,13 @@ class Table extends HTMLTableElement{
 
     /**
      * Конструктор таблицы 
-     * @param {String} rootClass родительский элемент c class='rootClass', в котором размещается таблица
+     * @param {String} rootElement родительский элемент c class='rootElement', в котором размещается таблица
      * @param {Объект} params набор параметров инициализации таблицы
      */
-    constructor (rootClass, params) {
+    constructor (rootElement, params) {
         super();
+        this.id = rootElement.id+"Table";
         this.#table = {
-            id: "b-table",
-            name: rootClass,
             colCount: params.colCount,
             rowCount: params.rowCount
         };
@@ -27,7 +26,7 @@ class Table extends HTMLTableElement{
         // генерация внешнего вида таблицы
         this.generateTable(params);
         this.setCursor("A1");
-        this.focus();
+        rootElement.append(this);
 
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);

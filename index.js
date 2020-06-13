@@ -9,18 +9,16 @@ class App {
 
     /**
      * Конструктор клиентского приложения
-     * @param {String} appName id корневого узла приложения
+     * @param {String} appSelector id корневого узла приложения
      * @param {Object} param различные параметры приложенич
      */
-    constructor (appName, param) {
-        this.#root = document.querySelector("#"+appName);
+    constructor (appSelector, param) {
+        this.#root = document.querySelector(appSelector);
 
-        // this.appendElement(this.#butPanel, "label", appName+"Label", "Кнопки");
-        this.appendElement(this.#editFormula, "input", appName+"Input");
+        // this.appendElement(this.#butPanel, "label", appSelector+"Label", "Кнопки");
+        this.appendElement(this.#editFormula, "input", this.#root.id+"Input");
 
-        this.#table = new Table (appName, { rowCount: param.rowCount, colCount: param.colCount });
-        this.#table.id = appName+"Table";
-        this.#root.append(this.#table);
+        this.#table = new Table (this.#root, { rowCount: param.rowCount, colCount: param.colCount });
         this.#table.focus();
     }
 
