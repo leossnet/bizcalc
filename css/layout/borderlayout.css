@@ -1,0 +1,24 @@
+.border-layout {
+    display: flex;
+    flex-direction: column;
+}
+.row-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+.top-layout {
+    flex-grow: 1;
+}
+.left-layout {
+    flex-grow: 1;
+}
+.center-layout {
+    flex-grow: 6;
+}
+.right-layout {
+    flex-grow: 1;
+}
+.bottom-layout {
+    flex-grow: 1;
+}
