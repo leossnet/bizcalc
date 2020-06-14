@@ -22,3 +22,13 @@
 .bottom-layout {
     flex-grow: 1;
 }
+.grid-layout {
+    display: table;
+    width: 100%;
+}
+.row-grid-layout {
+    display: table-row;
+}
+.cell-grid-layout {
+    display: table-cell;
+}
