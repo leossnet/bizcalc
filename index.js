@@ -75,12 +75,39 @@ class App {
     handlerClickButton(event) {
         switch(event.target.id) {
             case "btSave" :
-                console.log("btSave");
+                App.saveJSON('{"a": "hello"}');
                 break;
             case "btOpen" :
-                console.log("btOpen");
+                App.openJSON();
                 break;
         }
+    }
+
+    /**
+     * Сохранение JSON в файл на локальном диске
+     * @param {JSON} json 
+     */
+    static saveJSON(json) {
+        let output = document.createElement("a");
+        let jsonData = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
+        output.href = jsonData;
+        output.target = '_blank';
+        output.download = 'filename.json';
+        output.click();
+    }
+
+    /**
+     * Открытие файла JSON
+     */
+    static openJSON() {
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.accept=".json";
+        input.onchange = (event) => { 
+            let file = event.target.files[0]; 
+            console.log(file);
+        };
+        input.click();            
     }
 
 }
