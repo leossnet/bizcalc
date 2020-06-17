@@ -27,7 +27,7 @@ class Cell extends HTMLElement {
     constructor(table, rowName, colName) {
         super();
         this.#table = table;
-        this.#tdata = this.#table.tabledata;
+        this.#tdata = this.#table.tableData;
 
         this.#cell = {
             name: colName+String(rowName),

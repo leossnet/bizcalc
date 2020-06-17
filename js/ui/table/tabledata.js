@@ -2,6 +2,7 @@
  * Класс, реализующий поддержку расчетов ячеек по формулам
  */
 class TableData {
+    #app;
     #cells;
     #tokens;
     #values;
@@ -10,7 +11,8 @@ class TableData {
     /**
      * Конструктор данных электронной таблицы
      */
-    constructor() {
+    constructor(app) {
+        this.#app = app;
         this.#cells = new Map();
         this.#tokens = new Map();
         this.#values = new Map();
@@ -100,6 +102,33 @@ class TableData {
      */
     getValue(cellName) {
         return this.#values.get(cellName);;
+    }
+
+    /**
+     * Возвращает данные в формате JSON
+     */
+    getData() {
+        let table = this.#app.getComponent("table");;
+        console.log(table);
+        let data = {
+            rows: table.tableParam.rowCount,
+            cols: table.tableParam.colCount,
+            cells: Object.fromEntries(this.#values.entries())
+        };
+
+        // let res = JSON.stringify(data);
+        let res = data;
+        
+        console.log(res);
+        return res; 
+    }
+
+    /**
+     * Устанавливает данные таблицы из внешних данных в формате JSON
+     * @param {JSON} json - внешние данные в формате JSON
+     */
+    setData(json) {
+        console.log(json);
     }
 
 }

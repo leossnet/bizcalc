@@ -2,13 +2,15 @@
  * Класс, реализующий набор кпонок
  */
 class ButtonPanel extends HTMLElement {
+    #app;
     #components;
 
-    constructor(buttons) {
+    constructor(app, buttons) {
         super();
+        this.#app = app;
         this.#components = new Map();
         buttons.forEach(button => {
-            this.#components.set(button.name, new Button({name: button.name, label: button.label, handler: button.handler}));
+            this.#components.set(button.name, new Button(app, {name: button.name, label: button.label, handler: button.handler}));
             this.append(this.#components.get(button.name));
         });        
     }
@@ -26,6 +28,10 @@ class ButtonPanel extends HTMLElement {
      */
     get components() {
         return this.#components;
+    }
+
+    get app() {
+        return this.#app;
     }
 }
 

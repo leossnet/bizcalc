@@ -15,20 +15,20 @@ class Table extends HTMLTableElement{
     constructor (app, params) {
         super();
         this.#app = app;
-        this.id = app.id+"Table";
+        this.id = app.root.id+"Table";
         this.#table = {
             colCount: params.colCount,
             rowCount: params.rowCount
         };
         this.headers = [];
-        this.#tdata = new TableData();
+        this.#tdata = new TableData(app);
         this.#cursor = new Cursor(app, this);
         this.tabIndex = -1;
 
         // генерация внешнего вида таблицы
         this.generateTable(params);
         this.setCursor("A1");
-        app.append(this);
+        app.root.append(this);
         if ( params.isFocus ) this.focus();
 
         // обработчики событий
@@ -76,9 +76,16 @@ class Table extends HTMLTableElement{
     }
 
     /**
+     * Возвращает параметры таблицы
+     */
+    get tableParam() {
+        return this.#table;
+    }
+
+    /**
      * Получение объекта данных таблицы
      */
-    get tabledata() {
+    get tableData() {
         return this.#tdata;
     }
 

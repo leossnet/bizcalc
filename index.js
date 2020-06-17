@@ -23,15 +23,15 @@ class App {
         this.#blayout.add(this.#tlayout, LayoutRegion.TOP);
 
         // регистрация составных компонентов
-        this.#btPanel = new ButtonPanel([
+        this.#btPanel = new ButtonPanel(this, [
             {name: "btOpen", label: "Открыть...", handler: this.handlerClickButton},
             {name: "btSave", label: "Сохранить...", handler: this.handlerClickButton}
         ]);
         this.addComponents(this.#btPanel.components);
 
         // регистрация простых компонентов
-        this.addComponent("editor", new Editor(this.#root, {}));
-        this.addComponent("table", new Table (this.#root, { 
+        this.addComponent("editor", new Editor(this, {}));
+        this.addComponent("table", new Table (this, { 
             rowCount: param.rowCount, colCount: param.colCount, isFocus: true 
         }));
 
@@ -39,6 +39,10 @@ class App {
         this.#tlayout.add(this.#btPanel, 0, 0);
         this.#tlayout.add(this.getComponent("editor"), 0, 1);
         this.#blayout.add(this.getComponent("table"), LayoutRegion.CENTER);
+    }
+
+    get root() {
+        return this.#root;
     }
 
     /**
@@ -75,10 +79,10 @@ class App {
     handlerClickButton(event) {
         switch(event.target.id) {
             case "btSave" :
-                App.saveJSON('{"a": "hello"}');
+                App.saveJSON(this.app.getComponent("table").tableData.getData());
                 break;
             case "btOpen" :
-                App.openJSON();
+                App.openJSON(this.app.getComponent("table").tableData);
                 break;
         }
     }
@@ -99,13 +103,12 @@ class App {
     /**
      * Открытие файла JSON
      */
-    static openJSON() {
+    static openJSON(target) {
         let input = document.createElement('input');
         input.type = 'file';
         input.accept=".json";
         input.onchange = (event) => { 
-            let file = event.target.files[0]; 
-            console.log(file);
+            target.setData(event.target.files[0]);
         };
         input.click();            
     }

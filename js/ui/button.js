@@ -2,12 +2,18 @@
  * Класс, реализующий пользовательскую кнопку
  */
 class Button extends HTMLButtonElement {
+    #app;
 
-    constructor(params) {
+    constructor(app, params) {
         super();
+        this.#app = app;
         this.id = params.name;
         this.innerHTML = params.label;
         this.addEventListener("click", params.handler);
+    }
+
+    get app() {
+        return this.#app;
     }
 }        
 
