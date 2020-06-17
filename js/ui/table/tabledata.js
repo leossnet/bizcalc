@@ -108,18 +108,24 @@ class TableData {
      * Возвращает данные в формате JSON
      */
     getData() {
-        let table = this.#app.getComponent("table");
-        console.log(Object.fromEntries(this.#tokens.entries()));
+		let table = this.#app.getComponent("table");
+		let tokens = {};
+		this.#tokens.forEach( (value, key, map) => { 
+			tokens[key] = [];
+			this.getTokens(key).forEach( ( token ) => {
+				tokens[key].push({
+					type: token.type,
+					value: token.value
+				});
+			}) 
+		} );
         let data = {
             rows: table.tableParam.rowCount,
             cols: table.tableParam.colCount,
 			values: Object.fromEntries(this.#values.entries()),
-			tokens: Object.fromEntries(this.#tokens.entries())
-        };
-
-        let res = JSON.stringify(data);
-        console.log(res);
-        return res; 
+			tokens: tokens
+		};
+        return JSON.stringify(data);
     }
 
     /**

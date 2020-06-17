@@ -2,12 +2,12 @@
  * Объект с типами операндов
  */
 const Types = {
-    Cell: "Переменная" ,
-    Number: "Число" ,
-    Operator: "Оператор" ,
-    LeftBracket: "Левая скобка" , 
-    RightBracket: "Правая скобка",
-    Text: "Текст"
+    Cell: "cell" ,
+    Number: "number" ,
+    Operator: "operator" ,
+    LeftBracket: "left bracket" , 
+    RightBracket: "right bracket",
+    Text: "text"
 };
 
 /**
