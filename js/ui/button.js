@@ -3,9 +3,11 @@
  */
 class Button extends HTMLButtonElement {
 
-    constructor(label) {
+    constructor(params) {
         super();
-        this.innerHTML = label;
+        this.id = params.name;
+        this.innerHTML = params.label;
+        this.addEventListener("click", params.handler);
     }
 }        
 

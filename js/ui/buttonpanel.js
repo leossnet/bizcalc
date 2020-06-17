@@ -8,7 +8,7 @@ class ButtonPanel extends HTMLElement {
         super();
         this.#components = new Map();
         buttons.forEach(button => {
-            this.#components.set(button.name, new Button(button.label));
+            this.#components.set(button.name, new Button({name: button.name, label: button.label, handler: button.handler}));
             this.append(this.#components.get(button.name));
         });        
     }

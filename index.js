@@ -22,10 +22,10 @@ class App {
         this.#tlayout = new GridLayout(this.#root, 2, 1);
         this.#blayout.add(this.#tlayout, LayoutRegion.TOP);
 
-        // регистрация состаных компонентов
+        // регистрация составных компонентов
         this.#btPanel = new ButtonPanel([
-            {name: "btOpen", label: "Открыть..."},
-            {name: "btSave", label: "Сохранить..."}
+            {name: "btOpen", label: "Открыть...", handler: this.handlerClickButton},
+            {name: "btSave", label: "Сохранить...", handler: this.handlerClickButton}
         ]);
         this.addComponents(this.#btPanel.components);
 
@@ -67,5 +67,21 @@ class App {
     getComponent(componentName) {
         return this.#components.get(componentName);
     }
+
+    /**
+     * Обработчик щелчка мыши по кнопке
+     * @param {ClickEvent} event 
+     */
+    handlerClickButton(event) {
+        switch(event.target.id) {
+            case "btSave" :
+                console.log("btSave");
+                break;
+            case "btOpen" :
+                console.log("btOpen");
+                break;
+        }
+    }
+
 }
 
