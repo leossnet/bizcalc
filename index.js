@@ -4,6 +4,7 @@
 class App {
     #root;
     #components;
+    #btPanel;
     #blayout;
     #tlayout;
 
@@ -21,15 +22,21 @@ class App {
         this.#tlayout = new GridLayout(this.#root, 2, 1);
         this.#blayout.add(this.#tlayout, LayoutRegion.TOP);
 
-        // регистрация компонентов в приложении
-        this.addComponent("btSave", new Button("Сохранить..."));
+        // регистрация состаных компонентов
+        this.#btPanel = new ButtonPanel([
+            {name: "btOpen", label: "Открыть..."},
+            {name: "btSave", label: "Сохранить..."}
+        ]);
+        this.addComponents(this.#btPanel.components);
+
+        // регистрация простых компонентов
         this.addComponent("editor", new Editor(this.#root, {}));
         this.addComponent("table", new Table (this.#root, { 
             rowCount: param.rowCount, colCount: param.colCount, isFocus: true 
         }));
 
         // размещение компонентов на интерфейсе
-        this.#tlayout.add(this.getComponent("btSave"), 0, 0);
+        this.#tlayout.add(this.#btPanel, 0, 0);
         this.#tlayout.add(this.getComponent("editor"), 0, 1);
         this.#blayout.add(this.getComponent("table"), LayoutRegion.CENTER);
     }
@@ -41,6 +48,16 @@ class App {
      */
     addComponent(componentName, component) {
         this.#components.set(componentName, component);
+    }
+
+    /**
+     * Добавление нескольких заранее подготовленных компонетов
+     * @param {Map} components хеш компонетов
+     */
+    addComponents (components) {
+        for ( let component of components.values()) {
+            this.#components.set(component.name, component);
+        }
     }
 
     /**

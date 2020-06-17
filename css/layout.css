@@ -25,6 +25,7 @@
 .grid-layout {
     display: table;
     width: 100%;
+    background-color: lightgray;
 }
 .row-grid-layout {
     display: table-row;

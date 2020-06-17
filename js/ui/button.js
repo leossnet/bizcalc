@@ -3,9 +3,9 @@
  */
 class Button extends HTMLButtonElement {
 
-    constructor(name) {
+    constructor(label) {
         super();
-        this.innerHTML = name;
+        this.innerHTML = label;
     }
 }        
 
