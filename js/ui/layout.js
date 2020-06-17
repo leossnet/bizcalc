@@ -55,10 +55,10 @@ class BorderLayout extends HTMLElement {
      */
     createRegion(regionTypes) {
         let row = document.createElement("div");
-        row.classList.add("row-layout");
+        row.classList.add("row-border-layout");
         for (let rt=0; rt<regionTypes.length; rt++) {
             let cell = document.createElement("div");
-            cell.classList.add(regionTypes[rt]+"-layout");
+            cell.classList.add(regionTypes[rt]+"-border-layout");
             row.append(cell);
             this.#region[regionTypes[rt]] = cell;
         }
@@ -73,7 +73,7 @@ class BorderLayout extends HTMLElement {
      */
     add(component, region) {
         if ( this.#region[region] ) this.#region[region].append(component);
-        component.addEventListener("click", (e) => console.log(e.target));
+        // component.addEventListener("click", (e) => console.log(e.target));
     }
 
 }
