@@ -172,7 +172,7 @@ class Token {
         
         tokenCodes.forEach(function (tokenCode){
             if ( tokenCode in Operators ) 
-                tokens.push( new Token ( Types.Operator, { calc: Operators[tokenCode].calc, priority: Operators[tokenCode].priority } ));
+                tokens.push( new Token ( Types.Operator, { value: tokenCode, calc: Operators[tokenCode].calc, priority: Operators[tokenCode].priority } ));
             else if ( tokenCode === "(" )  
                 tokens.push ( new Token ( Types.LeftBracket, { value: tokenCode } ));
             else if ( tokenCode === ")" ) 
@@ -191,5 +191,9 @@ class Token {
      */    
     static escape(str) {
         return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    }    
+	}    
+	
+	toString() {
+		return this.#value;
+	}
 }
