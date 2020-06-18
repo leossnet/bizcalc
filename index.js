@@ -108,7 +108,11 @@ class App {
         input.type = 'file';
         input.accept=".json";
         input.onchange = (event) => { 
-            target.setData(event.target.files[0]);
+            let file = event.target.files[0];
+            let reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = () => { target.setData(reader.result); }
+            reader.onerror = () => { target.setData(reader.error); }
         };
         input.click();            
     }

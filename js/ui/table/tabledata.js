@@ -24,7 +24,7 @@ class TableData {
      */
     calcAllCells() {
         for (let cellName of this.#tokens.keys()) {
-            this.getCell(cellName).refreshValue();
+            this.getCell(cellName.toUpperCase()).refreshValue();
         }
     }
 
@@ -33,7 +33,7 @@ class TableData {
      * @param {String} cellName - имя ячейки
      */
     calcCell (cellName) {
-        return this.#calculator.calc(this.getTokens(cellName));
+        return this.#calculator.calc(this.getTokens(cellName.toUpperCase()));
     }
 
     /**
@@ -42,7 +42,7 @@ class TableData {
      * @param {Object} cell - объект ячейки
      */
     setCell (cellName, cell) {
-        this.#cells.set(cellName, cell);
+        this.#cells.set(cellName.toUpperCase(), cell);
     }
 
     /**
@@ -50,15 +50,15 @@ class TableData {
      * @param {String} cellName 
      */
     getCell (cellName) {
-        return this.#cells.get(cellName);
+        return this.#cells.get(cellName.toUpperCase());
     }
 
     isNumber(cellName) {
-        return this.#values.has(cellName);
+        return this.#values.has(cellName.toUpperCase());
     }
 
     isFormula(cellName) {
-        return this.#tokens.has(cellName);
+        return this.#tokens.has(cellName.toUpperCase());
     }
 
     /**
@@ -74,7 +74,7 @@ class TableData {
      * @param {Strgin} cellName  - имя ячейки
      */
     getTokens(cellName) {
-        return this.#tokens.get(cellName);
+        return this.#tokens.get(cellName.toUpperCase());
     }
 
     /**
@@ -83,8 +83,13 @@ class TableData {
      * @param {Array} formula 
      */
     setTokens(cellName, formula) {
-        let f = formula.substring(1).toUpperCase();
-        this.#tokens.set(cellName.toUpperCase(), Token.getTokens(f));
+        if ( Array.isArray(formula) ) {
+            this.#tokens.set(cellName.toUpperCase(), formula);
+        }
+        else {
+            let f = formula.substring(1).toUpperCase();
+            this.#tokens.set(cellName.toUpperCase(), Token.getTokens(f));
+        }
     }
 
     /**
@@ -93,7 +98,7 @@ class TableData {
      * @param {Number} value 
      */
     setValue(cellName, value) {
-        this.#values.set(cellName, value);
+        this.#values.set(cellName.toUpperCase(), value);
     }
 
     /**
@@ -101,7 +106,7 @@ class TableData {
      * @param {String} cellName 
      */
     getValue(cellName) {
-        return this.#values.get(cellName);;
+        return this.#values.get(cellName.toUpperCase());;
     }
 
     /**
@@ -120,12 +125,10 @@ class TableData {
 			}) 
 		} );
         let data = {
-            rows: table.tableParam.rowCount,
-            cols: table.tableParam.colCount,
 			values: Object.fromEntries(this.#values.entries()),
 			tokens: tokens
 		};
-        return JSON.stringify(data);
+        return JSON.stringify(data, null, 2);
     }
 
     /**
@@ -133,7 +136,33 @@ class TableData {
      * @param {JSON} json - внешние данные в формате JSON
      */
     setData(json) {
-        console.log(json);
+        // очистка старых значений
+        for (let cellName of this.#values.keys()){
+            this.getCell(cellName).clearCell();
+        }
+        for (let cellName of this.#tokens.keys()){
+            this.getCell(cellName).clearCell();
+        }
+
+        // парсинг json 
+        let data = JSON.parse(json);
+
+        // обновление первичных данных
+        this.#values.clear();
+        let values = new Map(Object.entries(data.values));
+        for (let cellName of values.keys()){
+            this.getCell(cellName).value = values.get(cellName);
+        }
+        
+        // обновление формул
+        this.#tokens.clear();
+        let tokens = new Map(Object.entries(data.tokens));
+        for (let cellName of tokens.keys()){
+            tokens.get(cellName).map( (item, index, array) => {
+                array[index] = new Token(item.type, item.value);
+            } );
+            this.getCell(cellName).value = tokens.get(cellName);
+        }
     }
 
 }

@@ -118,12 +118,12 @@ class Token {
      * @param {Types} type 
      * @param {Array} params 
      */
-    constructor(type, value, params){
+    constructor(type, value){
         this.#type = type;
         this.#value = value;
-        if ( params ) {
-            this.#calc = params.calc;
-            this.#priority = params.priority;
+        if ( type === Types.Operator ) {
+            this.#calc = Operators[value].calc;
+            this.#priority = Operators[value].priority;
         }
     }
 
@@ -174,7 +174,7 @@ class Token {
         
         tokenCodes.forEach(function (tokenCode){
             if ( tokenCode in Operators ) 
-                tokens.push( new Token ( Types.Operator, tokenCode, { calc: Operators[tokenCode].calc, priority: Operators[tokenCode].priority } ));
+                tokens.push( new Token ( Types.Operator, tokenCode ));
             else if ( tokenCode === "(" )  
                 tokens.push ( new Token ( Types.LeftBracket, tokenCode ));
             else if ( tokenCode === ")" ) 

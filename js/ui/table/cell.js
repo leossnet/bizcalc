@@ -142,6 +142,13 @@ class Cell extends HTMLElement {
             this.#data.value = this.#tdata.calcCell(cellName);
             this.setAttribute("type", this.#data.type);
         }
+        else if ( Array.isArray(value) ) {
+            this.#data.type = ValueTypes.Formula;
+            this.#data.formula = "="+value.map( (item, index, array) => item.value ).join("");
+            this.#tdata.setTokens(cellName, value);
+            this.#data.value = this.#tdata.calcCell(cellName);
+            this.setAttribute("type", this.#data.type);
+        }
         else {
             this.#data.type = ValueTypes.String;
             this.#data.string = value;
@@ -149,6 +156,16 @@ class Cell extends HTMLElement {
             this.setAttribute("type", this.#data.type);
         }
         this.refresh();
+    }
+
+    clearCell() {
+        this.#data = {
+            value: null,
+            type: ValueTypes.None,
+            number: 0,
+            formula : "",
+            string: ""
+        };        
     }
 
     refreshValue() {
