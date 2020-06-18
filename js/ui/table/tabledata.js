@@ -66,7 +66,7 @@ class TableData {
      * @param {Object} token объект токена 
      */
     getNumberToken (token) {
-        return new Token (Types.Number, { value: this.getValue(token.value) } );
+        return new Token (Types.Number, this.getValue(token.value) );
     }
 
     /**

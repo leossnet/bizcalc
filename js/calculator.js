@@ -60,7 +60,7 @@ class Calculator {
                 }
                 else if ( self.#tdata.isFormula(token.value) ) {
                     let formula = self.#tdata.getTokens(token.value);
-                    operands.push(new Token(Types.Number, {value: self.calc(formula)} ));
+                    operands.push(new Token(Types.Number, self.calc(formula)));
                 }
                 else operands.push(NaN);
             }
@@ -92,7 +92,7 @@ class Calculator {
             let leftOperand = operands.pop().value;
             let operator = operators.pop();
             let result = operator.calc(leftOperand, rightOperand);
-            operands.push(new Token ( Types.Number, { value: result } ));
+            operands.push(new Token ( Types.Number, result ));
         }
     }
 }
@@ -118,11 +118,13 @@ class Token {
      * @param {Types} type 
      * @param {Array} params 
      */
-    constructor(type, params){
+    constructor(type, value, params){
         this.#type = type;
-        this.#value = params.value;
-        this.#calc = params.calc;
-        this.#priority = params.priority;
+        this.#value = value;
+        if ( params ) {
+            this.#calc = params.calc;
+            this.#priority = params.priority;
+        }
     }
 
     /**
@@ -172,15 +174,15 @@ class Token {
         
         tokenCodes.forEach(function (tokenCode){
             if ( tokenCode in Operators ) 
-                tokens.push( new Token ( Types.Operator, { value: tokenCode, calc: Operators[tokenCode].calc, priority: Operators[tokenCode].priority } ));
+                tokens.push( new Token ( Types.Operator, tokenCode, { calc: Operators[tokenCode].calc, priority: Operators[tokenCode].priority } ));
             else if ( tokenCode === "(" )  
-                tokens.push ( new Token ( Types.LeftBracket, { value: tokenCode } ));
+                tokens.push ( new Token ( Types.LeftBracket, tokenCode ));
             else if ( tokenCode === ")" ) 
-                tokens.push ( new Token ( Types.RightBracket, { value: tokenCode } ));
+                tokens.push ( new Token ( Types.RightBracket, tokenCode ));
             else if ( tokenCode.match(/^\d+[.]?\d*/g) !== null ) 
-                tokens.push ( new Token ( Types.Number, { value: Number(tokenCode) } )); 
+                tokens.push ( new Token ( Types.Number, Number(tokenCode) )); 
             else if ( tokenCode.match(/^[A-Z]+[1-9]+/g) !== null )
-                tokens.push ( new Token ( Types.Cell, { value: tokenCode } ));
+                tokens.push ( new Token ( Types.Cell, tokenCode ));
         });
         return tokens;
     }
