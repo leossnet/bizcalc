@@ -7,6 +7,7 @@ class App {
     #btPanel;
     #blayout;
     #tlayout;
+    #fileName;
 
     /**
      * Конструктор клиентского приложения
@@ -16,6 +17,7 @@ class App {
     constructor (appSelector, param) {
         this.#root = document.querySelector(appSelector);
         this.#components = new Map();
+        this.#fileName = 'filename.json';
 
         // добавление менеджеров размещения компонентов на интерфейсе (компоновщиков)
         this.#blayout = new BorderLayout(this.#root, [LayoutRegion.TOP, LayoutRegion.CENTER, LayoutRegion.BOTTOM]);
@@ -41,6 +43,9 @@ class App {
         this.#blayout.add(this.getComponent("table"), LayoutRegion.CENTER);
     }
 
+    /**
+     * Получение корневого узла приложения
+     */
     get root() {
         return this.#root;
     }
@@ -79,10 +84,10 @@ class App {
     handlerClickButton(event) {
         switch(event.target.id) {
             case "btSave" :
-                App.saveJSON(this.app.getComponent("table").tableData.getData());
+                this.app.saveJSON(this.app.getComponent("table").tableData.getData());
                 break;
             case "btOpen" :
-                App.openJSON(this.app.getComponent("table").tableData);
+                this.app.openJSON(this.app.getComponent("table").tableData);
                 break;
         }
     }
@@ -91,24 +96,25 @@ class App {
      * Сохранение JSON в файл на локальном диске
      * @param {JSON} json 
      */
-    static saveJSON(json) {
+    saveJSON(json) {
         let output = document.createElement("a");
         let jsonData = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
         output.href = jsonData;
         output.target = '_blank';
-        output.download = 'filename.json';
+        output.download = this.#fileName;
         output.click();
     }
 
     /**
-     * Открытие файла JSON
+     * Выбор файла JSON для его открытия в приложении
      */
-    static openJSON(target) {
+    openJSON(target) {
         let input = document.createElement('input');
         input.type = 'file';
         input.accept=".json";
         input.onchange = (event) => { 
             let file = event.target.files[0];
+            this.#fileName = file.name;
             let reader = new FileReader();
             reader.readAsText(file);
             reader.onload = () => { target.setData(reader.result); }

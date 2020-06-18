@@ -36,14 +36,8 @@ class Cell extends HTMLElement {
             rowNumber: Number.parseInt(rowName),
             colNumber: colName.charCodeAt(0) - this.#deltaA,
         };
+        this.initCell();
 
-        this.#data = {
-            value: null,
-            type: ValueTypes.None,
-            number: 0,
-            formula : "",
-            string: ""
-        };
         this.setAttribute("type", this.#data.type);
         this.addEventListener("click", this.handlerClick );
     }
@@ -56,7 +50,12 @@ class Cell extends HTMLElement {
     }
 
 
-    getCellName(colNumber, rowNumber) {
+    /**
+     * Получение имени ячейки по номеру строки и колонки
+     * @param {Number} rowNumber - номер строки
+     * @param {Number} colNumber - номер колонки
+     */
+    getCellName(rowNumber, colNumber) {
         return String.fromCharCode(colNumber+this.#deltaA)+String(rowNumber);
     }
     
@@ -158,7 +157,10 @@ class Cell extends HTMLElement {
         this.refresh();
     }
 
-    clearCell() {
+    /**
+     * Установление первоначальных значений ячейки
+     */
+    initCell() {
         this.#data = {
             value: null,
             type: ValueTypes.None,

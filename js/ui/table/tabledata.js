@@ -47,16 +47,24 @@ class TableData {
 
     /**
      * Получение объекта ячейки по имени ячейки
-     * @param {String} cellName 
+     * @param {String} cellName - имя ячейки
      */
     getCell (cellName) {
         return this.#cells.get(cellName.toUpperCase());
     }
 
+    /**
+     * Содержит ли ячейка число
+     * @param {String} cellName - имя ячейки
+     */
     isNumber(cellName) {
         return this.#values.has(cellName.toUpperCase());
     }
 
+    /**
+     * Содержит ли ячейка формулу
+     * @param {String} cellName - имя ячейки
+     */
     isFormula(cellName) {
         return this.#tokens.has(cellName.toUpperCase());
     }
@@ -138,10 +146,10 @@ class TableData {
     setData(json) {
         // очистка старых значений
         for (let cellName of this.#values.keys()){
-            this.getCell(cellName).clearCell();
+            this.getCell(cellName).initCell();
         }
         for (let cellName of this.#tokens.keys()){
-            this.getCell(cellName).clearCell();
+            this.getCell(cellName).initCell();
         }
 
         // парсинг json 

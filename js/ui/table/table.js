@@ -126,7 +126,7 @@ class Table extends HTMLTableElement{
         if ( deltaCol > 0 ) newCol += Math.min(deltaCol, this.#table.colCount-newCol);
         else newCol += Math.max(deltaCol, 1-newCol);
 
-        this.setCursor(currentCell.getCellName(newCol, newRow));
+        this.setCursor(currentCell.getCellName(newRow, newCol));
     }
 
    /**
