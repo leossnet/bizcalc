@@ -205,7 +205,7 @@ class Table extends HTMLTableElement{
      */
     handlerKeyEditing(keyEvent) {
         let currentCellName = this.#cursor.cell.name;
-        switch(event.key) {
+        switch(keyEvent.key) {
             case "F2" : 
                 this.#cursor.beginEditing();
                 break;
@@ -229,7 +229,7 @@ class Table extends HTMLTableElement{
                 }
                 break;
             default: 
-                if ( this.#cursor.isPrintKey(event.keyCode) ) {
+                if ( this.#cursor.isPrintKey(keyEvent.keyCode) ) {
                     if ( !this.#cursor.isEdit ) this.#cursor.beginInput();
                     this.#cursor.addKey(keyEvent);
                 }
