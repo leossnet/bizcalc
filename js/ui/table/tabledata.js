@@ -6,6 +6,7 @@ class TableData {
     #cells;
     #tokens;
     #values;
+    #strings; 
     #calculator;
 
     /**
@@ -16,6 +17,7 @@ class TableData {
         this.#cells = new Map();
         this.#tokens = new Map();
         this.#values = new Map();
+        this.#strings = new Map();
         this.#calculator = new Calculator(this);
     }
 
@@ -70,6 +72,14 @@ class TableData {
     }
 
     /**
+     * Содержил ли ячейка строку
+     * @param {String} cellName - имя ячейки
+     */
+    isString(cellName) {
+        return this.#strings.has(cellName.toUpperCase());
+    }
+
+    /**
      * Преобразование токена ячейки в токен его значения
      * @param {Object} token объект токена 
      */
@@ -118,6 +128,23 @@ class TableData {
     }
 
     /**
+     * Добавление в модель данных текстового значения
+     * @param {String} cellName 
+     * @param {String} string 
+     */
+    setString(cellName, string) {
+        this.#strings.set(cellName.toUpperCase(), string);
+    }
+
+    /**
+     * Получение текстового значения ячейки
+     * @param {String} cellName 
+     */
+    getString(cellName) {
+        return this.#strings.get(cellName.toUpperCase());
+    }
+
+    /**
      * Возвращает данные в формате JSON
      */
     getData() {
@@ -133,9 +160,10 @@ class TableData {
 			}) 
 		} );
         let data = {
+            strings:Object.fromEntries(this.#strings.entries()), 
 			values: Object.fromEntries(this.#values.entries()),
 			tokens: tokens
-		};
+        };
         return JSON.stringify(data, null, 2);
     }
 
@@ -155,21 +183,34 @@ class TableData {
         // парсинг json 
         let data = JSON.parse(json);
 
+        // обновление строковый значений
+        this.#strings.clear();
+        if ( data.strings ) {
+            let strings = new Map(Object.entries(data.strings));
+            for (let cellName of strings.keys()){
+                this.getCell(cellName).value = strings.get(cellName);
+            }
+        }
+
         // обновление первичных данных
         this.#values.clear();
-        let values = new Map(Object.entries(data.values));
-        for (let cellName of values.keys()){
-            this.getCell(cellName).value = values.get(cellName);
+        if ( data.values ) {
+            let values = new Map(Object.entries(data.values));
+            for (let cellName of values.keys()){
+                this.getCell(cellName).value = values.get(cellName);
+            }
         }
         
         // обновление формул
         this.#tokens.clear();
-        let tokens = new Map(Object.entries(data.tokens));
-        for (let cellName of tokens.keys()){
-            tokens.get(cellName).map( (item, index, array) => {
-                array[index] = new Token(item.type, item.value);
-            } );
-            this.getCell(cellName).value = tokens.get(cellName);
+        if ( data.tokens ) {
+            let tokens = new Map(Object.entries(data.tokens));
+            for (let cellName of tokens.keys()){
+                tokens.get(cellName).map( (item, index, array) => {
+                    array[index] = new Token(item.type, item.value);
+                } );
+                this.getCell(cellName).value = tokens.get(cellName);
+            }
         }
     }
 

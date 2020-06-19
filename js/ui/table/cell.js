@@ -152,6 +152,7 @@ class Cell extends HTMLElement {
             this.#data.type = ValueTypes.String;
             this.#data.string = value;
             this.#data.value = value;
+            this.#tdata.setString(cellName, value);
             this.setAttribute("type", this.#data.type);
         }
         this.refresh();
