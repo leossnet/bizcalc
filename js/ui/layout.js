@@ -89,7 +89,7 @@ class GridLayout extends HTMLDivElement {
     #parent;
     #colCount;
     #rowCount;
-    #cells = [];
+    #gridItems;
 
     /**
      * Конструктор табличного контейнера
@@ -100,28 +100,29 @@ class GridLayout extends HTMLDivElement {
     constructor(parent, rowCount, colCount) {
         super(); 
         this.#parent = parent;
+        this.#gridItems = new Map();
         this.#rowCount = rowCount || 1;
         this.#colCount = colCount || 1; 
-        this.classList.add("grid-layout");
-        this.generateLayout();
+
+        this.generateGridLayout(rowCount, colCount);
+
         this.#parent.append(this);
     }
 
     /**
-     * Генерация содержимого контейнера
+     * 
+     * @param {*} rowCount 
+     * @param {*} colCount 
      */
-    generateLayout() {
-        for ( let r=0; r < this.#rowCount; r++ ) {
-            let row = document.createElement("div");
-            this.#cells.push(new Array());
-            row.classList.add("row-grid-layout");
-            for (let c=0; c<this.#colCount; c++) {
-                let cell = document.createElement("div");
-                cell.classList.add("cell-grid-layout");
-                this.#cells[r].push(cell);
-                row.append(cell);
+    generateGridLayout(rowCount, colCount) {
+        this.classList.add("grid-layout");
+        this.style = "--grid-rows:" + rowCount + ";--grid-cols:" + colCount + ";";
+        for (let r=0; r<rowCount; r++) {
+            for (let c=0; c<colCount; c++) {
+                let item = new GridItem(r, c);
+                this.append(item);
+                this.#gridItems.set(item.id, item);
             }
-            this.append(row);
         }
     }
 
@@ -149,10 +150,32 @@ class GridLayout extends HTMLDivElement {
     add(component, row, col) {
         let r = row < 0 ? 0 : ( row > this.#rowCount-1 ? this.#rowCount-1 : row ) ;
         let c = col < 0 ? 0 : ( col > this.#colCount-1 ? this.#colCount-1 : col ) ;
-        this.#cells[r][c].append(component);
+        this.#gridItems.get(GridItem.getId(row, col)).append(component);
     }
 
 }
 
 // регистрация нового html-элемента
 customElements.define('grid-layout', GridLayout, {extends: 'div'});
+
+
+
+class GridItem extends HTMLDivElement {
+    #rowNum;
+    #colNum;
+
+    constructor(rowNum, colNum) {
+        super();
+        this.#rowNum = rowNum;
+        this.#colNum = colNum;
+        this.id = GridItem.getId(rowNum, colNum);
+        this.classList.add("grid-item");
+    }
+
+    static getId(rowNum, colNum) {
+        return "R"+rowNum+"C"+colNum;
+    }
+}
+
+// регистрация нового html-элемента
+customElements.define('grid-item', GridItem, {extends: 'div'});

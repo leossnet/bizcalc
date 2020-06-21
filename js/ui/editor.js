@@ -12,9 +12,9 @@ class Editor extends HTMLInputElement {
     constructor(app, params) {
         super();
         this.#app = app;
-        this.id = this.#app.id+"Editor";
+        this.id = app.root.id+"Editor";
 
-        this.#app.root.append(this);
+        // this.#app.root.append(this);
     }
 }
 

@@ -23,13 +23,12 @@
     flex-grow: 1;
 }
 .grid-layout {
-    display: table;
-    width: 100%;
+    display: grid;
+    grid-template-rows: repeat(var(--grid-rows), auto);
+    grid-template-columns: repeat(var( --grid-cols), auto);
     background-color: lightgray;
+    gap: 2px;
 }
-.row-grid-layout {
-    display: table-row;
-}
-.cell-grid-layout {
-    display: table-cell;
+.grid-item {
+    background-color: lightgray;
 }

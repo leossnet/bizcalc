@@ -1,0 +1,8 @@
+nav-bar {
+    display: flex;
+    background-color: #217346;
+    color: white;
+    height: 42px;
+    text-align: left;
+    padding: 10px;
+}

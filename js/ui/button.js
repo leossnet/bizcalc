@@ -10,6 +10,7 @@ class Button extends HTMLButtonElement {
         this.id = params.name;
         this.innerHTML = params.label;
         this.addEventListener("click", params.handler);
+        this.dataset.description = params.label;
     }
 
     get app() {

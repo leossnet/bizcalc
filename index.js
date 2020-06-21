@@ -21,7 +21,7 @@ class App {
 
         // добавление менеджеров размещения компонентов на интерфейсе (компоновщиков)
         this.#blayout = new BorderLayout(this.#root, [LayoutRegion.TOP, LayoutRegion.CENTER, LayoutRegion.BOTTOM]);
-        this.#tlayout = new GridLayout(this.#root, 2, 1);
+        this.#tlayout = new GridLayout(this.#root, 3, 1);
         this.#blayout.add(this.#tlayout, LayoutRegion.TOP);
 
         // регистрация составных компонентов
@@ -32,14 +32,16 @@ class App {
         this.addComponents(this.#btPanel.components);
 
         // регистрация простых компонентов
+        this.addComponent("navbar", new Navbar(this, {}));
         this.addComponent("editor", new Editor(this, {}));
         this.addComponent("table", new Table (this, { 
             rowCount: param.rowCount, colCount: param.colCount, isFocus: true 
         }));
 
         // размещение компонентов на интерфейсе
-        this.#tlayout.add(this.#btPanel, 0, 0);
-        this.#tlayout.add(this.getComponent("editor"), 0, 1);
+        this.#tlayout.add(this.#btPanel, 1, 0);
+        this.#tlayout.add(this.getComponent("navbar"), 0, 0);
+        this.#tlayout.add(this.getComponent("editor"), 2, 0);
         this.#blayout.add(this.getComponent("table"), LayoutRegion.CENTER);
     }
 
