@@ -27,7 +27,6 @@
     grid-template-rows: repeat(var(--grid-rows), auto);
     grid-template-columns: repeat(var( --grid-cols), auto);
     background-color: lightgray;
-    gap: 2px;
 }
 .grid-item {
     background-color: lightgray;

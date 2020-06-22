@@ -9,9 +9,9 @@ const LayoutRegion = {
     CENTER: "center"
 };
 
-/**
+/**#####################################################################################
  * Класс контейнера с размещением содержимого в фиксированных местах 
- */
+ *######################################################################################*/
 class BorderLayout extends HTMLElement {
     #parent; 
     #region = {};
@@ -82,9 +82,9 @@ class BorderLayout extends HTMLElement {
 customElements.define('border-layout', BorderLayout);
 
 
-/**
+/**#####################################################################################
  * Класс табличного контейнера, обеспечивающий выравнивание содержащихся элементов в виде таблицы
- */
+ *######################################################################################*/
 class GridLayout extends HTMLDivElement {
     #parent;
     #colCount;
@@ -110,7 +110,7 @@ class GridLayout extends HTMLDivElement {
     }
 
     /**
-     * 
+     * Генерация табличной разметки
      * @param {*} rowCount 
      * @param {*} colCount 
      */
@@ -160,10 +160,18 @@ customElements.define('grid-layout', GridLayout, {extends: 'div'});
 
 
 
+/**#####################################################################################
+ * Класс единичного блока для размещения объектов в табличном контейнере
+ *######################################################################################*/
 class GridItem extends HTMLDivElement {
     #rowNum;
     #colNum;
 
+    /**
+     * Конструктор единичного блока табличного контейнера
+     * @param {Number} rowNum - номер строки блока контейнера
+     * @param {Number} colNum - номер колонки блока контейнера
+     */
     constructor(rowNum, colNum) {
         super();
         this.#rowNum = rowNum;
@@ -172,6 +180,11 @@ class GridItem extends HTMLDivElement {
         this.classList.add("grid-item");
     }
 
+    /**
+     * Статический класс для генерации id единичного блока по номерам строки и колонки
+     * @param {Number} rowNum 
+     * @param {Number} colNum 
+     */
     static getId(rowNum, colNum) {
         return "R"+rowNum+"C"+colNum;
     }
