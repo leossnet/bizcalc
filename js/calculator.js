@@ -16,11 +16,11 @@ const Types = {
  * 2. Функция, вызываемая для обработки оператора
  */
 const Operators = {
-    ["+"]: { priority: 1, calc: function (a, b) { return a + b; } },
-    ["-"]: { priority: 1, calc: function (a, b) { return a - b; } }, 
-    ["*"]: { priority: 2, calc: function (a, b) { return a * b; } },
-    ["/"]: { priority: 2, calc: function (a, b) { return a / b; } },
-    ["^"]: { priority: 3, calc: function (a, b) { return Math.pow(a, b); } }
+    ["+"]: { priority: 1, calc: (a, b) => a + b },
+    ["-"]: { priority: 1, calc: (a, b) => a - b }, 
+    ["*"]: { priority: 2, calc: (a, b) => a * b },
+    ["/"]: { priority: 2, calc: (a, b) => a / b },
+    ["^"]: { priority: 3, calc: (a, b) => Math.pow(a, b) }
 };
 
 
