@@ -11,3 +11,6 @@ button:hover::after {
     left: 60px;
     z-index: 1;
    }
+button:focus {
+    outline: none;
+}

@@ -11,6 +11,7 @@ class Button extends HTMLButtonElement {
         this.innerHTML = params.label;
         this.addEventListener("click", params.handler);
         this.dataset.description = params.label;
+        this.tabIndex = -1;
     }
 
     get app() {
