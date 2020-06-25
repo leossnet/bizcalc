@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <title>Меню на табах</title>
+
+    <style>
+        /* Базовые стили демо-страницы */
+        body {
+            background: gray;
+        }
+
+        /* Базовый контейнер табов */
+        .button-panel {
+            padding: 0px;
+            margin: 0 auto;
+            background: #fff;
+        }
+
+        /* Стили секций с содержанием */
+        .button-panel>section {
+            display: none;
+            padding: 10px;
+        }
+
+        /* Прячем чекбоксы */
+        .button-panel>input {
+            display: none;
+            position: absolute;
+        }
+        /* Стили переключателей вкладок (табов) */
+        .button-panel>label {
+            display: inline-block;
+            padding: 5px 5px;
+            text-align: center;
+            color: gray;
+        }
+        /* Изменения стиля переключателей вкладок при наведении */
+        .button-panel>label:hover {
+            color: #555;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        /* Стили для активной вкладки */
+        .button-panel>input:checked+label {
+            color: #555;
+            font-weight: bold;
+            border-bottom: 2px solid green;
+        }
+
+        /* Активация секций с помощью псевдокласса :checked */
+        #file:checked~#content-file,
+        #main:checked~#content-main,
+        #info:checked~#content-info  {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="testClass"></div>
+
+    <script>
+        class ButtonPanel extends HTMLDivElement {
+            constructor(root, buttons) {
+                super();
+                this.classList.add("button-panel");
+
+                for (let buttonTab in buttons) {
+                    let input = document.createElement("input");
+                    input.id = buttonTab;
+                    input.type = "radio";
+                    input.name = "button-panel";
+                    this.append(input);
+
+                    let label = document.createElement("label");
+                    label.setAttribute("for", buttonTab);
+                    label.title = buttons[buttonTab].name;
+                    label.innerHTML = buttons[buttonTab].name;
+                    this.append(label);
+                }
+                this.querySelector("input").setAttribute("checked", true);;
+                for (let buttonTab in buttons) {
+                    let section = document.createElement("section");
+                    section.id = "content-"+buttonTab;
+                    buttons[buttonTab].buttons.forEach(button => {
+                        section.append(button);
+                    });
+                    this.append(section);
+                }
+
+                root.append(this);
+            }
+        }
+        customElements.define('button-panel', ButtonPanel, {extends: 'div'});    
+
+        class Button extends HTMLButtonElement {
+            constructor(label) {
+                super();
+                this.innerHTML = label;
+            }
+        }
+        customElements.define('my-button', Button, {extends: 'button'});   
+
+        const buttons = {
+            file: {
+                name: "Файл",
+                buttons: [new Button("Открыть"), new Button("Сохранить")]
+            },
+            main: {
+                name: "Главная",
+                buttons: [new Button("Рассчитать")]
+            },
+            info: {
+                name: "Справка",
+                buttons: [new Button("Справка")]
+            }
+        };
+        
+        new ButtonPanel(document.querySelector(".testClass"), buttons);
+    </script>
+</body>
+
+</html>
