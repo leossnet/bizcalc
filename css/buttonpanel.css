@@ -1,16 +1,85 @@
+/* Глобальные переменные */
+:root {
+    --bg-color: #eee;
+    --bg-sel-color: #fff;
+    --font-color: #555;
+    --font-sel-color: #333;
+    --bg-button-sel-color: white;
+    --border-button-color: #eee;
+    --hover-border-color: yellow;
+    --hover-bg-color: lightyellow;
+}
+/* Базовый контейнер табов */
+.button-panel {
+    padding: 0px;
+    margin: 0 auto;
+    background: var(--bg-color);
+    font-size: 13px;
+}
+/* Стили секций с содержанием */
+.button-panel>section {
+    display: none;
+    padding: 3px;
+}
+/* Прячем чекбоксы */
+.button-panel>input {
+    display: none;
+    position: absolute;
+}
+/* Стили переключателей вкладок (табов) */
+.button-panel>label {
+    display: inline-block;
+    padding: 5px 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    text-align: center;
+    color: var(--font-color);
+}
+/* Изменения стиля переключателей вкладок при наведении */
+.button-panel>label:hover {
+    color: var(--font-color);
+    font-weight: bold;
+    cursor: pointer;
+    background-color: var(--bg-sel-color);
+}
+/* Стили для активной вкладки */
+.button-panel>input:checked+label {
+    color: var(--font-sel-color);
+    font-weight: bold;
+    border-bottom: 2px solid green;
+}
+/* Активация секций с помощью псевдокласса :checked */
+#file:checked~#content-file,
+#main:checked~#content-main,
+#info:checked~#content-info  {
+    display: block;
+}
+/* Глобальные параметры кнопки */
 button {
     position: relative;
+    font-size: 12px;
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid var(--border-button-color);
    }
+button:hover {
+    background-color: var(--bg-button-sel-color);
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid var(--border-button-color);
+}
+/* Параметры кнопки при наведении курсора */
 button:hover::after {
     content: attr(data-description);
-    background: #ffe;
+    background: var(--hover-bg-color);
     padding: 5px;
-    border: 1px solid #666;
+    border: 1px solid var(--hover-border-color);
     position: absolute;
     top: 18px;
     left: 60px;
     z-index: 1;
    }
+/* Удаление рамки с кнопки в фокусе */
 button:focus {
     outline: none;
 }

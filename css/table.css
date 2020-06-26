@@ -72,3 +72,6 @@ input:focus {
     height: 100%;
     float: left;
 }
+b-cursor:focus {
+    outline: none;
+}

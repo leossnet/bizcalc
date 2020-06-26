@@ -4,6 +4,11 @@
 class Button extends HTMLButtonElement {
     #app;
 
+    /**
+     * Конструктор кнопки
+     * @param {Object} app - объект приложения
+     * @param {Object} params - объект с параметрами кнопок
+     */
     constructor(app, params) {
         super();
         this.#app = app;
@@ -14,6 +19,9 @@ class Button extends HTMLButtonElement {
         this.tabIndex = -1;
     }
 
+    /**
+     * Возвращает объект приложения
+     */
     get app() {
         return this.#app;
     }

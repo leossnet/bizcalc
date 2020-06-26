@@ -24,11 +24,27 @@ class App {
         this.#tlayout = new GridLayout(this.#root, 3, 1);
         this.#blayout.add(this.#tlayout, LayoutRegion.TOP);
 
-        // регистрация составных компонентов
-        this.#btPanel = new ButtonPanel(this, [
-            {name: "btOpen", label: "Открыть...", handler: this.handlerClickButton},
-            {name: "btSave", label: "Сохранить...", handler: this.handlerClickButton}
-        ]);
+        // настройка кнопочной панели
+        const buttons = {
+            file: { name: "Файл",
+                checked: true,
+                buttons: [
+                    { name: "btOpen", label: "Открыть...", handler: this.handlerClickButton },
+                    { name: "btSave", label: "Сохранить...", handler: this.handlerClickButton }
+                ]
+            },
+            main: { name: "Главная",
+                buttons: [
+                    { name: "btCalc", label: "Рассчитать", handler: this.handlerClickButton }
+                ]
+            },
+            info: { name: "Справка",
+                buttons: [
+                    { name: "btInfo", label: "Справка", handler: this.handlerClickButton }
+                ]
+            }
+        };
+        this.#btPanel = new ButtonPanel(this, buttons);        
         this.addComponents(this.#btPanel.components);
 
         // регистрация простых компонентов
@@ -43,6 +59,8 @@ class App {
         this.#tlayout.add(this.getComponent("navbar"), 0, 0);
         this.#tlayout.add(this.getComponent("editor"), 2, 0);
         this.#blayout.add(this.getComponent("table"), LayoutRegion.CENTER);
+
+        this.getComponent("table").focus();
     }
 
     /**
