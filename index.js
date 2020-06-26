@@ -35,7 +35,8 @@ class App {
             },
             main: { name: "Главная",
                 buttons: [
-                    { name: "btCalc", label: "Рассчитать", handler: this.handlerClickButton }
+                    { name: "btCalc", label: "Рассчитать", handler: this.handlerClickButton },
+                    { name: "btFixArea", label: "Закрепить области", handler: this.handlerClickButton }
                 ]
             },
             info: { name: "Справка",
