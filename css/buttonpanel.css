@@ -1,14 +1,3 @@
-/* Глобальные переменные */
-:root {
-    --bg-color: #eee;
-    --bg-sel-color: #fff;
-    --font-color: #555;
-    --font-sel-color: #333;
-    --bg-button-sel-color: white;
-    --border-button-color: #eee;
-    --hover-border-color: yellow;
-    --hover-bg-color: lightyellow;
-}
 /* Базовый контейнер табов */
 .button-panel {
     padding: 0px;
@@ -53,33 +42,4 @@
 #main:checked~#content-main,
 #info:checked~#content-info  {
     display: block;
-}
-/* Глобальные параметры кнопки */
-button {
-    position: relative;
-    font-size: 12px;
-    margin: 2px;
-    padding: 2px;
-    border: 1px solid var(--border-button-color);
-   }
-button:hover {
-    background-color: var(--bg-button-sel-color);
-    margin: 2px;
-    padding: 2px;
-    border: 1px solid var(--border-button-color);
-}
-/* Параметры кнопки при наведении курсора */
-button:hover::after {
-    content: attr(data-description);
-    background: var(--hover-bg-color);
-    padding: 5px;
-    border: 1px solid var(--hover-border-color);
-    position: absolute;
-    top: 18px;
-    left: 60px;
-    z-index: 1;
-   }
-/* Удаление рамки с кнопки в фокусе */
-button:focus {
-    outline: none;
 }

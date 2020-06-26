@@ -29,19 +29,19 @@ class App {
             file: { name: "Файл",
                 checked: true,
                 buttons: [
-                    { name: "btOpen", label: "Открыть...", handler: this.handlerClickButton },
-                    { name: "btSave", label: "Сохранить...", handler: this.handlerClickButton }
+                    { name: "btOpen", label: "Открыть...", handler: this.handlerClickButton, icon: "folder-open" },
+                    { name: "btSave", label: "Сохранить...", handler: this.handlerClickButton, icon: "save" }
                 ]
             },
             main: { name: "Главная",
                 buttons: [
-                    { name: "btCalc", label: "Рассчитать", handler: this.handlerClickButton },
-                    { name: "btFixArea", label: "Закрепить области", handler: this.handlerClickButton }
+                    { name: "btCalc", label: "Рассчитать", handler: this.handlerClickButton, icon: "calculator" },
+                    { name: "btFixArea", label: "Закрепить области", handler: this.handlerClickButton, icon: "table" }
                 ]
             },
             info: { name: "Справка",
                 buttons: [
-                    { name: "btInfo", label: "Справка", handler: this.handlerClickButton }
+                    { name: "btInfo", label: "Справка", handler: this.handlerClickButton, icon: "info-circle" }
                 ]
             }
         };

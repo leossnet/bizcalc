@@ -1,0 +1,11 @@
+/* Глобальные стилевые переменные */
+:root {
+    --bg-color: #eee;
+    --bg-sel-color: #fff;
+    --font-color: #555;
+    --font-sel-color: #333;
+    --bg-button-sel-color: white;
+    --border-button-color: #eee;
+    --hover-border-color: yellow;
+    --hover-bg-color: lightyellow;
+}
