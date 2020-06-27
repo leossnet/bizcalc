@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Тестирование svg-иконки</title>
+    <meta charset="utf-8">
+    <style>
+        button {
+            width: 100px;
+            height: 50px;
+        }        
+    </style></head>
+<body>
+    <div id="testsvgicon"></div>
+    <script>
+
+        class SvgIcon extends SVGImageElement {
+            #app;
+            #fileName;
+
+            constructor(app, fileName) {
+                super();
+                this.#app = app;
+                this.#fileName = fileName;
+
+            }
+
+        }
+        customElements.define('svg-icon', SvgIcon);    
+
+        let app = document.querySelector("#testsvgicon");
+        let button = document.createElement("button");
+
+        let obj = document.createElement("object");        
+        obj.setAttribute("type", "image/svg+xml");
+        obj.setAttribute("data", "save.svg");
+        obj.width = 20;
+        obj.height = 20;        
+        button.append(obj);
+
+        button.append("Кнопка");
+
+        app.append(button);
+
+    </script>
+</body>
+</html>
