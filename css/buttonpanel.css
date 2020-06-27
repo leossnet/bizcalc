@@ -37,9 +37,4 @@
     font-weight: bold;
     border-bottom: 2px solid green;
 }
-/* Активация секций с помощью псевдокласса :checked */
-#file:checked~#content-file,
-#main:checked~#content-main,
-#info:checked~#content-info  {
-    display: block;
-}
+

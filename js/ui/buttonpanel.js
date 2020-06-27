@@ -24,11 +24,23 @@ class ButtonPanel extends HTMLDivElement {
      * @param {Object} buttons - объект с параметрами кнопок, размещаемых на панели
      */
     generateButtonPanel(app, buttons) {
+        // подготовка для формирования глобальных стилей привязки элементов кнопочной панели
+        let headStyle = document.head.querySelector("head style");
+        if ( !headStyle ) {
+            headStyle = document.createElement("style");
+            document.head.append(headStyle);
+        }
+        console.log(headStyle);
         for (let buttonTab in buttons) {
             let input = document.createElement("input");
             input.id = buttonTab;
             input.type = "radio";
             input.name = "button-panel";
+
+            // привязка заголовков и содержимого кнопочной панели
+            let css = "#"+buttonTab+":checked~#content-"+buttonTab+" { display: block; }\n\t";
+            headStyle.innerHTML += css;
+
             this.append(input);
             this.#components.set(input.id, input);
             if ( buttons[buttonTab].checked ) input.setAttribute("checked", true);
