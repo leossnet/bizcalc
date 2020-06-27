@@ -30,7 +30,6 @@ class ButtonPanel extends HTMLDivElement {
             headStyle = document.createElement("style");
             document.head.append(headStyle);
         }
-        console.log(headStyle);
         for (let buttonTab in buttons) {
             let input = document.createElement("input");
             input.id = buttonTab;
