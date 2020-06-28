@@ -10,6 +10,7 @@ button:hover {
     background-color: var(--bg-button-sel-color);
     margin: 2px;
     padding: 2px;
+    cursor: pointer;
     border: 1px solid var(--border-button-color);
 }
 /* Параметры кнопки при наведении курсора */
