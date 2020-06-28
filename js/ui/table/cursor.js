@@ -29,8 +29,9 @@ class Cursor extends HTMLElement{
         this.#app = app;
         this.#table = table;
         this.#isEdit = false;
-        // this.#tInput = document.querySelector("#bizcalcEditor");
-        this.#tInput = this.#app.getComponent("editor");
+        console.log(app);
+        // this.#tInput = this.#app.getComponent("editor");
+        this.#tInput = this.#table.editor;
         this.tabIndex = -1;
     }
 

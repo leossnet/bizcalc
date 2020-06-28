@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <title>Табы для таблицы</title>
+    <script src="../js/ui/table/table.js"></script>
+    <script src="../js/ui/table/tabledata.js"></script>
+    <script src="../js/ui/table/cursor.js"></script>
+    <script src="../js/ui/table/editor.js"></script>
+    <script src="../js/ui/table/cell.js"></script>
+    <script src="../js/data/calculator.js"></script>
+
+    <style>
+        /* Базовые стили демо-страницы */
+        body {
+            background: gray;
+        }
+
+        /* Базовый контейнер табов */
+        .tab-panel {
+            padding: 0px;
+            margin: 0 auto;
+            background: #fff;
+        }
+
+        /* Стили секций с содержанием */
+        .tab-panel>section {
+            display: none;
+            padding: 10px;
+        }
+
+        /* Прячем чекбоксы */
+        .tab-panel>input {
+            display: none;
+            position: absolute;
+        }
+        /* Стили переключателей вкладок (табов) */
+        .tab-panel>label {
+            display: inline-block;
+            padding: 5px 5px;
+            text-align: center;
+            color: gray;
+        }
+        /* Изменения стиля переключателей вкладок при наведении */
+        .tab-panel>label:hover {
+            color: #555;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        /* Стили для активной вкладки */
+        .tab-panel>input:checked+label {
+            color: #555;
+            font-weight: bold;
+            border-bottom: 2px solid green;
+        }
+
+        /* Активация секций с помощью псевдокласса :checked */
+        #table1:checked~#content-table1,
+        #table2:checked~#content-table2 {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="testClass"></div>
+
+    <script>
+        class App {
+            #root;
+            #components;
+
+            constructor(appSelector) {
+                this.#root = document.querySelector(appSelector);
+                this.#components = new Map();
+            }
+
+            get root() {
+                return this.#root;
+            }
+
+            addComponent(componentName, component) {
+                this.#components.set(componentName, component);
+            }
+
+            getComponent(componentName) {
+                return this.#components.get(componentName);
+            }            
+        }
+
+        class TabPanel extends HTMLDivElement {
+            #app;
+
+            constructor(app, tables) {
+                super();
+                this.#app = app;
+                this.classList.add("tab-panel");
+
+                for (let tableTab in tables) {
+                    let input = document.createElement("input");
+                    input.id = tableTab;
+                    input.type = "radio";
+                    input.name = "tab-panel";
+                    this.append(input);
+
+                    let label = document.createElement("label");
+                    label.setAttribute("for", tableTab);
+                    label.title = tables[tableTab].name;
+                    label.innerHTML = tables[tableTab].name;
+                    this.append(label);
+                }
+                this.querySelector("input").setAttribute("checked", true);;
+                for (let tableTab in tables) {
+                    let section = document.createElement("section");
+                    section.id = "content-"+tableTab;
+                    section.append(new Table(app, tables[tableTab].params));
+                    this.append(section);
+                }
+
+                app.root.append(this);
+            }
+        }
+        customElements.define('tab-panel', TabPanel, {extends: 'div'});    
+
+        const tableParams = {
+            table2: {
+                name: "Таблица 1",
+                checked: true,
+                params: { rowCount: 15, colCount: 10, isFocus: true }
+            },
+            table2: {
+                name: "Таблица 2",
+                params: { rowCount: 15, colCount: 10, isFocus: true }
+            }
+        };
+        
+        let app = new App(".testClass");
+        app.addComponent("tabPanel", new TabPanel(app, tableParams));
+
+    </script>
+</body>
+
+</html>
