@@ -16,16 +16,15 @@ class Table extends HTMLTableElement{
     constructor (app, params) {
         super();
         this.#app = app;
-        console.log(app);
-        // this.id = app.root.id+"Table";
+            // this.id = app.root.id+"Table";
         this.#table = {
             colCount: params.colCount,
             rowCount: params.rowCount
         };
         this.headers = [];
         this.#tdata = new TableData(app);
+        this.#editor = params.editor;
         this.#cursor = new Cursor(app, this);
-        this.#editor = new Editor(app, {});
         this.tabIndex = -1;
 
         // генерация внешнего вида таблицы

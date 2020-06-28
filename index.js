@@ -54,15 +54,15 @@ class App {
 
         // регистрация простых компонентов
         this.addComponent("navbar", new Navbar(this, {}));
-        // this.addComponent("editor", new Editor(this, {}));
+        this.addComponent("editor", new Editor(this, {}));
         this.addComponent("table", new Table (this, { 
-            rowCount: param.rowCount, colCount: param.colCount, isFocus: true 
+            rowCount: param.rowCount, colCount: param.colCount, isFocus: true
         }));
 
         // размещение компонентов на интерфейсе
         this.#tlayout.add(this.#btPanel, 1, 0);
         this.#tlayout.add(this.getComponent("navbar"), 0, 0);
-        // this.#tlayout.add(this.getComponent("editor"), 2, 0);
+        this.#tlayout.add(this.getComponent("editor"), 2, 0);
         this.#blayout.add(this.getComponent("table"), LayoutRegion.CENTER);
 
         this.getComponent("table").focus();
@@ -73,6 +73,10 @@ class App {
      */
     get root() {
         return this.#root;
+    }
+
+    get editor() {
+        return this.#components.get("editor");
     }
 
     /**

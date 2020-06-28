@@ -14,8 +14,6 @@ class Editor extends HTMLInputElement {
         this.#app = app;
         this.id = app.root.id+"Editor";
         this.tabIndex = -1;
-
-        // this.#app.root.append(this);
     }
 }
 

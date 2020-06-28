@@ -4,6 +4,10 @@
 <head>
     <meta charset="utf-8">
     <title>Табы для таблицы</title>
+
+    <link rel="stylesheet" href="../css/table.css"><link>
+    <link rel="stylesheet" href="../css/editor.css"><link>
+
     <script src="../js/ui/table/table.js"></script>
     <script src="../js/ui/table/tabledata.js"></script>
     <script src="../js/ui/table/cursor.js"></script>
@@ -70,14 +74,21 @@
         class App {
             #root;
             #components;
+            #editor;
 
             constructor(appSelector) {
                 this.#root = document.querySelector(appSelector);
                 this.#components = new Map();
+                this.#editor = new Editor(this, {});
+                this.#root.append(this.#editor);
             }
 
             get root() {
                 return this.#root;
+            }
+
+            get editor() {
+                return this.#editor;
             }
 
             addComponent(componentName, component) {
@@ -96,7 +107,6 @@
                 super();
                 this.#app = app;
                 this.classList.add("tab-panel");
-
                 for (let tableTab in tables) {
                     let input = document.createElement("input");
                     input.id = tableTab;
@@ -109,8 +119,7 @@
                     label.title = tables[tableTab].name;
                     label.innerHTML = tables[tableTab].name;
                     this.append(label);
-                }
-                this.querySelector("input").setAttribute("checked", true);;
+                }                
                 for (let tableTab in tables) {
                     let section = document.createElement("section");
                     section.id = "content-"+tableTab;
@@ -118,20 +127,23 @@
                     this.append(section);
                 }
 
+                this.querySelector("input").setAttribute("checked", true);;
+
+
                 app.root.append(this);
             }
         }
-        customElements.define('tab-panel', TabPanel, {extends: 'div'});    
+        customElements.define('tab-panel', TabPanel, {extends: 'div'}); 
 
         const tableParams = {
-            table2: {
+            table1: {
                 name: "Таблица 1",
                 checked: true,
                 params: { rowCount: 15, colCount: 10, isFocus: true }
             },
             table2: {
                 name: "Таблица 2",
-                params: { rowCount: 15, colCount: 10, isFocus: true }
+                params: { rowCount: 10, colCount: 5, isFocus: true }
             }
         };
         

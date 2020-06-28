@@ -18,7 +18,7 @@ class Cursor extends HTMLElement{
     #initValue;
     #table;
     #isEdit;
-    #tInput; // поле редактирования содержимого ячейки над таблицей
+    #editor; // поле редактирования содержимого ячейки над таблицей
 
     /**
      * Конструктор курсора таблицы
@@ -29,9 +29,7 @@ class Cursor extends HTMLElement{
         this.#app = app;
         this.#table = table;
         this.#isEdit = false;
-        console.log(app);
-        // this.#tInput = this.#app.getComponent("editor");
-        this.#tInput = this.#table.editor;
+        this.#editor = this.#app.editor;
         this.tabIndex = -1;
     }
 
@@ -43,7 +41,7 @@ class Cursor extends HTMLElement{
         this.#cell.innerHTML = "";
         this.#cell.append(this);
         this.value = cell.value;
-        this.setEditableValue(this.#tInput);
+        this.setEditableValue(this.#editor);
     }
 
 
@@ -106,8 +104,8 @@ class Cursor extends HTMLElement{
         if ( this.isPrintKey(keyEvent.keyCode) ) {
             this.value += keyEvent.key;
         }
-        this.setEditableValue(this.#tInput);
-        this.#tInput.value = this.value;
+        this.setEditableValue(this.#editor);
+        this.#editor.value = this.value;
     }
 
     /**
@@ -118,8 +116,8 @@ class Cursor extends HTMLElement{
         if ( strValue.length ) {
             this.value = strValue.substring(0, strValue.length-1);
         }
-        this.setEditableValue(this.#tInput);
-        this.#tInput.value = this.value;
+        this.setEditableValue(this.#editor);
+        this.#editor.value = this.value;
     }
 
     /**
@@ -128,8 +126,8 @@ class Cursor extends HTMLElement{
     clearValue() {
         this.value = "";
         this.#cell.value = undefined;
-        this.setEditableValue(this.#tInput);
-        this.#tInput.value = this.value;
+        this.setEditableValue(this.#editor);
+        this.#editor.value = this.value;
     }
 
     /**
