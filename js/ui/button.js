@@ -17,7 +17,7 @@ class Button extends HTMLButtonElement {
         if ( params && params.handler ) this.addEventListener("click", params.handler);
         if ( params && params.label ) this.dataset.description = params.label;
         if ( params && params.icon ) {
-            let icon = new SvgIcon(app, params.icon, { width: 15, height: 15, color: "green" });
+            let icon = new SvgIcon(app, params.icon, { width: 15, height: 15, color: "cornflowerblue" });
             this.append(icon);
         }
         if ( params && params.label ) {
