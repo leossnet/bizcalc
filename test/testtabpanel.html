@@ -20,28 +20,18 @@
         body {
             background: gray;
         }
-
         /* Базовый контейнер табов */
         .tab-panel {
             padding: 0px;
             margin: 0 auto;
-            background: #fff;
+            background: #eee;
         }
-
         /* Стили секций с содержанием */
         .tab-panel>section {
-            display: none;
             padding: 10px;
-        }
-
-        /* Прячем чекбоксы */
-        .tab-panel>input {
-            display: none;
-            position: absolute;
         }
         /* Стили переключателей вкладок (табов) */
         .tab-panel>label {
-            display: inline-block;
             padding: 5px 5px;
             text-align: center;
             color: gray;
@@ -56,14 +46,9 @@
         .tab-panel>input:checked+label {
             color: #555;
             font-weight: bold;
-            border-bottom: 2px solid green;
+            border-top: 2px solid green;
         }
 
-        /* Активация секций с помощью псевдокласса :checked */
-        #table1:checked~#content-table1,
-        #table2:checked~#content-table2 {
-            display: block;
-        }
     </style>
 </head>
 
@@ -102,35 +87,60 @@
 
         class TabPanel extends HTMLDivElement {
             #app;
+            #currentSection;
 
             constructor(app, tables) {
                 super();
                 this.#app = app;
                 this.classList.add("tab-panel");
+                
+                for (let tableTab in tables) {
+                    let section = document.createElement("section");
+                    section.id = "content-"+tableTab;
+                    section.style.display = "none";
+                    section.append(new Table(app, tables[tableTab].params));
+                    this.append(section);
+                }                
                 for (let tableTab in tables) {
                     let input = document.createElement("input");
                     input.id = tableTab;
                     input.type = "radio";
                     input.name = "tab-panel";
+                    input.style.display = "none";
+                    input.style.position = "absolute";
+                    input.setAttribute("target", "content-"+tableTab);
                     this.append(input);
 
                     let label = document.createElement("label");
                     label.setAttribute("for", tableTab);
                     label.title = tables[tableTab].name;
+                    label.style.display = "inline-block";
                     label.innerHTML = tables[tableTab].name;
                     this.append(label);
-                }                
-                for (let tableTab in tables) {
-                    let section = document.createElement("section");
-                    section.id = "content-"+tableTab;
-                    section.append(new Table(app, tables[tableTab].params));
-                    this.append(section);
                 }
+                this.addEventListener("click", this.handlerClick);
 
-                this.querySelector("input").setAttribute("checked", true);;
-
-
+                let currentInput = this.querySelector("input");
+                currentInput.setAttribute("checked", true);
+                this.#currentSection = this.querySelector("#"+currentInput.getAttribute("target"));
+                this.#currentSection.style.display = "block";
                 app.root.append(this);
+            }
+
+            get currentSection() {
+                return this.#currentSection;
+            }
+
+            set currentSection(section) {
+                this.currentSection.style.display = "none";
+                this.#currentSection = section;
+                this.currentSection.style.display = "block";
+            }
+
+            handlerClick (event) {
+                if  (event.target.getAttribute("target")) {
+                    this.currentSection = document.querySelector("#"+event.target.getAttribute("target"));
+                }
             }
         }
         customElements.define('tab-panel', TabPanel, {extends: 'div'}); 
