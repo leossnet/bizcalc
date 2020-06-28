@@ -14,19 +14,13 @@ class Button extends HTMLButtonElement {
         super();
         this.#app = app;
         this.id = params.name;
-        if ( params.handler ) this.addEventListener("click", params.handler);
-        if ( params.label ) this.dataset.description = params.label;
-        if ( params.icon ) {
-            this.#obj = document.createElement("object");
-            this.#obj.id=params.icon;
-            this.#obj.setAttribute("type", "image/svg+xml");
-            this.#obj.setAttribute("data", "res/icon/"+params.icon+".svg");
-            this.#obj.classList.add("button-svg");
-            this.#obj.width = 12;
-            this.#obj.height = 12;
-            this.append( this.#obj);
+        if ( params && params.handler ) this.addEventListener("click", params.handler);
+        if ( params && params.label ) this.dataset.description = params.label;
+        if ( params && params.icon ) {
+            let icon = new SvgIcon(app, params.icon, { width: 15, height: 15, color: "green" });
+            this.append(icon);
         }
-        if ( params.label ) {
+        if ( params && params.label ) {
             this.append(params.label);
         }
         this.tabIndex = -1;

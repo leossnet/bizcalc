@@ -27,17 +27,6 @@ button:hover::after {
 button:focus {
     outline: none;
 }
-/* .button-svg {
+.svg-icon {
     display: inline-block;
-    background-color: lightpink;
-    fill: green;
 }
-.button-svg fill {
-    fill: green;
-}
-.icon-div {
-    display: inline-block;
-    mask: url('res/icon/save.svg') no-repeat 50% 50%;
-    mask-size: cover;
-    background-color: green;
-} */
