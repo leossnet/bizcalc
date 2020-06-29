@@ -2,7 +2,7 @@
 .table-panel {
     padding: 0px;
     margin: 0 auto;
-    background: #eee;
+    background: var(--bg-color);
     font-size: 13px;
 }
 /* Стили секций с содержанием */
@@ -11,19 +11,25 @@
 }
 /* Стили переключателей вкладок (табов) */
 .table-panel>label {
-    padding: 5px 5px;
+    padding-right: 12px;
+    padding-left: 12px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     text-align: center;
-    color: gray;
+    color: var(--font-color);
+    border-right: 1px solid gray;
+    border-top: 1px solid white;
 }
 /* Изменения стиля переключателей вкладок при наведении */
 .table-panel>label:hover {
-    color: #555;
+    color: var(--font-color);
     font-weight: bold;
     cursor: pointer;
+    background-color: var(--bg-sel-color);
 }
 /* Стили для активной вкладки */
 .table-panel>input:checked+label {
-    color: #555;
+    color: var(--font-sel-color);
     font-weight: bold;
-    border-top: 2px solid green;
+    border-bottom: 2px solid green;
 }

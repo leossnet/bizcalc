@@ -2,7 +2,7 @@ table {
     table-layout: auto ;
     border-collapse: collapse;  
     padding-right: 1%;    
-    background-color: #eee;
+    background-color: white;
     overflow: auto;
 }
 table:focus {

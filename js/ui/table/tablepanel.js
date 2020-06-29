@@ -25,7 +25,8 @@ class TablePanel extends HTMLDivElement {
 
         let currentInput = this.querySelector("input");
         currentInput.setAttribute("checked", true);
-        this.#currentSection = this.querySelector("#"+currentInput.getAttribute("target"));
+        // this.#currentSection = this.querySelector("#"+currentInput.getAttribute("target"));
+        this.#currentSection = this.querySelector("section");
         this.#currentSection.style.display = "block";
         app.root.append(this);
     }
@@ -40,7 +41,9 @@ class TablePanel extends HTMLDivElement {
             let section = document.createElement("section");
             section.id = "content-" + tableTab;
             section.style.display = "none";
-            section.append(new Table(app, tables[tableTab].params));
+            let table = new Table(app, tables[tableTab].params);
+            section.append(table);
+            this.#app.addComponent(tables[tableTab], table);
             this.append(section);
         }
         for (let tableTab in tables) {
@@ -67,6 +70,10 @@ class TablePanel extends HTMLDivElement {
      */
     get currentSection() {
         return this.#currentSection;
+    }
+
+    get currentTable() {
+        return this.#currentSection.getElementsByTagName("table")[0];
     }
 
     /**

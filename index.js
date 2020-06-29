@@ -11,10 +11,10 @@ class App {
 
     /**
      * Конструктор клиентского приложения
-     * @param {String} appSelector id корневого узла приложения
-     * @param {Object} param различные параметры приложенич
+     * @params {String} appSelector id корневого узла приложения
+     * @params {Object} params различные параметры приложенич
      */
-    constructor (appSelector, param) {
+    constructor (appSelector, params) {
         this.#root = document.querySelector(appSelector);
         this.#components = new Map();
         this.#fileName = 'filename.json';
@@ -59,18 +59,14 @@ class App {
             table1: {
                 name: "Лист 1",
                 checked: true,
-                params: { rowCount: 15, colCount: 10, isFocus: true }
+                params: { rowCount: params.rowCount, colCount: params.colCount, isFocus: true }
             },
             table2: {
                 name: "Лист 2",
-                params: { rowCount: 10, colCount: 5, isFocus: true }
+                params: { rowCount: params.rowCount, colCount: params.colCount, isFocus: true }
             }
         };
         this.addComponent("tablePanel", new TablePanel(this, tableParams));
-
-        // this.addComponent("table", new Table (this, { 
-        //     rowCount: param.rowCount, colCount: param.colCount, isFocus: true
-        // }));
 
         // размещение компонентов на интерфейсе
         this.#tlayout.add(this.#btPanel, 1, 0);
@@ -78,7 +74,7 @@ class App {
         this.#tlayout.add(this.getComponent("editor"), 2, 0);
         this.#blayout.add(this.getComponent("tablePanel"), LayoutRegion.CENTER);
 
-        this.getComponent("table").focus();
+        this.getComponent("tablePanel").currentTable.focus();
     }
 
     /**
@@ -94,8 +90,8 @@ class App {
 
     /**
      * Регистрация нового компонента в приложении
-     * @param {String} componentName - имя компонента
-     * @param {Object} component - объект компонента
+     * @params {String} componentName - имя компонента
+     * @params {Object} component - объект компонента
      */
     addComponent(componentName, component) {
         this.#components.set(componentName, component);
@@ -103,7 +99,7 @@ class App {
 
     /**
      * Добавление нескольких заранее подготовленных компонетов
-     * @param {Map} components хеш компонетов
+     * @params {Map} components хеш компонетов
      */
     addComponents (components) {
         for ( let component of components.values()) {
@@ -113,7 +109,7 @@ class App {
 
     /**
      * Получение зарегистрированного компонента по его имени
-     * @param {String} componentName 
+     * @params {String} componentName 
      */
     getComponent(componentName) {
         return this.#components.get(componentName);
@@ -121,22 +117,22 @@ class App {
 
     /**
      * Обработчик щелчка мыши по кнопке
-     * @param {ClickEvent} event 
+     * @params {ClickEvent} event 
      */
     handlerClickButton(event) {
         switch(event.target.id) {
             case "btSave" :
-                this.app.saveJSON(this.app.getComponent("table").tableData.getData());
+                this.app.saveJSON(this.app.getComponent("tablePanel").currentTable.tableData.getData());
                 break;
             case "btOpen" :
-                this.app.openJSON(this.app.getComponent("table").tableData);
+                this.app.openJSON(this.app.getComponent("tablePanel").currentTable.tableData);
                 break;
         }
     }
 
     /**
      * Сохранение JSON в файл на локальном диске
-     * @param {JSON} json 
+     * @params {JSON} json 
      */
     saveJSON(json) {
         let output = document.createElement("a");
@@ -162,7 +158,7 @@ class App {
             reader.onload = () => { target.setData(reader.result); }
             reader.onerror = () => { target.setData(reader.error); }
         };
-        input.click();            
+        input.click();
     }
 
 }
