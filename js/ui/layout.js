@@ -13,67 +13,64 @@ const LayoutRegion = {
  * Класс контейнера с размещением содержимого в фиксированных местах 
  *######################################################################################*/
 class BorderLayout extends HTMLElement {
-    #parent; 
-    #region = {};
+    #parent;
+    #component;
 
     /**
      * Конструктор контейнера
      * @param {Object} parent - родительский элемент, в который помещается табличный контейнер
      * @param {Array[LayoutRegion]} regionTypes - массив мест размещения компонентов
      */
-    constructor(parent, regionTypes) {
+    constructor(parent) {
         super();
         this.#parent = parent;
-        this.classList.add("border-layout");
-        this.generateLayout(regionTypes);
+        this.id = "border-layout";
+        this.#component = new Map();
+        this.generateLayout();
         this.#parent.append(this);
     }
 
     /**
      * Генерация содержимого контейнера
-     * @param {Array[LayoutRegion} regionTypes 
-     */
-    generateLayout(regionTypes) {
-        if ( regionTypes.includes(LayoutRegion.TOP)) {
-            this.createRegion([LayoutRegion.TOP]);
-        }
-        if ( regionTypes.includes(LayoutRegion.TOP)) {
-            let reg = [];
-            if ( regionTypes.includes(LayoutRegion.LEFT)) reg.push(LayoutRegion.LEFT);
-            if ( regionTypes.includes(LayoutRegion.CENTER)) reg.push(LayoutRegion.CENTER);
-            if ( regionTypes.includes(LayoutRegion.RIGHT)) reg.push(LayoutRegion.RIGHT);
-            this.createRegion(reg);
-        }
-        if ( regionTypes.includes(LayoutRegion.BOTTOM)) {
-            this.createRegion([LayoutRegion.BOTTOM]);
-        }
-    }
-
-    /**
-     * Создание отдельного места расположения компонента
      * @param {Array[LayoutRegion]} regionTypes 
      */
-    createRegion(regionTypes) {
-        let row = document.createElement("div");
-        row.classList.add("row-border-layout");
-        for (let rt=0; rt<regionTypes.length; rt++) {
-            let cell = document.createElement("div");
-            cell.classList.add(regionTypes[rt]+"-border-layout");
-            row.append(cell);
-            this.#region[regionTypes[rt]] = cell;
-        }
-        this.append(row);
+    generateLayout() {
+        let header = document.createElement("header");
+        this.#component.set(LayoutRegion.TOP, header);
+        this.append(header);
+
+        let content = document.createElement("div");
+        content.id = "content";
+
+
+        let nav = document.createElement("nav");
+        this.#component.set(LayoutRegion.LEFT, nav);
+        content.append(nav);
+        
+        let main = document.createElement("main");
+        this.#component.set(LayoutRegion.CENTER, main);
+        content.append(main);
+
+
+        let asside = document.createElement("asside");
+        this.#component.set(LayoutRegion.RIGHT, asside);
+        content.append(asside);
+
+        this.append(content);
+
+        let footer = document.createElement("footer");
+        this.#component.set(LayoutRegion.BOTTOM, footer);
+        this.append(footer);
+        this.#parent.append(this);
     }
 
-    
     /**
      * Размещение компонента в контейнере в указанное место
      * @param {Object} component - размещаемый компопнент
      * @param {LayoutRegion} region - место размещения компонента
      */
     add(component, region) {
-        if ( this.#region[region] ) this.#region[region].append(component);
-        // component.addEventListener("click", (e) => console.log(e.target));
+        this.#component.get(region).append(component);
     }
 
 }

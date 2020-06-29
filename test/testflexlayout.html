@@ -5,54 +5,60 @@
 
     <style>
         :root {
-            --header-heigth: 50px;
-            --footer-heigth: 30px;
+            --top-heigth: 50px;
+            --bottom-heigth: 30px;
+            --left-width: 20vw;
+            --right-width: 20vw;
         }
 
-/*                 * {
+        * {
             box-sizing: border-box;
-        } */
+        }
 
         body {
             margin: 0;
         }
 
-        #content {
-            display: flex;
-            min-height: calc(100vh - var(--header-heigth) - var(--footer-heigth));
-        }
-
-        #content>main {
-            flex: 1;
-        }
-
-        #content>nav {
-            flex: 0 0 20vw;
-        }
-
-        #content>aside {
-            flex: 0 0 20vw;
-        }
-
-        #content>nav {
-            order: -1;
-        }
-
-        /*         header,
+        header,
         footer,
         main,
         nav,
         aside {
             padding: 0em;
         }
-    
- */
+
+
+        #content {
+            display: flex;
+            min-height: calc(100vh - var(--top-heigth) - var(--bottom-heigth));
+        }
+
+        #content>main {
+            flex-grow: 1;
+        }
+
+        #content>nav {
+            flex-grow: 0;
+            flex-shrink: 0;
+            flex-basis: var(--left-width);
+        }
+
+        #content>asside {
+            flex-grow: 0;
+            flex-shrink: 0;
+            flex-basis: var(--right-width);
+        }
+
+        #content>nav {
+            order: -1;
+        }
+
         header {
-            height: var(--header-heigth);
+            height: var(--top-heigth);
         }
 
         footer {
-            height: var(--footer-heigth);
+            height: var(--bottom-heigth);
         }
 
         button {
@@ -94,6 +100,7 @@
             constructor(parent) {
                 super();
                 this.#parent = parent;
+                this.id = "border-layout";
                 this.#component = new Map();
                 this.generateLayout();
                 this.#parent.append(this);
@@ -101,7 +108,7 @@
 
             /**
              * Генерация содержимого контейнера
-             * @param {Array[LayoutRegion} regionTypes 
+             * @param {Array[LayoutRegion]} regionTypes 
              */
             generateLayout() {
                 let header = document.createElement("header");

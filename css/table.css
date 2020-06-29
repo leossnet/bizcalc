@@ -3,10 +3,13 @@ table {
     border-collapse: collapse;  
     padding-right: 1%;    
     background-color: white;
-    overflow: auto;
+/*     overflow: auto; */
 }
 table:focus {
     outline: none;
+}
+table>tbody {
+    overflow: scroll;
 }
 td {
     font-size: 14px;

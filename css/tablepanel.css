@@ -4,10 +4,10 @@
     margin: 0 auto;
     background: var(--bg-color);
     font-size: 13px;
+    height: 100%;
 }
-/* Стили секций с содержанием */
 .table-panel>section {
-    padding: 10px;
+    height: 97%;
 }
 /* Стили переключателей вкладок (табов) */
 .table-panel>label {

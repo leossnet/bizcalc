@@ -20,7 +20,7 @@ class App {
         this.#fileName = 'filename.json';
 
         // добавление менеджеров размещения компонентов на интерфейсе (компоновщиков)
-        this.#blayout = new BorderLayout(this.#root, [LayoutRegion.TOP, LayoutRegion.CENTER, LayoutRegion.BOTTOM]);
+        this.#blayout = new BorderLayout(this.#root);
         this.#tlayout = new GridLayout(this.#root, 3, 1);
         this.#blayout.add(this.#tlayout, LayoutRegion.TOP);
 
