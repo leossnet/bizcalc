@@ -21,6 +21,7 @@
 }
 .bottom-border-layout {
     flex-grow: 1;
+    height: 30px;
 }
 .grid-layout {
     display: grid;

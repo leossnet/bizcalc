@@ -1,0 +1,7 @@
+#info-bar {
+    background-color: white;
+    font-size: 12px;
+    color: gray;
+    padding: 3px;
+    border: 1px solid lightgrey;
+}

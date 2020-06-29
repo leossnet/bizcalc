@@ -67,12 +67,14 @@ class App {
             }
         };
         this.addComponent("tablePanel", new TablePanel(this, tableParams));
+        this.addComponent("infobar", new Infobar(this, {}));
 
         // размещение компонентов на интерфейсе
         this.#tlayout.add(this.#btPanel, 1, 0);
         this.#tlayout.add(this.getComponent("navbar"), 0, 0);
         this.#tlayout.add(this.getComponent("editor"), 2, 0);
         this.#blayout.add(this.getComponent("tablePanel"), LayoutRegion.CENTER);
+        this.#blayout.add(this.getComponent("infobar"), LayoutRegion.BOTTOM);
 
         this.getComponent("tablePanel").currentTable.focus();
     }
@@ -153,6 +155,7 @@ class App {
         input.onchange = (event) => { 
             let file = event.target.files[0];
             this.#fileName = file.name;
+            this.getComponent("infobar").content = "Последний открытый файл: '"+file.name+"'";
             let reader = new FileReader();
             reader.readAsText(file);
             reader.onload = () => { target.setData(reader.result); }
