@@ -2,9 +2,7 @@
     box-sizing: border-box;
     font-family: Awesome,Helvetica,Verdana,Arial,sans-serif;
 }
-html {
-    display: contents;    
-}
+html,
 body {
     width: 100%;
     display: contents;  

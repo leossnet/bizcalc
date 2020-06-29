@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>Flexbox в CSS3</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      padding: 0;
+      margin: 0;
+      font-family: verdana, arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 2 2 12em;
+      padding: 1em;
+    }
+
+    nav,
+    aside {
+      flex: 1;
+    }
+
+    nav {
+      order: -1;
+    }
+
+    header,
+    footer {
+      flex: 0 0 5em;
+    }
+
+    @media screen and (min-width: 600px) {
+      body {
+        min-height: 100vh;
+      }
+
+      #content {
+        flex-direction: row;
+        min-height: 100%;
+        flex: 1 1 auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <p>Header</p>
+  </header>
+  <div id="content">
+    <main>
+      <h1>Что такое Lorem Ipsum?</h1>
+      <p>
+        Lorem Ipsum - это текст-"рыба", часто используемый в печати и
+        вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на
+        латинице с начала XVI века. В то время некий безымянный печатник
+        создал большую коллекцию размеров и форм шрифтов, используя Lorem
+        Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил
+        без заметных изменений пять веков, но и перешагнул в электронный
+        дизайн. Его популяризации в новое время
+      </p>
+    </main>
+    <nav>
+      <p>Navigation</p>
+    </nav>
+    <aside>
+      <p>Sidebar</p>
+    </aside>
+  </div>
+  <footer>
+    <p>Footer</p>
+  </footer>
+</body>
+
+</html>
