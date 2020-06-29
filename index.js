@@ -55,15 +55,28 @@ class App {
         // регистрация простых компонентов
         this.addComponent("navbar", new Navbar(this, {}));
         this.addComponent("editor", new Editor(this, {}));
-        this.addComponent("table", new Table (this, { 
-            rowCount: param.rowCount, colCount: param.colCount, isFocus: true
-        }));
+        const tableParams = {
+            table1: {
+                name: "Лист 1",
+                checked: true,
+                params: { rowCount: 15, colCount: 10, isFocus: true }
+            },
+            table2: {
+                name: "Лист 2",
+                params: { rowCount: 10, colCount: 5, isFocus: true }
+            }
+        };
+        this.addComponent("tablePanel", new TablePanel(this, tableParams));
+
+        // this.addComponent("table", new Table (this, { 
+        //     rowCount: param.rowCount, colCount: param.colCount, isFocus: true
+        // }));
 
         // размещение компонентов на интерфейсе
         this.#tlayout.add(this.#btPanel, 1, 0);
         this.#tlayout.add(this.getComponent("navbar"), 0, 0);
         this.#tlayout.add(this.getComponent("editor"), 2, 0);
-        this.#blayout.add(this.getComponent("table"), LayoutRegion.CENTER);
+        this.#blayout.add(this.getComponent("tablePanel"), LayoutRegion.CENTER);
 
         this.getComponent("table").focus();
     }

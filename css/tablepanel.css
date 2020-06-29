@@ -1,0 +1,29 @@
+/* Базовый контейнер табов */
+.table-panel {
+    padding: 0px;
+    margin: 0 auto;
+    background: #eee;
+    font-size: 13px;
+}
+/* Стили секций с содержанием */
+.table-panel>section {
+    padding: 10px;
+}
+/* Стили переключателей вкладок (табов) */
+.table-panel>label {
+    padding: 5px 5px;
+    text-align: center;
+    color: gray;
+}
+/* Изменения стиля переключателей вкладок при наведении */
+.table-panel>label:hover {
+    color: #555;
+    font-weight: bold;
+    cursor: pointer;
+}
+/* Стили для активной вкладки */
+.table-panel>input:checked+label {
+    color: #555;
+    font-weight: bold;
+    border-top: 2px solid green;
+}
