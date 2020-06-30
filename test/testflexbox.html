@@ -2,91 +2,144 @@
 <html>
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width" />
-  <title>Flexbox в CSS3</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      padding: 0;
-      margin: 0;
-      font-family: verdana, arial, sans-serif;
-    }
-
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-
-    #content {
-      display: flex;
-      flex-direction: column;
-    }
-
-    main {
-      flex: 2 2 12em;
-      padding: 1em;
-    }
-
-    nav,
-    aside {
-      flex: 1;
-    }
-
-    nav {
-      order: -1;
-    }
-
-    header,
-    footer {
-      flex: 0 0 5em;
-    }
-
-    @media screen and (min-width: 600px) {
-      body {
-        min-height: 100vh;
-      }
-
-      #content {
-        flex-direction: row;
-        min-height: 100%;
-        flex: 1 1 auto;
-      }
-    }
-  </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Flexbox в CSS3</title>
+    <link rel="stylesheet" href="../css/flexlayout.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        html,
+        body,
+        #testflex {
+            padding: 0;
+            margin: 0;
+            font-family: verdana, arial, sans-serif;
+        }
+        .top-button,
+        .bottom-button {
+            width: 100%;
+            height: 100px;
+        }
+        .left-button,
+        .right-button {
+            width: 250px;
+            height: 100%;
+        }
+        .main-button {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 
 <body>
-  <header>
-    <p>Header</p>
-  </header>
-  <div id="content">
-    <main>
-      <h1>Что такое Lorem Ipsum?</h1>
-      <p>
-        Lorem Ipsum - это текст-"рыба", часто используемый в печати и
-        вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на
-        латинице с начала XVI века. В то время некий безымянный печатник
-        создал большую коллекцию размеров и форм шрифтов, используя Lorem
-        Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил
-        без заметных изменений пять веков, но и перешагнул в электронный
-        дизайн. Его популяризации в новое время
-      </p>
-    </main>
-    <nav>
-      <p>Navigation</p>
-    </nav>
-    <aside>
-      <p>Sidebar</p>
-    </aside>
-  </div>
-  <footer>
-    <p>Footer</p>
-  </footer>
+    <div id="testflex">
+    <script>
+        /**
+         * Места расположения компонентов в контейнере
+         */
+        const Space = {
+            TOP: "top",
+            BOTTOM: "bottom",
+            LEFT: "left",
+            RIGHT: "right",
+            CENTER: "center"
+        };
+
+        /**#####################################################################################
+         * Класс контейнера с размещением содержимого в фиксированных местах 
+         *######################################################################################*/
+        class FlexLayout extends HTMLDivElement {
+            #parent;
+            #component;
+
+            /**
+             * Конструктор контейнера
+             * @param {Object} parent - родительский элемент, в который помещается табличный контейнер
+             */
+            constructor(parent) {
+                super();
+                this.#parent = parent;
+                this.id = "flex-layout";
+                this.#component = new Map();
+                this.generateLayout();
+                this.#parent.append(this);
+            }
+
+            /**
+             * Генерация содержимого контейнера
+             */
+            generateLayout() {
+                let header = document.createElement("header");
+                this.#component.set(Space.TOP, header);
+                this.append(header);
+
+                let content = document.createElement("div");
+                content.id = "content";
+
+                let main = document.createElement("main");
+                this.#component.set(Space.CENTER, main);
+                content.append(main);
+                
+                let nav = document.createElement("nav");
+                this.#component.set(Space.LEFT, nav);
+                content.append(nav);
+
+                let asside = document.createElement("asside");
+                this.#component.set(Space.RIGHT, asside);
+                content.append(asside);
+
+                this.append(content);
+
+                let footer = document.createElement("footer");
+                this.#component.set(Space.BOTTOM, footer);
+                this.append(footer);
+            }
+
+            /**
+             * Размещение компонента в контейнере в указанное место
+             * @param {Object} component - размещаемый компопнент
+             * @param {Space} space - место размещения компонента
+             */
+            add(component, space) {
+                this.#component.get(space).append(component);
+            }
+
+        }
+
+        // регистрация нового html-элемента
+        customElements.define('flex-layout', FlexLayout, {extends: "div"});
+
+
+
+        let root = document.querySelector("#testflex");
+        let flexlo = new FlexLayout(root);
+
+        let topButton = document.createElement("button");
+        topButton.classList.add("top-button");
+
+        let leftButton = document.createElement("button");
+        leftButton.classList.add("left-button");
+
+        let mainButton = document.createElement("button");
+        mainButton.classList.add("main-button");
+
+        let rightButton = document.createElement("button");
+        rightButton.classList.add("right-button");
+
+        let bottomButton = document.createElement("button");
+        bottomButton.classList.add("bottom-button");
+
+
+        flexlo.add(topButton, Space.TOP);
+        flexlo.add(leftButton, Space.LEFT);
+        flexlo.add(mainButton, Space.CENTER);
+        flexlo.add(rightButton, Space.RIGHT);
+        flexlo.add(bottomButton, Space.BOTTOM);
+
+    </script>
 </body>
 
 </html>

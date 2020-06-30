@@ -1,0 +1,9 @@
+.grid-layout {
+    display: grid;
+    grid-template-rows: repeat(var(--grid-rows), auto);
+    grid-template-columns: repeat(var( --grid-cols), auto);
+    background-color: lightgray;
+}
+.grid-item {
+    background-color: lightgray;
+}

@@ -5,7 +5,7 @@ class App {
     #root;
     #components;
     #btPanel;
-    #blayout;
+    #flayout;
     #tlayout;
     #fileName;
 
@@ -20,9 +20,9 @@ class App {
         this.#fileName = 'filename.json';
 
         // добавление менеджеров размещения компонентов на интерфейсе (компоновщиков)
-        this.#blayout = new BorderLayout(this.#root);
+        this.#flayout = new FlexLayout(this.#root);
         this.#tlayout = new GridLayout(this.#root, 3, 1);
-        this.#blayout.add(this.#tlayout, LayoutRegion.TOP);
+        this.#flayout.add(this.#tlayout, Space.TOP);
 
         // настройка кнопочной панели
         const buttons = {
@@ -73,8 +73,8 @@ class App {
         this.#tlayout.add(this.#btPanel, 1, 0);
         this.#tlayout.add(this.getComponent("navbar"), 0, 0);
         this.#tlayout.add(this.getComponent("editor"), 2, 0);
-        this.#blayout.add(this.getComponent("tablePanel"), LayoutRegion.CENTER);
-        this.#blayout.add(this.getComponent("infobar"), LayoutRegion.BOTTOM);
+        this.#flayout.add(this.getComponent("tablePanel"), Space.CENTER);
+        this.#flayout.add(this.getComponent("infobar"), Space.BOTTOM);
 
         this.getComponent("tablePanel").currentTable.focus();
     }

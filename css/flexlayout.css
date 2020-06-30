@@ -1,0 +1,34 @@
+#flex-layout {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+#content {
+    display: flex;
+    flex-direction: column;
+}
+main {
+    flex: 2 2 25em;
+}
+nav,
+aside {
+    flex: 1;
+}
+nav {
+    order: -1;
+}
+header,
+footer {
+    flex: 0 0 1em;
+}
+@media screen and (min-width: 600px) {
+    #flex-layout {
+        min-height: 100vh;
+    }
+    #content {
+        flex-direction: row;
+        min-height: 100%;
+        flex: 1 1 auto;
+    }
+}
