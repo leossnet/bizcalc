@@ -53,6 +53,7 @@ class Table extends HTMLTableElement{
             let letter = String.fromCharCode("A".charCodeAt(0) + i);
             this.headers.push(letter);
             let th = document.createElement("th");
+            th.setAttribute("col", letter);
             th.innerHTML = letter;
             hRow.append(th);
         }
@@ -62,15 +63,20 @@ class Table extends HTMLTableElement{
         let tBody = document.createElement("tBody");
         for (let i = 1; i < this.#table.rowCount + 1; i++) {
             let row = tBody.insertRow(-1);
+            row.setAttribute("row", i);
             let th = document.createElement("th");
+            th.setAttribute("row", i);
             th.innerHTML = i;
             row.append(th);
             for (let j = 1; j <= this.#table.colCount; j++) {
                 let letter = this.headers[j];
                 let cell = new Cell(this, i, letter);
-                cell.id = letter + i;
+                // cell.id = letter + i;
                 this.#tdata.setCell(letter + i, cell);
-                row.insertCell(-1).append(cell);
+                let th = row.insertCell(-1);
+                th.setAttribute("col", letter);
+                th.append(cell);
+                // row.insertCell(-1).append(cell);
             }
         }
         this.append(tBody);

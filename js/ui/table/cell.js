@@ -38,6 +38,7 @@ class Cell extends HTMLElement {
         };
         this.initCell();
 
+        this.id = colName+rowName;
         this.setAttribute("type", this.#data.type);
         this.addEventListener("click", this.handlerClick );
     }
