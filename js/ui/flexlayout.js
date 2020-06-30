@@ -2,11 +2,11 @@
  * Места расположения компонентов в контейнере
  */
 const Space = {
-    TOP: "top",
-    BOTTOM: "bottom",
-    LEFT: "left",
-    RIGHT: "right",
-    CENTER: "center"
+    TOP: "header",
+    BOTTOM: "footer",
+    LEFT: "nav",
+    RIGHT: "asside",
+    CENTER: "main"
 };
 
 /**#####################################################################################
@@ -23,40 +23,38 @@ class FlexLayout extends HTMLDivElement {
     constructor(parent) {
         super();
         this.#parent = parent;
-        this.id = "flex-layout";
+        this.classList.add("flex-layout");
         this.#component = new Map();
         this.generateLayout();
         this.#parent.append(this);
     }
 
     /**
-     * Генерация содержимого контейнера
+     * Генерация содержимого блочного компоновщика
      */
     generateLayout() {
-        let header = document.createElement("header");
-        this.#component.set(Space.TOP, header);
-        this.append(header);
+        this.appendFlexItem(this, Space.TOP); 
 
         let content = document.createElement("div");
-        content.id = "content";
-
-        let main = document.createElement("main");
-        this.#component.set(Space.CENTER, main);
-        content.append(main);
-        
-        let nav = document.createElement("nav");
-        this.#component.set(Space.LEFT, nav);
-        content.append(nav);
-
-        let asside = document.createElement("asside");
-        this.#component.set(Space.RIGHT, asside);
-        content.append(asside);
-
+        content.classList.add("flex-row");
+        this.appendFlexItem(content, Space.CENTER); 
+        this.appendFlexItem(content, Space.LEFT); 
+        this.appendFlexItem(content, Space.RIGHT); 
         this.append(content);
 
-        let footer = document.createElement("footer");
-        this.#component.set(Space.BOTTOM, footer);
-        this.append(footer);
+        this.appendFlexItem(this, Space.BOTTOM); 
+    }
+
+    /**
+     * Создание контейнера и добавление его к родительскому компоненту
+     * @param {Object} parent - родитель контейнера
+     * @param {Space} space - тип контейнера
+     */
+    appendFlexItem(parent, space) {
+        let flexItem = document.createElement(space);
+        this.#component.set(space, flexItem);
+        flexItem.classList.add("flex-item");
+        parent.append(flexItem);
     }
 
     /**
