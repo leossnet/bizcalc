@@ -8,18 +8,18 @@
     display: flex;
     flex-direction: column;
 }
-main {
+main.flex-item {
     flex: 2 2 25em;
 }
-nav,
-aside {
+nav.flex-item,
+aside.flex-item {
     flex: 1;
 }
-nav {
+nav.flex-item {
     order: -1;
 }
-header,
-footer {
+header.flex-item,
+footer.flex-item {
     flex: 0 0 1em;
 }
 .flex-item:empty {
