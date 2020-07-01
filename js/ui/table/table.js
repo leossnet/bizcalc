@@ -33,14 +33,13 @@ class Table extends HTMLTableElement{
         this.generateTable(params);
         this.#tableStyle = document.createElement("style");
         this.append(this.#tableStyle);
-        this.viewCells("B2", "F10");
-        this.setCursor("B2");
+        // this.viewCells("B2", "F10");
+        this.setCursor("A1");
         if ( params.isFocus ) this.focus();
 
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
         this.addEventListener("keydown", this.handlerKeyEditing);
-        window.addEventListener("resize", this.handlerResize);
     }
 
     /**
@@ -48,6 +47,16 @@ class Table extends HTMLTableElement{
      * @param {Object} params - набор параметром, упакованных в объект
      */
     generateTable(params) {
+        // генерация параметров колонок
+        let cgHeader = document.createElement("colgroup");
+        cgHeader.classList.add("col-header");
+        cgHeader.span = 1;
+        this.append(cgHeader);
+        let cgData = document.createElement("colgroup");
+        cgData.classList.add("col-data");
+        cgData.span = params.colCount;
+        this.append(cgData);        
+
         // генерация шапки таблицы
         let tHead = document.createElement("tHead");
         let hRow = tHead.insertRow(-1);
@@ -124,6 +133,7 @@ class Table extends HTMLTableElement{
         if  ( this.#cursor.cell ) oldCell = this.#cursor.cell;
         let newCell = this.getCell(cellName);
         this.#cursor.cell = newCell;
+        this.setAttribute("cursor-cell", this.#cursor.cell.name);
         if ( oldCell && oldCell !== newCell) oldCell.refresh();
         // this.#cursor.setInput();
     }
@@ -181,10 +191,16 @@ class Table extends HTMLTableElement{
 
     }
 
-    handlerResize(event) {
-        console.log(event);
-        console.log(this.#app.getComponent("table1").style.width);
+
+    static get observedAttributes() {
+        return ["cursor-cell"];
     }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        console.log(name+": "+oldValue+" -> "+newValue);
+        // console.log(this.parentElement);
+        // console.log(this.parentElement.clientWidth+"x"+this.parentElement.clientHeight);
+    }    
 
    /**
      * Обработка нажатий на клавиши стрелок
