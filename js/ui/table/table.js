@@ -8,6 +8,7 @@ class Table extends HTMLTableElement{
     #tdata;
     #editor;
     #tableStyle;
+    #view = {};
 
     /**
      * Конструктор таблицы 
@@ -30,6 +31,8 @@ class Table extends HTMLTableElement{
 
         // генерация внешнего вида таблицы
         this.generateTable(params);
+        this.#tableStyle = document.createElement("style");
+        this.append(this.#tableStyle);
         this.viewCells("B2", "F10");
         this.setCursor("B2");
         if ( params.isFocus ) this.focus();
@@ -37,6 +40,7 @@ class Table extends HTMLTableElement{
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
         this.addEventListener("keydown", this.handlerKeyEditing);
+        window.addEventListener("resize", this.handlerResize);
     }
 
     /**
@@ -44,13 +48,6 @@ class Table extends HTMLTableElement{
      * @param {Object} params - набор параметром, упакованных в объект
      */
     generateTable(params) {
-        // подготовка для формирования глобальных стилей привязки элементов кнопочной панели
-        this.#tableStyle = this.querySelector("table style");
-        if ( !this.#tableStyle ) {
-            this.#tableStyle = document.createElement("style");
-            this.append(this.#tableStyle);
-        }
-        
         // генерация шапки таблицы
         let tHead = document.createElement("tHead");
         let hRow = tHead.insertRow(-1);
@@ -170,6 +167,23 @@ class Table extends HTMLTableElement{
             +"th[col]:nth-child(n+"+endCol+"), td[col]:nth-child(n+"+endCol+")"+
             "{display: none;}";
         this.#tableStyle.innerHTML = cssText;
+    }
+
+    /**
+     * Получение доступной высоты блока ячеек 
+     * @param {String} beginCell - начальная ячейка в левом верхнем углу
+     */
+    getCellsHeight(beginCellName){
+
+    }
+
+    getCellsWidth(beginCell) {
+
+    }
+
+    handlerResize(event) {
+        console.log(event);
+        console.log(this.#app.getComponent("table1").style.width);
     }
 
    /**
