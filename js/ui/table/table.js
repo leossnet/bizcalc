@@ -7,6 +7,7 @@ class Table extends HTMLTableElement{
     #cursor;
     #tdata;
     #editor;
+    #tableStyle;
 
     /**
      * Конструктор таблицы 
@@ -29,7 +30,8 @@ class Table extends HTMLTableElement{
 
         // генерация внешнего вида таблицы
         this.generateTable(params);
-        this.setCursor("A1");
+        this.viewCells("B2", "F10");
+        this.setCursor("B2");
         if ( params.isFocus ) this.focus();
 
         // обработчики событий
@@ -42,6 +44,13 @@ class Table extends HTMLTableElement{
      * @param {Object} params - набор параметром, упакованных в объект
      */
     generateTable(params) {
+        // подготовка для формирования глобальных стилей привязки элементов кнопочной панели
+        this.#tableStyle = this.querySelector("table style");
+        if ( !this.#tableStyle ) {
+            this.#tableStyle = document.createElement("style");
+            this.append(this.#tableStyle);
+        }
+        
         // генерация шапки таблицы
         let tHead = document.createElement("tHead");
         let hRow = tHead.insertRow(-1);
@@ -79,6 +88,7 @@ class Table extends HTMLTableElement{
                 // row.insertCell(-1).append(cell);
             }
         }
+
         this.append(tBody);
     }
 
@@ -138,6 +148,28 @@ class Table extends HTMLTableElement{
         else newCol += Math.max(deltaCol, 1-newCol);
 
         this.setCursor(currentCell.getCellName(newRow, newCol));
+    }
+
+    
+    /**
+     * Установка видимой части таблицы
+     * @param {String} beginCellName - левая верхняя видимая ячейка таблицы
+     * @param {Strinhg} endCellName - правая нижняя видимая ячейка таблицы
+     */
+    viewCells(beginCellName, endCellName) {
+        let beginCell = this.getCell(beginCellName);
+        let endCell = this.getCell(endCellName);
+        let beginRow = beginCell.rowNumber-1;
+        let beginCol = beginCell.colNumber;
+        let endRow = endCell.rowNumber+1;
+        let endCol = endCell.colNumber+2;
+        let cssText = ""
+            +"tr[row]:nth-child(-n+"+beginRow+"),tr[row]:nth-child(n+"+endRow+")"
+            +"{display: none;}"
+            +"th[col]:nth-child(-n+"+beginCol+"), td[col]:nth-child(-n+"+beginCol+"),"
+            +"th[col]:nth-child(n+"+endCol+"), td[col]:nth-child(n+"+endCol+")"+
+            "{display: none;}";
+        this.#tableStyle.innerHTML = cssText;
     }
 
    /**

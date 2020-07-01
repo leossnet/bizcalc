@@ -74,13 +74,4 @@ input:focus {
 b-cursor:focus {
     outline: none;
 }
-/* Скрытие определенных строк с атрибутом row */
-tr[row~='1'],
-tr[row~='2']{
-    display: none;
-}
-/* Скрытие определенных колонок с атрибутом col */
-th[col~="A"],
-td[col~="A"] {
-    display: none;
-}
+
