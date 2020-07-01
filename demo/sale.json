@@ -1,0 +1,127 @@
+{
+  "strings": {
+    "A1": "Продажи продукции",
+    "A2": "№",
+    "B2": "Наименование",
+    "C2": "Кол-во",
+    "D2": "Цена",
+    "E2": "Сумма",
+    "B3": "Продукция 1",
+    "B4": "Продукция 2",
+    "B5": "Продукция 3",
+    "B6": "Итого:"
+  },
+  "values": {
+    "A3": 1,
+    "A4": 2,
+    "A5": 3,
+    "C3": 30,
+    "C4": 20,
+    "C5": 25,
+    "D3": 140,
+    "D4": 60,
+    "D5": 90
+  },
+  "tokens": {
+    "E3": [
+      {
+        "type": "cell",
+        "value": "C3"
+      },
+      {
+        "type": "operator",
+        "value": "*"
+      },
+      {
+        "type": "cell",
+        "value": "D3"
+      }
+    ],
+    "E4": [
+      {
+        "type": "cell",
+        "value": "C4"
+      },
+      {
+        "type": "operator",
+        "value": "*"
+      },
+      {
+        "type": "cell",
+        "value": "D4"
+      }
+    ],
+    "E5": [
+      {
+        "type": "cell",
+        "value": "C5"
+      },
+      {
+        "type": "operator",
+        "value": "*"
+      },
+      {
+        "type": "cell",
+        "value": "D5"
+      }
+    ],
+    "C6": [
+      {
+        "type": "cell",
+        "value": "C3"
+      },
+      {
+        "type": "operator",
+        "value": "+"
+      },
+      {
+        "type": "cell",
+        "value": "C4"
+      },
+      {
+        "type": "operator",
+        "value": "+"
+      },
+      {
+        "type": "cell",
+        "value": "C5"
+      }
+    ],
+    "E6": [
+      {
+        "type": "cell",
+        "value": "E3"
+      },
+      {
+        "type": "operator",
+        "value": "+"
+      },
+      {
+        "type": "cell",
+        "value": "E4"
+      },
+      {
+        "type": "operator",
+        "value": "+"
+      },
+      {
+        "type": "cell",
+        "value": "E5"
+      }
+    ],
+    "D6": [
+      {
+        "type": "cell",
+        "value": "E6"
+      },
+      {
+        "type": "operator",
+        "value": "/"
+      },
+      {
+        "type": "cell",
+        "value": "C6"
+      }
+    ]
+  }
+}
