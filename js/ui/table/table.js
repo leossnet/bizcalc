@@ -33,13 +33,17 @@ class Table extends HTMLTableElement{
         this.generateTable(params);
         this.#tableStyle = document.createElement("style");
         this.append(this.#tableStyle);
-        // this.viewCells("B2", "F10");
+        // this.viewCells("B2", 2, 2);
         this.setCursor("A1");
         if ( params.isFocus ) this.focus();
 
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
         this.addEventListener("keydown", this.handlerKeyEditing);
+        window.addEventListener("resize", () => { 
+            this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
+            this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+        });
     }
 
     /**
@@ -60,6 +64,7 @@ class Table extends HTMLTableElement{
         // генерация шапки таблицы
         let tHead = document.createElement("tHead");
         let hRow = tHead.insertRow(-1);
+        hRow.classList.add("row-header");
         this.headers.push("");
         let th = document.createElement("th");
         th.innerHTML = "";
@@ -79,6 +84,7 @@ class Table extends HTMLTableElement{
         for (let i = 1; i < this.#table.rowCount + 1; i++) {
             let row = tBody.insertRow(-1);
             row.setAttribute("row", i);
+            row.classList.add("row-data");
             let th = document.createElement("th");
             th.setAttribute("row", i);
             th.innerHTML = i;
@@ -163,13 +169,12 @@ class Table extends HTMLTableElement{
      * @param {String} beginCellName - левая верхняя видимая ячейка таблицы
      * @param {Strinhg} endCellName - правая нижняя видимая ячейка таблицы
      */
-    viewCells(beginCellName, endCellName) {
+    viewCells(beginCellName, deltaRow, deltaCol) {
         let beginCell = this.getCell(beginCellName);
-        let endCell = this.getCell(endCellName);
         let beginRow = beginCell.rowNumber-1;
         let beginCol = beginCell.colNumber;
-        let endRow = endCell.rowNumber+1;
-        let endCol = endCell.colNumber+2;
+        let endRow = beginRow+deltaRow;
+        let endCol = beginCol+deltaCol+1;
         let cssText = ""
             +"tr[row]:nth-child(-n+"+beginRow+"),tr[row]:nth-child(n+"+endRow+")"
             +"{display: none;}"
@@ -180,26 +185,48 @@ class Table extends HTMLTableElement{
     }
 
     /**
-     * Получение доступной высоты блока ячеек 
-     * @param {String} beginCell - начальная ячейка в левом верхнем углу
+     * Обрабочик, вызываемой после добавления компонента в документ
      */
-    getCellsHeight(beginCellName){
-
+    connectedCallback() { 
+        this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
+        this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
     }
 
-    getCellsWidth(beginCell) {
-
-    }
-
-
+    /**
+     * Массив пользовательских атрибутов, значения которых отслеживаются процедурой attributeChangedCallback
+     */
     static get observedAttributes() {
-        return ["cursor-cell"];
+        return ["cursor-cell", "view-width", "view-height"];
     }
 
+    /**
+     * Обработчик события изменения значений пользовательских атрибутов, возвращаемых observedAttributes
+     * @param {String} name - имя атрибута 
+     * @param {String} oldValue - предыдущее значение атрибута
+     * @param {String} newValue - новое значение атрибута
+     */
     attributeChangedCallback(name, oldValue, newValue) {
-        console.log(name+": "+oldValue+" -> "+newValue);
-        // console.log(this.parentElement);
-        // console.log(this.parentElement.clientWidth+"x"+this.parentElement.clientHeight);
+        if (name =="cursor-cell") {
+            console.log("cursor: "+oldValue+" -> "+newValue);
+        }
+        if (name == "view-width" || name == "view-height" ) {
+            // let vh = parseInt(this.getAttribute("view-height"));
+            let vw = parseInt(this.getAttribute("view-width"));
+
+            let hHeader = parseInt(getComputedStyle(document.querySelector("header.flex-item")).height);
+            let hFooter = parseInt(getComputedStyle(document.querySelector("footer.flex-item")).height);
+            let hDocument = parseInt(getComputedStyle(document.querySelector("div#bizcalc")).height);
+            let vh = hDocument-hHeader-hFooter;
+            console.log(hDocument+" - "+hHeader+" - "+hFooter+" = "+(hDocument-hHeader-hFooter));
+
+            // console.log(vh);
+            // console.log(vw);
+            let maxRow = Math.floor(vh/22);
+            let maxCol = Math.floor((vw-40)/80);
+            // console.log(maxRow+":"+maxCol);
+            // console.log(getComputedStyle(this.parentElement).height);
+            this.viewCells("A1", maxRow, maxCol);
+        }
     }    
 
    /**
@@ -302,7 +329,7 @@ class Table extends HTMLTableElement{
                 }
                 break;
             default: 
-                if ( this.#cursor.isPrintKey(keyEvent.keyCode) ) {
+                if ( this.#cursor.isPrintKey(keyEvent.keyCode) && !keyEvent.ctrlKey ) {
                     if ( !this.#cursor.isEdit ) this.#cursor.beginInput();
                     this.#cursor.addKey(keyEvent);
                 }

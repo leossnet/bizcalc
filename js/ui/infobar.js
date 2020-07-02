@@ -15,6 +15,10 @@ class Infobar extends HTMLLabelElement {
         this.id = "info-bar";
         this.innerHTML = "Здесь выводится разная полезная информация";
         this.style.display = "flex";
+        window.addEventListener("resize", () => { 
+            this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
+            this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+        });
     }
 
     set content(content) {
@@ -26,6 +30,20 @@ class Infobar extends HTMLLabelElement {
     }
 
 
+    /**
+     * Обрабочик, вызываемой после добавления компонента в документ
+     */
+    connectedCallback() { 
+        this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
+        this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+    }
+
+    /**
+     * Массив пользовательских атрибутов, значения которых отслеживаются процедурой attributeChangedCallback
+     */
+    static get observedAttributes() {
+        return ["cursor-cell", "view-width", "view-height"];
+    } 
 }
 
 // регистрация нового html-элемента

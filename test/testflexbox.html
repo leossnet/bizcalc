@@ -62,7 +62,7 @@
             constructor(parent) {
                 super();
                 this.#parent = parent;
-                this.id = "flex-layout";
+                this.classList.add("flex-layout");
                 this.#component = new Map();
                 this.generateLayout();
                 this.#parent.append(this);
@@ -73,27 +73,33 @@
              */
             generateLayout() {
                 let header = document.createElement("header");
+                header.classList.add("flex-item");
                 this.#component.set(Space.TOP, header);
                 this.append(header);
 
                 let content = document.createElement("div");
+                header.classList.add("flex-row");
                 content.id = "content";
 
                 let main = document.createElement("main");
                 this.#component.set(Space.CENTER, main);
+                main.classList.add("flex-item");
                 content.append(main);
                 
                 let nav = document.createElement("nav");
+                nav.classList.add("flex-item");
                 this.#component.set(Space.LEFT, nav);
                 content.append(nav);
 
                 let asside = document.createElement("asside");
+                asside.classList.add("flex-item");
                 this.#component.set(Space.RIGHT, asside);
                 content.append(asside);
 
                 this.append(content);
 
                 let footer = document.createElement("footer");
+                footer.classList.add("flex-item");
                 this.#component.set(Space.BOTTOM, footer);
                 this.append(footer);
             }

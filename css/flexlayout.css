@@ -9,7 +9,7 @@
     flex-direction: column;
 }
 main.flex-item {
-    flex: 2 2 25em;
+    flex: 2 2 25em; 
 }
 nav.flex-item,
 aside.flex-item {

@@ -16,6 +16,10 @@ class ButtonPanel extends HTMLDivElement {
         this.#components = new Map();
         this.classList.add("button-panel");
         this.generateButtonPanel(app, buttons);
+        window.addEventListener("resize", () => { 
+            this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
+            this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+        });
     }
 
     /**
@@ -86,6 +90,21 @@ class ButtonPanel extends HTMLDivElement {
     get app() {
         return this.#app;
     }
+
+    /**
+     * Обрабочик, вызываемой после добавления компонента в документ
+     */
+    connectedCallback() { 
+        this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
+        this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+    }
+
+    /**
+     * Массив пользовательских атрибутов, значения которых отслеживаются процедурой attributeChangedCallback
+     */
+    static get observedAttributes() {
+        return ["cursor-cell", "view-width", "view-height"];
+    }    
 }
 
 // регистрация нового html-элемента

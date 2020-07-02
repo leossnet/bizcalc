@@ -55,28 +55,43 @@ class App {
         // регистрация простых компонентов
         this.addComponent("navbar", new Navbar(this, {}));
         this.addComponent("editor", new Editor(this, {}));
+        // const tablePanelParams = {
+        //     table1: {
+        //         name: "Лист 1",
+        //         checked: true,
+        //         params: { rowCount: params.rowCount, colCount: params.colCount, isFocus: true }
+        //     },
+        //     table2: {
+        //         name: "Лист 2",
+        //         params: { rowCount: params.rowCount, colCount: params.colCount, isFocus: true }
+        //     }
+        // };
+        // this.addComponent("tablePanel", new TablePanel(this, tablePanelParams));
+
         const tableParams = {
-            table1: {
-                name: "Лист 1",
-                checked: true,
-                params: { rowCount: params.rowCount, colCount: params.colCount, isFocus: true }
-            },
-            table2: {
-                name: "Лист 2",
-                params: { rowCount: params.rowCount, colCount: params.colCount, isFocus: true }
-            }
+            colCount: params.colCount,
+            rowCount: params.rowCount,
+            isFocus: true
         };
-        this.addComponent("tablePanel", new TablePanel(this, tableParams));
+        let table = new Table(this, tableParams);
+        console.log(table);
+        this.addComponent("table", table);
+
         this.addComponent("infobar", new Infobar(this, {}));
 
         // размещение компонентов на интерфейсе
         this.#tlayout.add(this.#btPanel, 1, 0);
         this.#tlayout.add(this.getComponent("navbar"), 0, 0);
         this.#tlayout.add(this.getComponent("editor"), 2, 0);
-        this.#flayout.add(this.getComponent("tablePanel"), Space.CENTER);
+        
+        // this.#flayout.add(this.getComponent("tablePanel"), Space.CENTER);
+        this.#flayout.add(this.getComponent("table"), Space.CENTER);
+        // this.#flayout.add("Просто текст", Space.CENTER);
+
         this.#flayout.add(this.getComponent("infobar"), Space.BOTTOM);
 
-        this.getComponent("tablePanel").currentTable.focus();
+        // this.getComponent("tablePanel").currentTable.focus();
+        this.getComponent("table").focus();
     }
 
     /**
