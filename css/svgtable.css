@@ -1,0 +1,11 @@
+
+svg-table {
+    background-color: lightgrey;
+    width: 100%;
+    height: 100%;
+}
+rect {
+    fill: white;
+    stroke: #aaa;
+    stroke-width: 0.5px;
+}
