@@ -71,6 +71,7 @@ class App {
         const tableParams = {
             colCount: params.colCount,
             rowCount: params.rowCount,
+            colWidths: [60,70,80,90,100,60,70,80,90,100,60,70,80,90,100],
             isFocus: true
         };
         let table = new Table(this, tableParams);

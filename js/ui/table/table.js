@@ -9,6 +9,8 @@ class Table extends HTMLTableElement{
     #editor;
     #tableStyle;
     #view = {};
+    #colWidths;
+    #cols;
 
     /**
      * Конструктор таблицы 
@@ -24,6 +26,8 @@ class Table extends HTMLTableElement{
             rowCount: params.rowCount
         };
         this.headers = [];
+        this.#colWidths = params.colWidths;
+        this.#cols = new Map();
         this.#tdata = new TableData(app);
         this.#editor = params.editor;
         this.#cursor = new Cursor(app, this);
@@ -59,6 +63,14 @@ class Table extends HTMLTableElement{
         let cgData = document.createElement("colgroup");
         cgData.classList.add("col-data");
         cgData.span = params.colCount;
+        console.log(this.#colWidths);
+        for (let c=0; c<params.colCount; c++) {
+            let col = document.createElement("col");
+            col.id = String.fromCharCode("A".charCodeAt(0) + c);
+            col.setAttribute("width", this.#colWidths[c]);
+            this.#cols.set(col.id, col);
+            cgData.append(col);
+        }
         this.append(cgData);        
 
         // генерация шапки таблицы
@@ -104,8 +116,12 @@ class Table extends HTMLTableElement{
         this.append(tBody);
     }
 
+    setColWidth(colName, width) {
+        this.#cols.get(colName).setAttribute("width", width);
+    }
+
     /**
-     * Возвращает параметры таблицы
+     * Возвращает пар   аметры таблицы
      */
     get tableParam() {
         return this.#table;
