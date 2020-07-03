@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Табы для таблицы</title>
+
+    <style>
+
+        html, body {
+            background: gray;
+            box-sizing: border-box;
+            font-family: Helvetica,Verdana,Arial,sans-serif;
+        }
+        svg-table {
+            background-color: lightgrey;
+        }
+        rect {
+            fill: lightgreen;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="testSvgTable"></div>
+
+<script>
+
+/**
+ * Класс приложения
+*/
+class App {
+    #root;
+    #components;
+
+    constructor(appSelector) {
+        this.#root = document.querySelector(appSelector);
+        this.#components = new Map();
+    }
+
+    get root() {
+        return this.#root;
+    }
+
+    addComponent(componentName, root, component) {
+        this.#components.set(componentName, component);
+        root.append(component);
+    }
+
+    getComponent(componentName) {
+        return this.#components.get(componentName);
+    }            
+}
+
+
+/**
+ * Класс таблицы, основанной на SVG
+ */
+class SvgTable extends HTMLElement {
+    #app;
+    
+    constructor(app, params) {
+        super();
+        this.#app = app;
+        this.generateTable(params);
+    }
+
+    generateTable(params) {
+        var xmlns = "http://www.w3.org/2000/svg";
+        var boxWidth = 160;
+        var boxHeight = 40;
+
+        var table = document.createElementNS (xmlns, "svg");
+        // table.setAttributeNS (null, "viewBox", "0 0 40 160");
+        table.setAttributeNS (null, "boxWidth", boxWidth);
+        table.setAttributeNS (null, "boxHeight", boxHeight);
+
+        var cell = document.createElementNS (xmlns, "rect");
+        cell.setAttributeNS (null, "width", 80);
+        cell.setAttributeNS (null, "height", 20);
+        cell.setAttributeNS (null, "x", 0);
+        cell.setAttributeNS (null, "y", 0);
+        table.appendChild (cell);
+
+        this.append(table);
+    }
+
+    /**
+     * Обрабочик, вызываемой после добавления компонента в документ
+     */
+     connectedCallback() { 
+         console.log("connectedCallback");
+    }
+
+    /**
+     * Массив пользовательских атрибутов, значения которых отслеживаются процедурой attributeChangedCallback
+     */
+    static get observedAttributes() {
+        return ["id"];
+    }
+
+    /**
+     * Обработчик события изменения значений пользовательских атрибутов, возвращаемых observedAttributes
+     * @param {String} name - имя атрибута 
+     * @param {String} oldValue - предыдущее значение атрибута
+     * @param {String} newValue - новое значение атрибута
+     */
+    attributeChangedCallback(name, oldValue, newValue) {
+        console.log(name);
+    }    
+
+}
+customElements.define('svg-table', SvgTable); 
+
+
+let app = new App("#testSvgTable");
+let tableParams = {
+    rowCount: 20,
+    colCount: 10
+};
+
+app.addComponent("table", app.root, new SvgTable(app, tableParams));
+
+</script>
+</body>
+
+</html>
