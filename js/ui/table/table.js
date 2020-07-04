@@ -206,11 +206,11 @@ class Table extends HTMLTableElement{
      */
     viewFromCell(initCellName, rowCount, colCount) {
         let beginCell = this.getCell(initCellName);
-        let beginRow = beginCell.rowNumber;
-        let initCol = beginCell.colNumber;
+        let beginRow = beginCell.rowNumber-1;
+        let beginCol = beginCell.colNumber;
         let endRow = beginRow+rowCount+1;
-        let endCol = initCol+colCount+1;
-        this.setCssText(beginRow, initCol, endRow, endCol);
+        let endCol = beginCol+colCount+1;
+        this.setCssText(beginRow, beginCol, endRow, endCol);
     }
     
     /**
@@ -222,7 +222,7 @@ class Table extends HTMLTableElement{
         let endCell = this.getCell(endCellName);
         let endRow = endCell.rowNumber;
         let endCol = endCell.rowNumber;
-        let beginRow = endRow-rowCount+1;
+        let beginRow = endRow-rowCount;
         let beginCol = endCol-colCount+1;
         this.setCssText(beginRow, beginCol, endRow, endCol);
     }
@@ -235,13 +235,13 @@ class Table extends HTMLTableElement{
      * @param {Number} endRow - номер конечной видимой строки
      * @param {Number} endCol - номер конечной видимой колонки
      */
-    setCssText(beginRow, initCol, endRow, endCol) {
+    setCssText(beginRow, beginCol, endRow, endCol) {
         let cssText = ""
             + ".row-data[row]:nth-child(-n+" + beginRow + ")," // строки до начальной строки
             + ".row-data[row]:nth-child(n+" + endRow + ")" // строки после конечной строки
             + "{display: none;}"
-            + ".cell-header[col]:nth-child(-n+" + initCol + ")," // колонки заголовков до начальной колонки
-            + ".cell-case[col]:nth-child(-n+" + initCol + ")," // колонки данных до начальной колонки
+            + ".cell-header[col]:nth-child(-n+" + beginCol + ")," // колонки заголовков до начальной колонки
+            + ".cell-case[col]:nth-child(-n+" + beginCol + ")," // колонки данных до начальной колонки
             + ".cell-header[col]:nth-child(n+" + endCol + ")," // колонки заголовков после конечной колонки
             + ".cell-case[col]:nth-child(n+" + endCol + ")" + // колонки данных после конечной колонки
             "{display: none;}";
