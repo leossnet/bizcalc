@@ -1,3 +1,10 @@
+const Course = {
+    LFFT: "left",
+    RIGHT: "right",
+    TOP: "top",
+    BOTTOM: "bottom"
+};
+
 /**
  * Класс, расширяющий функциональность базового класса таблицы
  */
@@ -38,7 +45,7 @@ class Table extends HTMLTableElement{
         this.generateTable(params);
         this.#tableStyle = document.createElement("style");
         this.append(this.#tableStyle);
-        // this.viewCells("B2", 2, 2);
+        // this.viewFromCell("B2", 2, 2);
         this.setCursor("A1");
         if ( params.isFocus ) this.focus();
 
@@ -131,7 +138,7 @@ class Table extends HTMLTableElement{
     }
 
     getColWidth(colName) {
-        this.#cols.get(colName).getAttribute("width");
+        return Number(this.#cols.get(colName).getAttribute("width"));
     }
 
     /**
@@ -140,7 +147,7 @@ class Table extends HTMLTableElement{
     get tableParam() {
         return this.#table;
     }
-
+    
     /**
      * Получение объекта данных таблицы
      */
@@ -171,7 +178,6 @@ class Table extends HTMLTableElement{
         this.#cursor.cell = newCell;
         this.setAttribute("cursor-cell", this.#cursor.cell.name);
         if ( oldCell && oldCell !== newCell) oldCell.refresh();
-        // this.#cursor.setInput();
     }
 
     /**
@@ -192,28 +198,53 @@ class Table extends HTMLTableElement{
 
         this.setCursor(currentCell.getCellName(newRow, newCol));
     }
-
     
     /**
      * Установка видимой части таблицы
-     * @param {String} beginCellName - левая верхняя видимая ячейка таблицы
+     * @param {String} initCellName - левая верхняя видимая ячейка таблицы
      * @param {Strinhg} endCellName - правая нижняя видимая ячейка таблицы
      */
-    viewCells(beginCellName, rowCount, colCount) {
-        let beginCell = this.getCell(beginCellName);
-        let beginRow = beginCell.rowNumber-1;
-        let beginCol = beginCell.colNumber;
+    viewFromCell(initCellName, rowCount, colCount) {
+        let beginCell = this.getCell(initCellName);
+        let beginRow = beginCell.rowNumber;
+        let initCol = beginCell.colNumber;
         let endRow = beginRow+rowCount+1;
-        let endCol = beginCol+colCount+1;
+        let endCol = initCol+colCount+1;
+        this.setCssText(beginRow, initCol, endRow, endCol);
+    }
+    
+    /**
+     * Установка видимой части таблицы
+     * @param {String} initCellName - правая нижняя видимая ячейка таблицы
+     * @param {Strinhg} endCellName - левая верхняя видимая ячейка таблицы
+     */
+    viewToCell(endCellName, rowCount, colCount) {
+        let endCell = this.getCell(endCellName);
+        let endRow = endCell.rowNumber;
+        let endCol = endCell.rowNumber;
+        let beginRow = endRow-rowCount+1;
+        let beginCol = endCol-colCount+1;
+        this.setCssText(beginRow, beginCol, endRow, endCol);
+    }
+
+
+    /**
+     * Установка видимости колонок
+     * @param {Number} beginRow - номер начальной видимой строки
+     * @param {Number} initCol - номер начальнок видимой колонки
+     * @param {Number} endRow - номер конечной видимой строки
+     * @param {Number} endCol - номер конечной видимой колонки
+     */
+    setCssText(beginRow, initCol, endRow, endCol) {
         let cssText = ""
-            +".row-data[row]:nth-child(-n+"+beginRow+"),"       // строки до начальной строки
-            +".row-data[row]:nth-child(n+"+endRow+")"           // строки после конечной строки
-                +"{display: none;}"
-            +".cell-header[col]:nth-child(-n+"+beginCol+"),"    // колонки заголовков до начальной колонки
-            +".cell-case[col]:nth-child(-n+"+beginCol+"),"      // колонки данных до начальной колонки
-            +".cell-header[col]:nth-child(n+"+endCol+"),"       // колонки заголовков после конечной колонки
-            +".cell-case[col]:nth-child(n+"+endCol+")"+         // колонки данных после конечной колонки
-                "{display: none;}";
+            + ".row-data[row]:nth-child(-n+" + beginRow + ")," // строки до начальной строки
+            + ".row-data[row]:nth-child(n+" + endRow + ")" // строки после конечной строки
+            + "{display: none;}"
+            + ".cell-header[col]:nth-child(-n+" + initCol + ")," // колонки заголовков до начальной колонки
+            + ".cell-case[col]:nth-child(-n+" + initCol + ")," // колонки данных до начальной колонки
+            + ".cell-header[col]:nth-child(n+" + endCol + ")," // колонки заголовков после конечной колонки
+            + ".cell-case[col]:nth-child(n+" + endCol + ")" + // колонки данных после конечной колонки
+            "{display: none;}";
         this.#tableStyle.innerHTML = cssText;
     }
 
@@ -240,10 +271,94 @@ class Table extends HTMLTableElement{
      */
     attributeChangedCallback(name, oldValue, newValue) {
         if (name == "view-width" || name == "view-height" ) {
-            let maxCol = this.setVisibleCols();
-            let maxRow = this.setVisibleRows();
-            this.viewCells("A1", maxRow, maxCol);
+            let visibleCols = this.setVisibleCols("A1", Course.RIGHT);
+            let visibleRows = this.setVisibleRows("A1", Course.BOTTOM);
+            this.viewFromCell("A1", visibleRows, visibleCols);
         }
+    }
+
+    /**
+     * Определение видимых на экране колонок таблицы
+     * @param {String} initCellName - колонка, от которой ведется отчет видимости
+     * @param {Object} course - направление отчета видимых колонок: Course.LEFT или Course.RIGHT
+     */
+    setVisibleCols(initCellName, course) {
+        let visibleCols = this.#table.colCount;
+        let headerWidth = 40;
+        let visibleWidth = parseInt(this.getAttribute("view-width")) - headerWidth;
+        this.setDefaultColWidth();
+        let fullVisibleCols = this.getFullVisibleCols(initCellName, visibleWidth, course);
+        let rightColWidth = visibleWidth - fullVisibleCols.width;
+
+        if (rightColWidth > 0) {
+            visibleCols = fullVisibleCols.count + 1;
+            let rightColIndex = visibleCols - 1;
+            let initCell = this.#tdata.getCell(initCellName);
+            let rightCol = String.fromCharCode(initCell.colName.charCodeAt(0) + rightColIndex);
+            if (this.#cols.get(rightCol))
+                this.#cols.get(rightCol).setAttribute("width", rightColWidth);
+        }
+        else {
+            visibleCols = fullVisibleCols.count;
+        }
+        return visibleCols;
+    }
+
+    /**
+     * Получение объекта полностью видимых колонок в виде:
+     * {
+     *    count: [число полностью видимых колонок]
+     *    width: [общая ширина полностью видимых колонок]
+     * }
+     * @param {String} initCellName - колонка, от которой ведется отчет видимости
+     * @param {Number} parentWidth - ширина родительского компонента
+     * @param {Object} course - направление отчета видимых колонок: Course.LEFT или Course.RIGHT
+     */
+    getFullVisibleCols(initCellName, parentWidth, course) {
+        let cell = this.#tdata.getCell(initCellName);
+        let initColIndex = cell.colNumber;
+        let initColName = cell.colName;
+        let colWidths = 0;
+        let deltaColCount;
+
+        if ( course == Course.RIGHT ) {
+            for (deltaColCount = initColIndex; deltaColCount<this.#table.colCount; deltaColCount++) {
+                let colName = this.getColName(initColName, deltaColCount);
+                if ( (colWidths + this.getColWidth(colName) ) > parentWidth ) break;
+                colWidths += this.getColWidth(colName);
+            }
+        }
+        else if ( course == Course.LEFT ) {
+            for (deltaColCount = initColIndex; deltaColCount>0; colIndex--) {
+                let colName = this.getColName(initColName, deltaColCount);
+                if ( (colWidths + this.getColWidth(colName) ) > parentWidth ) break;
+                colWidths += this.getColWidth(colName);
+            }
+        }
+        return {
+            count: deltaColCount, 
+            width: colWidths 
+        };
+    }
+
+    /**
+     * Получение имени колонки, расположенной на deltaColCount строк правее или левее колонки initColName
+     * @param {String} initColName - имя колонки, от которой ведется поиск
+     * @param {Number} deltaColCount - смещение от начальнок колонки
+     */
+    getColName(initColName, deltaColCount) {
+        return this.#cols.get(String.fromCharCode(initColName.charCodeAt(0)+deltaColCount)).id;
+    }
+
+
+    /**
+     * Установка ширины колонок по умолчанию, определенных в атрибуте widht элемента col
+     */
+    setDefaultColWidth() {
+        let cols = document.querySelector(".col-data").childNodes;
+        cols.forEach(col => {
+            col.setAttribute("width", this.#colWidths[col.getAttribute("index")]);
+        });
     }
 
     setVisibleRows() {
@@ -256,50 +371,6 @@ class Table extends HTMLTableElement{
         visibleRows = Math.floor(vh / 22);
 
         return visibleRows;
-    }
-
-    setVisibleCols() {
-        let visibleCols = this.#table.colCount;
-        let headerWidth = 40;
-        let visibleWidth = parseInt(this.getAttribute("view-width")) - headerWidth;
-        this.setDefaultColWidth();
-        let fullVisibleCols = this.getFullVisibleCols("A1", visibleWidth);
-        let rightColWidth = visibleWidth - fullVisibleCols.width;
-
-        if (rightColWidth > 0) {
-            visibleCols = fullVisibleCols.count + 1;
-            let rightColIndex = visibleCols - 1;
-            let rightCol = String.fromCharCode("A".charCodeAt(0) + rightColIndex);
-            if (this.#cols.get(rightCol))
-                this.#cols.get(rightCol).setAttribute("width", rightColWidth);
-        }
-        else {
-            visibleCols = fullVisibleCols.count;
-        }
-        return visibleCols;
-    }
-
-    getFullVisibleCols(beginCellName, parentWidth) {
-        let cell = this.#tdata.getCell(beginCellName);
-        let beginCol = Number(this.#cols.get(cell.getAttribute("col")).getAttribute("index"));
-        let colWidths = 0;
-        let colIndex;
-        for (colIndex = beginCol; colIndex<this.#table.colCount; colIndex++) {
-            let col = this.#cols.get(String.fromCharCode("A".charCodeAt(0)+colIndex)).id;
-            if ( (colWidths + Number(this.#cols.get(col).getAttribute("width")) ) > parentWidth ) break;
-            colWidths += Number(this.#cols.get(col).getAttribute("width"));
-        }
-        return {
-            count: colIndex, 
-            width: colWidths 
-        };
-    }
-
-    setDefaultColWidth() {
-        let cols = document.querySelector(".col-data").childNodes;
-        cols.forEach(col => {
-            col.setAttribute("width", this.#colWidths[col.getAttribute("index")]);
-        });
     }
 
    /**
