@@ -9,7 +9,7 @@ class Table extends HTMLTableElement{
     #editor;
     #tableStyle;
     #view = {};
-    #colWidths;
+    #colWidths = [];
     #cols;
 
     /**
@@ -25,7 +25,8 @@ class Table extends HTMLTableElement{
             rowCount: params.rowCount
         };
         this.headers = [];
-        this.#colWidths = params.colWidths;
+        if ( params && params.colWidths ) this.#colWidths = params.colWidths;
+        else for (let c=0; c<params.colCount; c++) this.#colWidths[c] = 80;
         this.#cols = new Map();
         this.#tdata = new TableData(app);
         this.#editor = params.editor;
@@ -59,11 +60,14 @@ class Table extends HTMLTableElement{
         let cgHeader = document.createElement("colgroup");
         cgHeader.classList.add("col-header");
         cgHeader.span = 1;
+        let col = document.createElement("col");
+        col.setAttribute("width", 40);
+        cgHeader.append(col);
         this.append(cgHeader);
         let cgData = document.createElement("colgroup");
         cgData.classList.add("col-data");
         cgData.span = params.colCount;
-        // console.log(this.#colWidths);
+
         for (let c=0; c<params.colCount; c++) {
             let col = document.createElement("col");
             col.id = String.fromCharCode("A".charCodeAt(0) + c);
@@ -294,7 +298,7 @@ class Table extends HTMLTableElement{
     setDefaultColWidth() {
         let cols = document.querySelector(".col-data").childNodes;
         cols.forEach(col => {
-            col.setAttribute("width", 80);
+            col.setAttribute("width", this.#colWidths[col.getAttribute("index")]);
         });
     }
 
