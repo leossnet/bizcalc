@@ -20,7 +20,6 @@ class Table extends HTMLTableElement{
     constructor (app, params) {
         super();
         this.#app = app;
-            // this.id = app.root.id+"Table";
         this.#table = {
             colCount: params.colCount,
             rowCount: params.rowCount
@@ -31,13 +30,14 @@ class Table extends HTMLTableElement{
         this.#tdata = new TableData(app);
         this.#editor = params.editor;
         this.#cursor = new Cursor(app, this);
+        this.classList.add("table");
         this.tabIndex = -1;
 
         // генерация внешнего вида таблицы
         this.generateTable(params);
         this.#tableStyle = document.createElement("style");
         this.append(this.#tableStyle);
-        // this.viewCells("B2", 2, 2);
+        this.viewCells("B2", 2, 2);
         this.setCursor("A1");
         if ( params.isFocus ) this.focus();
 
@@ -67,7 +67,8 @@ class Table extends HTMLTableElement{
         for (let c=0; c<params.colCount; c++) {
             let col = document.createElement("col");
             col.id = String.fromCharCode("A".charCodeAt(0) + c);
-            col.setAttribute("width", this.#colWidths[c]);
+            if ( params && params.colWidths ) col.setAttribute("width", params.colWidths[c]);
+            else col.setAttribute("width", 80);
             this.#cols.set(col.id, col);
             cgData.append(col);
         }
@@ -79,12 +80,14 @@ class Table extends HTMLTableElement{
         hRow.classList.add("row-header");
         this.headers.push("");
         let th = document.createElement("th");
+        th.classList.add("cell-header");
         th.innerHTML = "";
         hRow.append(th);
         for (let i = 0; i < this.#table.colCount; i++) {
             let letter = String.fromCharCode("A".charCodeAt(0) + i);
             this.headers.push(letter);
             let th = document.createElement("th");
+            th.classList.add("cell-header");
             th.setAttribute("col", letter);
             th.innerHTML = letter;
             hRow.append(th);
@@ -98,6 +101,7 @@ class Table extends HTMLTableElement{
             row.setAttribute("row", i);
             row.classList.add("row-data");
             let th = document.createElement("th");
+            th.classList.add("cell-header");
             th.setAttribute("row", i);
             th.innerHTML = i;
             row.append(th);
@@ -107,6 +111,7 @@ class Table extends HTMLTableElement{
                 // cell.id = letter + i;
                 this.#tdata.setCell(letter + i, cell);
                 let th = row.insertCell(-1);
+                th.classList.add("cell-case");
                 th.setAttribute("col", letter);
                 th.append(cell);
                 // row.insertCell(-1).append(cell);
@@ -118,6 +123,10 @@ class Table extends HTMLTableElement{
 
     setColWidth(colName, width) {
         this.#cols.get(colName).setAttribute("width", width);
+    }
+
+    getColWidth(colName) {
+        this.#cols.get(colName).getAttribute("width");
     }
 
     /**
@@ -192,7 +201,7 @@ class Table extends HTMLTableElement{
         let endRow = beginRow+deltaRow;
         let endCol = beginCol+deltaCol+1;
         let cssText = ""
-            +"tr[row]:nth-child(-n+"+beginRow+"),tr[row]:nth-child(n+"+endRow+")"
+            +".row-data[row]:nth-child(-n+"+beginRow+"),.row-data[row]:nth-child(n+"+endRow+")"
             +"{display: none;}"
             +"th[col]:nth-child(-n+"+beginCol+"), td[col]:nth-child(-n+"+beginCol+"),"
             +"th[col]:nth-child(n+"+endCol+"), td[col]:nth-child(n+"+endCol+")"+

@@ -71,7 +71,7 @@ class App {
         const tableParams = {
             colCount: params.colCount,
             rowCount: params.rowCount,
-            colWidths: [60,70,80,90,100,60,70,80,90,100,60,70,80,90,100],
+            // colWidths: [80,80,80,90,100,60,70,80,90,100,60,70,80,90,100],
             isFocus: true
         };
         let table = new Table(this, tableParams);
@@ -140,10 +140,12 @@ class App {
     handlerClickButton(event) {
         switch(event.target.id) {
             case "btSave" :
-                this.app.saveJSON(this.app.getComponent("tablePanel").currentTable.tableData.getData());
+                // this.app.saveJSON(this.app.getComponent("tablePanel").currentTable.tableData.getData());
+                this.app.saveJSON(this.app.getComponent("table").tableData.getData());
                 break;
             case "btOpen" :
-                this.app.openJSON(this.app.getComponent("tablePanel").currentTable.tableData);
+                // this.app.openJSON(this.app.getComponent("tablePanel").currentTable.tableData);
+                this.app.openJSON(this.app.getComponent("table").tableData);
                 break;
         }
     }

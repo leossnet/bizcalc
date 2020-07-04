@@ -29,6 +29,7 @@ class Cursor extends HTMLElement{
         this.#app = app;
         this.#table = table;
         this.#isEdit = false;
+        this.classList.add("table-cursor");
         this.#editor = this.#app.editor;
         this.tabIndex = -1;
     }
@@ -80,10 +81,10 @@ class Cursor extends HTMLElement{
     set isEdit(isEdit) {
         this.#isEdit = isEdit;
         if ( isEdit ) {
-            this.classList.add("edit");
+            this.classList.add("table-cursor-edit");
         }
         else {
-            this.classList.remove("edit");
+            this.classList.remove("table-cursor-edit");
             // this.#table.focus();
         }
     }

@@ -13,6 +13,7 @@ class Editor extends HTMLInputElement {
         super();
         this.#app = app;
         this.id = app.root.id+"Editor";
+        this.classList.add("table-editor");
         this.tabIndex = -1;
         window.addEventListener("resize", () => { 
             this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
