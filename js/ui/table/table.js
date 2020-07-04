@@ -171,19 +171,19 @@ class Table extends HTMLTableElement{
 
     /**
      * Перемещение курсора со сдвигом на количество строк и колонок относительно текущей позиции
-     * @param {Number} deltaRow - количество строк смещения 
-     * @param {Number} deltaCol - количество колонок смещения
+     * @param {Number} rowCount - количество строк смещения 
+     * @param {Number} colCount - количество колонок смещения
      * @param {String} cellName - имя ячейки, относительно которой производится перемещение курсора
      */
-    moveCursor(deltaRow, deltaCol, cellName) {
+    moveCursor(rowCount, colCount, cellName) {
         let currentCell = cellName ? this.getCell(cellName) : this.#cursor.cell;
         let newCol = currentCell.colNumber;
         let newRow = currentCell.rowNumber;
 
-        if ( deltaRow > 0 ) newRow += Math.min(deltaRow, this.#table.rowCount-newRow);
-        else newRow += Math.max(deltaRow, 1-newRow);
-        if ( deltaCol > 0 ) newCol += Math.min(deltaCol, this.#table.colCount-newCol);
-        else newCol += Math.max(deltaCol, 1-newCol);
+        if ( rowCount > 0 ) newRow += Math.min(rowCount, this.#table.rowCount-newRow);
+        else newRow += Math.max(rowCount, 1-newRow);
+        if ( colCount > 0 ) newCol += Math.min(colCount, this.#table.colCount-newCol);
+        else newCol += Math.max(colCount, 1-newCol);
 
         this.setCursor(currentCell.getCellName(newRow, newCol));
     }
@@ -194,18 +194,21 @@ class Table extends HTMLTableElement{
      * @param {String} beginCellName - левая верхняя видимая ячейка таблицы
      * @param {Strinhg} endCellName - правая нижняя видимая ячейка таблицы
      */
-    viewCells(beginCellName, deltaRow, deltaCol) {
+    viewCells(beginCellName, rowCount, colCount) {
         let beginCell = this.getCell(beginCellName);
         let beginRow = beginCell.rowNumber-1;
         let beginCol = beginCell.colNumber;
-        let endRow = beginRow+deltaRow;
-        let endCol = beginCol+deltaCol+1;
+        let endRow = beginRow+rowCount+1;
+        let endCol = beginCol+colCount+1;
         let cssText = ""
-            +".row-data[row]:nth-child(-n+"+beginRow+"),.row-data[row]:nth-child(n+"+endRow+")"
-            +"{display: none;}"
-            +"th[col]:nth-child(-n+"+beginCol+"), td[col]:nth-child(-n+"+beginCol+"),"
-            +"th[col]:nth-child(n+"+endCol+"), td[col]:nth-child(n+"+endCol+")"+
-            "{display: none;}";
+            +".row-data[row]:nth-child(-n+"+beginRow+"),"       // строки до начальной строки
+            +".row-data[row]:nth-child(n+"+endRow+")"           // строки после конечной строки
+                +"{display: none;}"
+            +".cell-header[col]:nth-child(-n+"+beginCol+"),"    // колонки заголовков до начальной колонки
+            +".cell-case[col]:nth-child(-n+"+beginCol+"),"      // колонки данных до начальной колонки
+            +".cell-header[col]:nth-child(n+"+endCol+"),"       // колонки заголовков после конечной колонки
+            +".cell-case[col]:nth-child(n+"+endCol+")"+         // колонки данных после конечной колонки
+                "{display: none;}";
         this.#tableStyle.innerHTML = cssText;
     }
 
@@ -250,7 +253,7 @@ class Table extends HTMLTableElement{
             let maxCol = Math.floor((vw-40)/80);
             // console.log(maxRow+":"+maxCol);
             // console.log(getComputedStyle(this.parentElement).height);
-            this.viewCells("A1", maxRow, maxCol);
+            // this.viewCells("A1", maxRow, maxCol);
         }
     }    
 
@@ -259,37 +262,37 @@ class Table extends HTMLTableElement{
      * @param {KeyEvent} event 
      */
     handlerKeyMoving(event) {
-        let deltaRow=0, deltaCol=0;
+        let rowCount=0, colCount=0;
         let currentCell = this.#cursor.cell;
         switch(event.key) {
             case "ArrowUp" : 
                 if ( this.#cursor.isEdit ) this.#cursor.endEditing();
             // переход на первую строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
-                    deltaRow = 1 - currentCell.rowNumber;
-                else deltaRow -= 1;
-                this.moveCursor(deltaRow, deltaCol);
+                    rowCount = 1 - currentCell.rowNumber;
+                else rowCount -= 1;
+                this.moveCursor(rowCount, colCount);
                 break;
             case "ArrowDown" :
                 if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на последнюю строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
-                    deltaRow = this.#table.rowCount - currentCell.rowNumber;
-                else deltaRow += 1;
-                this.moveCursor(deltaRow, deltaCol);
+                    rowCount = this.#table.rowCount - currentCell.rowNumber;
+                else rowCount += 1;
+                this.moveCursor(rowCount, colCount);
                 break;
             case "ArrowLeft" :
                 // переход на первую колонку при нажатой клавише Ctrl
                 if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 if ( event.ctrlKey )
-                    deltaCol = 1 - currentCell.colNumber;
+                    colCount = 1 - currentCell.colNumber;
                 // переход в конец верхней строки при нахождении курсора в первой ачейке строки
                 else if ( currentCell.colNumber == 1 ) {
-                    deltaCol += this.#table.colCount;
-                    deltaRow -= 1;
+                    colCount += this.#table.colCount;
+                    rowCount -= 1;
                 }
-                else deltaCol -= 1;
-                this.moveCursor(deltaRow, deltaCol);
+                else colCount -= 1;
+                this.moveCursor(rowCount, colCount);
                 break;
             case "Tab" :
                 this.focus();
@@ -297,28 +300,28 @@ class Table extends HTMLTableElement{
                     if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на последнюю колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey)
-                    deltaCol = this.#table.colCount - currentCell.colNumber;
+                    colCount = this.#table.colCount - currentCell.colNumber;
                 // переход в начало нижней строки при нахождении курсора в последней ачейке строки
                 else if ( currentCell.colNumber == this.#table.colCount ) {
-                    deltaCol -= this.#table.colCount;
-                    deltaRow += 1;
+                    colCount -= this.#table.colCount;
+                    rowCount += 1;
                 }
-                else deltaCol += 1;
-                this.moveCursor(deltaRow, deltaCol);
+                else colCount += 1;
+                this.moveCursor(rowCount, colCount);
                 break;
             case "Home" :
                 if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на первую колонку 
-                deltaCol = 1 - currentCell.colNumber;
-                if ( event.ctrlKey ) deltaRow = 1 - currentCell.rowNumber;
-                this.moveCursor(deltaRow, deltaCol);
+                colCount = 1 - currentCell.colNumber;
+                if ( event.ctrlKey ) rowCount = 1 - currentCell.rowNumber;
+                this.moveCursor(rowCount, colCount);
                 break;
             case "End" :
                 if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на последнюю колонку
-                deltaCol = this.#table.colCount - currentCell.colNumber;
-                if ( event.ctrlKey ) deltaRow = this.#table.rowCount - currentCell.rowNumber;
-                this.moveCursor(deltaRow, deltaCol);
+                colCount = this.#table.colCount - currentCell.colNumber;
+                if ( event.ctrlKey ) rowCount = this.#table.rowCount - currentCell.rowNumber;
+                this.moveCursor(rowCount, colCount);
                 break;
 
             }
