@@ -37,7 +37,7 @@ class Table extends HTMLTableElement{
         this.generateTable(params);
         this.#tableStyle = document.createElement("style");
         this.append(this.#tableStyle);
-        this.viewCells("B2", 2, 2);
+        // this.viewCells("B2", 2, 2);
         this.setCursor("A1");
         if ( params.isFocus ) this.focus();
 
@@ -63,12 +63,13 @@ class Table extends HTMLTableElement{
         let cgData = document.createElement("colgroup");
         cgData.classList.add("col-data");
         cgData.span = params.colCount;
-        console.log(this.#colWidths);
+        // console.log(this.#colWidths);
         for (let c=0; c<params.colCount; c++) {
             let col = document.createElement("col");
             col.id = String.fromCharCode("A".charCodeAt(0) + c);
             if ( params && params.colWidths ) col.setAttribute("width", params.colWidths[c]);
             else col.setAttribute("width", 80);
+            col.setAttribute("index", c);
             this.#cols.set(col.id, col);
             cgData.append(col);
         }
@@ -108,13 +109,13 @@ class Table extends HTMLTableElement{
             for (let j = 1; j <= this.#table.colCount; j++) {
                 let letter = this.headers[j];
                 let cell = new Cell(this, i, letter);
-                // cell.id = letter + i;
+                cell.setAttribute("row", i);
+                cell.setAttribute("col", letter);
                 this.#tdata.setCell(letter + i, cell);
                 let th = row.insertCell(-1);
                 th.classList.add("cell-case");
                 th.setAttribute("col", letter);
                 th.append(cell);
-                // row.insertCell(-1).append(cell);
             }
         }
 
@@ -234,28 +235,68 @@ class Table extends HTMLTableElement{
      * @param {String} newValue - новое значение атрибута
      */
     attributeChangedCallback(name, oldValue, newValue) {
-        if (name =="cursor-cell") {
-            console.log("cursor: "+oldValue+" -> "+newValue);
-        }
         if (name == "view-width" || name == "view-height" ) {
-            // let vh = parseInt(this.getAttribute("view-height"));
-            let vw = parseInt(this.getAttribute("view-width"));
-
-            let hHeader = parseInt(getComputedStyle(document.querySelector("header.flex-item")).height);
-            let hFooter = parseInt(getComputedStyle(document.querySelector("footer.flex-item")).height);
-            let hDocument = parseInt(getComputedStyle(document.querySelector("div#bizcalc")).height);
-            let vh = hDocument-hHeader-hFooter;
-            console.log(hDocument+" - "+hHeader+" - "+hFooter+" = "+(hDocument-hHeader-hFooter));
-
-            // console.log(vh);
-            // console.log(vw);
-            let maxRow = Math.floor(vh/22);
-            let maxCol = Math.floor((vw-40)/80);
-            // console.log(maxRow+":"+maxCol);
-            // console.log(getComputedStyle(this.parentElement).height);
-            // this.viewCells("A1", maxRow, maxCol);
+            let maxCol = this.setVisibleCols();
+            let maxRow = this.setVisibleRows();
+            this.viewCells("A1", maxRow, maxCol);
         }
-    }    
+    }
+
+    setVisibleRows() {
+        let visibleRows = this.#table.rowCount;
+        let vh = parseInt(this.getAttribute("view-height"));
+        let hHeader = parseInt(getComputedStyle(document.querySelector("header.flex-item")).height);
+        let hFooter = parseInt(getComputedStyle(document.querySelector("footer.flex-item")).height);
+        let hDocument = parseInt(getComputedStyle(document.querySelector("div#bizcalc")).height);
+        vh = hDocument - hHeader - hFooter;
+        visibleRows = Math.floor(vh / 22);
+
+        return visibleRows;
+    }
+
+    setVisibleCols() {
+        let visibleCols = this.#table.colCount;
+        let headerWidth = 40;
+        let visibleWidth = parseInt(this.getAttribute("view-width")) - headerWidth;
+        this.setDefaultColWidth();
+        let fullVisibleCols = this.getFullVisibleCols("A1", visibleWidth);
+        let rightColWidth = visibleWidth - fullVisibleCols.width;
+
+        if (rightColWidth > 0) {
+            visibleCols = fullVisibleCols.count + 1;
+            let rightColIndex = visibleCols - 1;
+            let rightCol = String.fromCharCode("A".charCodeAt(0) + rightColIndex);
+            if (this.#cols.get(rightCol))
+                this.#cols.get(rightCol).setAttribute("width", rightColWidth);
+        }
+        else {
+            visibleCols = fullVisibleCols.count;
+        }
+        return visibleCols;
+    }
+
+    getFullVisibleCols(beginCellName, parentWidth) {
+        let cell = this.#tdata.getCell(beginCellName);
+        let beginCol = Number(this.#cols.get(cell.getAttribute("col")).getAttribute("index"));
+        let colWidths = 0;
+        let colIndex;
+        for (colIndex = beginCol; colIndex<this.#table.colCount; colIndex++) {
+            let col = this.#cols.get(String.fromCharCode("A".charCodeAt(0)+colIndex)).id;
+            if ( (colWidths + Number(this.#cols.get(col).getAttribute("width")) ) > parentWidth ) break;
+            colWidths += Number(this.#cols.get(col).getAttribute("width"));
+        }
+        return {
+            count: colIndex, 
+            width: colWidths 
+        };
+    }
+
+    setDefaultColWidth() {
+        let cols = document.querySelector(".col-data").childNodes;
+        cols.forEach(col => {
+            col.setAttribute("width", 80);
+        });
+    }
 
    /**
      * Обработка нажатий на клавиши стрелок

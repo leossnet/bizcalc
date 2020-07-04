@@ -8,7 +8,7 @@ body {
     display: contents;  
     margin: 0 auto;
     background-color: rgb(145, 145, 145);
- /*    overflow: hidden; */
+    overflow: hidden;
   }
 .header > h2 {
     padding-left: 1%;
