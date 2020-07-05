@@ -352,21 +352,21 @@ class Table extends HTMLTableElement{
 
     /**
      * Определение видимых на экране колонок таблицы
-     * @param {String} initCellName - колонка, от которой ведется отчет видимости
+     * @param {String} startCellName - колонка, от которой ведется отчет видимости
      * @param {Object} course - направление отчета видимых колонок: Course.LEFT или Course.RIGHT
      */
-    setVisibleCols(initCellName, course) {
+    setVisibleCols(startCellName, course) {
         let visibleCols = this.#tableParams.colCount;
         let visibleWidth = this.getVisibleWidth();
         this.setDefaultColWidth();
-        let fullVisibleCols = this.getFullVisibleCols(initCellName, visibleWidth, course);
+        let fullVisibleCols = this.getFullVisibleCols(startCellName, visibleWidth, course);
         let rightColWidth = visibleWidth - fullVisibleCols.width;
 
         if (rightColWidth > 0) {
             visibleCols = fullVisibleCols.count + 1;
             let rightColIndex = visibleCols - 1;
-            let initCell = this.#tableData.getCell(initCellName);
-            let rightColName = String.fromCharCode(initCell.colName.charCodeAt(0) + rightColIndex);
+            let startCell = this.#tableData.getCell(startCellName);
+            let rightColName = String.fromCharCode(startCell.colName.charCodeAt(0) + rightColIndex);
             let rightCol = this.#colMap.get(rightColName);
             if ( rightCol ) rightCol.setAttribute("width", rightColWidth);
         }
@@ -387,29 +387,31 @@ class Table extends HTMLTableElement{
      *    count: [число полностью видимых колонок]
      *    width: [общая ширина полностью видимых колонок]
      * }
-     * @param {String} initCellName - колонка, от которой ведется отчет видимости
+     * @param {String} startCellName - колонка, от которой ведется отчет видимости
      * @param {Number} parentWidth - ширина родительского компонента
      * @param {Object} course - направление отчета видимых колонок: Course.LEFT или Course.RIGHT
      */
-    getFullVisibleCols(initCellName, parentWidth, course) {
-        let cell = this.#tableData.getCell(initCellName);
-        let initColIndex = cell.colNumber;
-        let initColName = cell.colName;
+    getFullVisibleCols(startCellName, parentWidth, course) {
+        let startCell = this.#tableData.getCell(startCellName);
+        let startColIndex = startCell.colNumber;
+        let startColName = startCell.colName;
         let colWidths = 0;
         let deltaColCount = 0;
 
         if ( course == Course.RIGHT ) {
-            let rightColCount = this.#tableParams.colCount - initColIndex;
+            console.log("right");
+            let rightColCount = this.#tableParams.colCount - startColIndex;
             for (deltaColCount = 0; deltaColCount < rightColCount; deltaColCount++) {
-                let newColName = this.getColName(initColName, deltaColCount);
+                let newColName = this.getColName(startColName, deltaColCount);
                 let newColWidth = this.getDefaultColWidth(newColName);
                 if ( (colWidths + newColWidth ) > parentWidth ) break;
                 colWidths += newColWidth;
             }
         }
         else if ( course == Course.LEFT ) {
-            for (deltaColCount = initColIndex; deltaColCount>0; deltaColCount--) {
-                let newColName = this.getColName(initColName, deltaColCount);
+            console.log("left");
+            for (deltaColCount = startColIndex; deltaColCount>0; deltaColCount--) {
+                let newColName = this.getColName(startColName, 1-deltaColCount);
                 let newColWidth = this.getDefaultColWidth(newColName);
                 if ( ( colWidths + newColWidth ) > parentWidth ) break;
                 colWidths += newColWidth;
@@ -427,7 +429,8 @@ class Table extends HTMLTableElement{
      * @param {Number} deltaColCount - смещение от начальнок колонки
      */
     getColName(initColName, deltaColCount) {
-        let colName = String.fromCharCode(initColName.charCodeAt(0)+deltaColCount);
+        let colName = Cell.getColName(Cell.getColNumber(initColName)+deltaColCount);
+        console.log(Cell.getColNumber(initColName)+" + "+deltaColCount+ " = " +Cell.getColNumber(colName));
         return this.#colMap.get(colName).id;
     }
 
