@@ -178,6 +178,7 @@ class Table extends HTMLTableElement{
      * @param {String} cellName имя ячейки в формате А1
      */
     setStartCell(cellName) {
+        console.log(cellName);
         this.setAttribute("start-cell", cellName);
     }
 
@@ -228,15 +229,15 @@ class Table extends HTMLTableElement{
      */
     moveCursor(rowCount, colCount, initCellName) {
         let currentCell = initCellName ? this.getCell(initCellName) : this.#cursor.cell;
-        let newCol = currentCell.colNumber;
+        let newColNum = currentCell.colNumber;
         let newRow = currentCell.rowNumber;
 
         if ( rowCount > 0 ) newRow += Math.min(rowCount, this.#tableParams.rowCount-newRow);
         else newRow += Math.max(rowCount, 1-newRow);
-        if ( colCount > 0 ) newCol += Math.min(colCount, this.#tableParams.colCount-newCol);
-        else newCol += Math.max(colCount, 1-newCol);
+        if ( colCount > 0 ) newColNum += Math.min(colCount, this.#tableParams.colCount-newColNum);
+        else newColNum += Math.max(colCount, 1-newColNum);
 
-        this.setCursor(currentCell.getCellName(newRow, newCol));
+        this.setCursor(currentCell.getCellName(newRow, newColNum));
     }
     
     /**
@@ -311,10 +312,11 @@ class Table extends HTMLTableElement{
      */
     attributeChangedCallback(name, oldValue, newValue) {
         if (name == "view-width" || name == "view-height" || name == "start-cell") {
-            let startCell = this.getAttribute("start-cell");
-            let visibleCols = this.setVisibleCols(startCell, Course.RIGHT);
-            let visibleRows = this.setVisibleRows(startCell, Course.BOTTOM);
-            this.viewFromCell(startCell, visibleRows, visibleCols);
+            let startCellName = this.getStartCell().name;
+            console.log(startCellName);
+            let visibleCols = this.setVisibleCols(startCellName, Course.RIGHT);
+            let visibleRows = this.setVisibleRows(startCellName, Course.BOTTOM);
+            this.viewFromCell(startCellName, visibleRows, visibleCols);
         }
     }
 
@@ -324,28 +326,31 @@ class Table extends HTMLTableElement{
      * @param {Object} newCell - новая ячейка, в которую перемещается курсор
      */
     updateVisibleCol(oldCell, newCell) {
-        let oldCol = oldCell ? oldCell.colNumber : this.getCell("A1").colNumber;;
-        let newCol = newCell.colNumber ;
+        let oldColNum = oldCell ? oldCell.colNumber : this.getCell("A1").colNumber;;
+        let newColNum = newCell.colNumber ;
         let startCell = this.getStartCell();
-        let startCol = startCell.colNumber;
-        let startRow = startCell.rowNumber;
+        let startColNum = startCell.colNumber;
+        let startRowNum = startCell.rowNumber;
 
-        let visibleWidth = this.getVisibleWidth();
-        let course = newCol>oldCol ? Course.RIGHT : ( newCol<oldCol ? Course.LEFT : Course.NONE );
+        let course = newColNum>oldColNum ? Course.RIGHT : ( newColNum<oldColNum ? Course.LEFT : Course.NONE );
+        let fullVisibleCols = this.getFullVisibleCols(startCell.name, this.getVisibleWidth(), course);
+        let endColNum = startCell.colNumber + fullVisibleCols.count - 1;
 
         switch (course) {
             case  Course.RIGHT:
-                let fullVisibleCols = this.getFullVisibleCols(startCell.name, visibleWidth, course);
-                let rightFullVisibleCol = startCell.colNumber + fullVisibleCols.count - 1;
-                if ( newCol > rightFullVisibleCol ) {
-                    let delta = ( newCol == this.#tableParams.colCount ) ? 1 : 0;
-                    let newStartCol = startCol + newCol - rightFullVisibleCol - delta;
-                    let newStartRow = startRow;
+                if ( newColNum > endColNum ) {
+                    let delta = ( newColNum == this.#tableParams.colCount ) ? 1 : 0;
+                    let newStartCol = startColNum + newColNum - endColNum - delta;
+                    let newStartRow = startRowNum;
                     this.setStartCell(this.getCellName(newStartRow, newStartCol));
                 }
                 break;
             case Course.LEFT: 
-            
+                if ( newColNum < startColNum ) {
+                    let newStartCol = newColNum;
+                    let newStartRow = startRowNum;
+                    this.setStartCell(this.getCellName(newStartRow, newStartCol));
+                }            
                 break;
         }
     }    
@@ -393,6 +398,7 @@ class Table extends HTMLTableElement{
      */
     getFullVisibleCols(initCellName, parentWidth, course) {
         let cell = this.#tableData.getCell(initCellName);
+        // console.log(cell);
         let initColIndex = cell.colNumber;
         let initColName = cell.colName;
         let colWidths = 0;
