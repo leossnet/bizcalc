@@ -16,7 +16,6 @@ class Cell extends HTMLElement {
     #tdata;
     #data;
     #cell = {};
-    #deltaA = "A".charCodeAt(0)-1;
 
     /**
      * Конструктор ячейки таблицы
@@ -34,7 +33,7 @@ class Cell extends HTMLElement {
             rowName: String(rowName),
             colName: colName,
             rowNumber: Number.parseInt(rowName),
-            colNumber: colName.charCodeAt(0) - this.#deltaA,
+            colNumber: Cell.getColNumber(colName),
         };
         this.initCell();
 
@@ -59,7 +58,7 @@ class Cell extends HTMLElement {
      * @param {Number} colNumber - номер колонки
      */
     getCellName(rowNumber, colNumber) {
-        return String.fromCharCode(colNumber+this.#deltaA)+String(rowNumber);
+        return Cell.getColName(colNumber)+rowNumber;
     }
     
     /**
@@ -159,6 +158,31 @@ class Cell extends HTMLElement {
             this.setAttribute("type", this.#data.type);
         }
         this.refresh();
+    }
+
+    /**
+     * Возвращает символ колонки по ее номеру
+     * @param {Number} colNumber - номер колонки начиная с 1 
+     */
+    static getColName(colNumber) {
+        return String.fromCharCode(colNumber + "A".charCodeAt(0) - 1);
+    }
+
+    /**
+     * Возвращает номер колонки по ее символу
+     * @param {String} colName - символ колонки из одной или двух латинских букв от A до ZZ
+     */
+    static getColNumber(colName) {
+        return colName.charCodeAt(0) - "A".charCodeAt(0) + 1;
+    }
+
+    /**
+     * Возвращает код ячейки по номерку строки и номеру колонки
+     * @param {Number} colNumber - номер колонки начиная с 1 
+     * @param {Number} colNumber - номер строки начиная с 1
+     */
+    static getCellName(rowNumber, colNumber) {
+        return Cell.getColName(colNumber)+rowNumber;
     }
 
     /**

@@ -215,11 +215,6 @@ class Table extends HTMLTableElement{
         return this.#cursor;
     }
 
-
-    getCellName(rowNumber, colNumber) {
-        return String.fromCharCode(colNumber+("A".charCodeAt(0)-1))+String(rowNumber);
-    }    
-
     /**
      * Перемещение курсора со сдвигом на количество строк и колонок относительно текущей позиции
      * @param {Number} rowCount - количество строк смещения 
@@ -236,7 +231,9 @@ class Table extends HTMLTableElement{
         if ( colCount > 0 ) newColNum += Math.min(colCount, this.#tableParams.colCount-newColNum);
         else newColNum += Math.max(colCount, 1-newColNum);
 
-        this.setCursor(currentCell.getCellName(newRow, newColNum));
+        console.log(this.getStartCell().name+": "+currentCell.name+" -> "+Cell.getColName(newColNum)+newRow);
+
+        this.setCursor(Cell.getCellName(newRow, newColNum));
     }
     
     /**
@@ -340,14 +337,14 @@ class Table extends HTMLTableElement{
                     let delta = ( newColNum == this.#tableParams.colCount ) ? 1 : 0;
                     let newStartCol = startColNum + newColNum - endColNum - delta;
                     let newStartRow = startRowNum;
-                    this.setStartCell(this.getCellName(newStartRow, newStartCol));
+                    this.setStartCell(Cell.getCellName(newStartRow, newStartCol));
                 }
                 break;
             case Course.LEFT: 
                 if ( newColNum < startColNum ) {
                     let newStartCol = newColNum;
                     let newStartRow = startRowNum;
-                    this.setStartCell(this.getCellName(newStartRow, newStartCol));
+                    this.setStartCell(Cell.getCellName(newStartRow, newStartCol));
                 }            
                 break;
         }
