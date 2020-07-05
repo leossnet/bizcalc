@@ -178,7 +178,6 @@ class Table extends HTMLTableElement{
      * @param {String} cellName имя ячейки в формате А1
      */
     setStartCell(cellName) {
-        console.log(cellName);
         this.setAttribute("start-cell", cellName);
     }
 
@@ -313,7 +312,6 @@ class Table extends HTMLTableElement{
     attributeChangedCallback(name, oldValue, newValue) {
         if (name == "view-width" || name == "view-height" || name == "start-cell") {
             let startCellName = this.getStartCell().name;
-            console.log(startCellName);
             let visibleCols = this.setVisibleCols(startCellName, Course.RIGHT);
             let visibleRows = this.setVisibleRows(startCellName, Course.BOTTOM);
             this.viewFromCell(startCellName, visibleRows, visibleCols);
@@ -398,7 +396,6 @@ class Table extends HTMLTableElement{
      */
     getFullVisibleCols(initCellName, parentWidth, course) {
         let cell = this.#tableData.getCell(initCellName);
-        // console.log(cell);
         let initColIndex = cell.colNumber;
         let initColName = cell.colName;
         let colWidths = 0;
