@@ -3,10 +3,10 @@
  */
 class TableData {
     #app;
-    #cells;
-    #tokens;
-    #values;
-    #strings; 
+    #cellMap;
+    #tokenMap;
+    #valueMap;
+    #stringMap; 
     #calculator;
 
     /**
@@ -14,10 +14,10 @@ class TableData {
      */
     constructor(app) {
         this.#app = app;
-        this.#cells = new Map();
-        this.#tokens = new Map();
-        this.#values = new Map();
-        this.#strings = new Map();
+        this.#cellMap = new Map();
+        this.#tokenMap = new Map();
+        this.#valueMap = new Map();
+        this.#stringMap = new Map();
         this.#calculator = new Calculator(this);
     }
 
@@ -25,7 +25,7 @@ class TableData {
      * Пересчет значений формульных ячеек электронной таблицы
      */
     calcAllCells() {
-        for (let cellName of this.#tokens.keys()) {
+        for (let cellName of this.#tokenMap.keys()) {
             this.getCell(cellName.toUpperCase()).refreshValue();
         }
     }
@@ -44,7 +44,7 @@ class TableData {
      * @param {Object} cell - объект ячейки
      */
     setCell (cellName, cell) {
-        this.#cells.set(cellName.toUpperCase(), cell);
+        this.#cellMap.set(cellName.toUpperCase(), cell);
     }
 
     /**
@@ -52,7 +52,7 @@ class TableData {
      * @param {String} cellName - имя ячейки
      */
     getCell (cellName) {
-        return this.#cells.get(cellName.toUpperCase());
+        return this.#cellMap.get(cellName.toUpperCase());
     }
 
     /**
@@ -60,7 +60,7 @@ class TableData {
      * @param {String} cellName - имя ячейки
      */
     isNumber(cellName) {
-        return this.#values.has(cellName.toUpperCase());
+        return this.#valueMap.has(cellName.toUpperCase());
     }
 
     /**
@@ -68,7 +68,7 @@ class TableData {
      * @param {String} cellName - имя ячейки
      */
     isFormula(cellName) {
-        return this.#tokens.has(cellName.toUpperCase());
+        return this.#tokenMap.has(cellName.toUpperCase());
     }
 
     /**
@@ -76,7 +76,7 @@ class TableData {
      * @param {String} cellName - имя ячейки
      */
     isString(cellName) {
-        return this.#strings.has(cellName.toUpperCase());
+        return this.#stringMap.has(cellName.toUpperCase());
     }
 
     /**
@@ -92,7 +92,7 @@ class TableData {
      * @param {Strgin} cellName  - имя ячейки
      */
     getTokens(cellName) {
-        return this.#tokens.get(cellName.toUpperCase());
+        return this.#tokenMap.get(cellName.toUpperCase());
     }
 
     /**
@@ -102,11 +102,11 @@ class TableData {
      */
     setTokens(cellName, formula) {
         if ( Array.isArray(formula) ) {
-            this.#tokens.set(cellName.toUpperCase(), formula);
+            this.#tokenMap.set(cellName.toUpperCase(), formula);
         }
         else {
             let f = formula.substring(1).toUpperCase();
-            this.#tokens.set(cellName.toUpperCase(), Token.getTokens(f));
+            this.#tokenMap.set(cellName.toUpperCase(), Token.getTokens(f));
         }
     }
 
@@ -116,7 +116,7 @@ class TableData {
      * @param {Number} value 
      */
     setValue(cellName, value) {
-        this.#values.set(cellName.toUpperCase(), value);
+        this.#valueMap.set(cellName.toUpperCase(), value);
     }
 
     /**
@@ -124,7 +124,7 @@ class TableData {
      * @param {String} cellName 
      */
     getValue(cellName) {
-        return this.#values.get(cellName.toUpperCase());;
+        return this.#valueMap.get(cellName.toUpperCase());;
     }
 
     /**
@@ -133,7 +133,7 @@ class TableData {
      * @param {String} string 
      */
     setString(cellName, string) {
-        this.#strings.set(cellName.toUpperCase(), string);
+        this.#stringMap.set(cellName.toUpperCase(), string);
     }
 
     /**
@@ -141,7 +141,7 @@ class TableData {
      * @param {String} cellName 
      */
     getString(cellName) {
-        return this.#strings.get(cellName.toUpperCase());
+        return this.#stringMap.get(cellName.toUpperCase());
     }
 
     /**
@@ -150,7 +150,7 @@ class TableData {
     getData() {
 		let table = this.#app.getComponent("table");
 		let tokens = {};
-		this.#tokens.forEach( (value, key, map) => { 
+		this.#tokenMap.forEach( (value, key, map) => { 
 			tokens[key] = [];
 			this.getTokens(key).forEach( ( token ) => {
 				tokens[key].push({
@@ -160,8 +160,8 @@ class TableData {
 			}) 
 		} );
         let data = {
-            strings:Object.fromEntries(this.#strings.entries()), 
-			values: Object.fromEntries(this.#values.entries()),
+            strings:Object.fromEntries(this.#stringMap.entries()), 
+			values: Object.fromEntries(this.#valueMap.entries()),
 			tokens: tokens
         };
         return JSON.stringify(data, null, 2);
@@ -173,10 +173,10 @@ class TableData {
      */
     setData(json) {
         // очистка старых значений
-        for (let cellName of this.#values.keys()){
+        for (let cellName of this.#valueMap.keys()){
             this.getCell(cellName).initCell();
         }
-        for (let cellName of this.#tokens.keys()){
+        for (let cellName of this.#tokenMap.keys()){
             this.getCell(cellName).initCell();
         }
 
@@ -184,7 +184,7 @@ class TableData {
         let data = JSON.parse(json);
 
         // обновление строковый значений
-        this.#strings.clear();
+        this.#stringMap.clear();
         if ( data.strings ) {
             let strings = new Map(Object.entries(data.strings));
             for (let cellName of strings.keys()){
@@ -193,7 +193,7 @@ class TableData {
         }
 
         // обновление первичных данных
-        this.#values.clear();
+        this.#valueMap.clear();
         if ( data.values ) {
             let values = new Map(Object.entries(data.values));
             for (let cellName of values.keys()){
@@ -202,7 +202,7 @@ class TableData {
         }
         
         // обновление формул
-        this.#tokens.clear();
+        this.#tokenMap.clear();
         if ( data.tokens ) {
             let tokens = new Map(Object.entries(data.tokens));
             for (let cellName of tokens.keys()){
@@ -213,5 +213,4 @@ class TableData {
             }
         }
     }
-
 }

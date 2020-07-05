@@ -195,4 +195,4 @@ class Cell extends HTMLElement {
 }
 
 // регистрация нового html-элемента
-customElements.define('b-cell', Cell);
+customElements.define('cell-data', Cell);

@@ -193,4 +193,4 @@ class Cursor extends HTMLElement{
 }
 
 // регистрация нового html-элемента
-customElements.define('b-cursor', Cursor);
+customElements.define('table-cursor', Cursor);

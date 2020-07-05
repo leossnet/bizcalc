@@ -44,6 +44,7 @@ class Table extends HTMLTableElement{
         this.generateTable(params);
         this.#tableStyle = document.createElement("style");
         this.append(this.#tableStyle);
+        this.setStartCell("A1");
         this.setCursor("A1");
         if ( params.isFocus ) this.focus();
 
@@ -167,16 +168,60 @@ class Table extends HTMLTableElement{
     }
 
     /**
+     * Установка крайней левой верхней видимой ячейки
+     * @param {String} cellName имя ячейки в формате А1
+     */
+    setStartCell(cellName) {
+        this.setAttribute("start-cell", cellName);
+    }
+
+    /**
+     * Получение объекта крайней левой верхней видимой ячейки таблицы
+     */
+    getStartCell() {
+        return this.#tableData.getCell(this.getAttribute("start-cell"));
+    }
+
+    /**
      * Установление курсора в позицию ячейки с именем cellName
-     * @param {String} cellName 
+     * @param {String} cellName имя ячейки в формате А1
      */
     setCursor(cellName) {
+        // запомнить текущее положение курсора
         let oldCell;
         if  ( this.#cursor.cell ) oldCell = this.#cursor.cell;
+
+        // установить новое положение курсора
         let newCell = this.getCell(cellName);
         this.#cursor.cell = newCell;
         this.setAttribute("cursor-cell", this.#cursor.cell.name);
-        if ( oldCell && oldCell !== newCell) oldCell.refresh();
+
+        // обновить ячейку со старым положением курсора
+        if ( oldCell && ( oldCell !== newCell) ) oldCell.refresh();
+
+        this.updateVisibleCol(oldCell, newCell);
+    }
+
+    /**
+     * Получение объекта курсора 
+     */
+    getCursor() {
+        return this.#cursor;
+    }
+
+    /**
+     * Обновление видимых на экране колонок при перемещении курсора
+     * @param {Object} oldCell - объект ячейки, в которой расположен курсор
+     * @param {Object} newCell - новая ячейка, в которую перемещается курсор
+     */
+    updateVisibleCol(oldCell, newCell) {
+        let oldCol = oldCell ? oldCell.colNumber : this.getCell("A1").colNumber;;
+        let newCol = newCell.colNumber ;
+        let startCell = this.getStartCell();
+        let visibleWidth = this.getVisibleWidth();
+        let course = newCol >= oldCol ? Course.RIGHT : Course.LEFT;
+        let fullVisibleCols = this.getFullVisibleCols(startCell.name, visibleWidth, course);
+
     }
 
     /**
@@ -185,8 +230,8 @@ class Table extends HTMLTableElement{
      * @param {Number} colCount - количество колонок смещения
      * @param {String} cellName - имя ячейки, относительно которой производится перемещение курсора
      */
-    moveCursor(rowCount, colCount, cellName) {
-        let currentCell = cellName ? this.getCell(cellName) : this.#cursor.cell;
+    moveCursor(rowCount, colCount, initCellName) {
+        let currentCell = initCellName ? this.getCell(initCellName) : this.#cursor.cell;
         let newCol = currentCell.colNumber;
         let newRow = currentCell.rowNumber;
 
@@ -283,8 +328,7 @@ class Table extends HTMLTableElement{
      */
     setVisibleCols(initCellName, course) {
         let visibleCols = this.#tableParams.colCount;
-        let headerWidth = 40;
-        let visibleWidth = parseInt(this.getAttribute("view-width")) - headerWidth;
+        let visibleWidth = this.getVisibleWidth();
         this.setDefaultColWidth();
         let fullVisibleCols = this.getFullVisibleCols(initCellName, visibleWidth, course);
         let rightColWidth = visibleWidth - fullVisibleCols.width;
@@ -301,6 +345,11 @@ class Table extends HTMLTableElement{
             visibleCols = fullVisibleCols.count;
         }
         return visibleCols;
+    }
+
+    getVisibleWidth() {
+        let headerWidth = 40;
+        return parseInt(this.getAttribute("view-width")) - headerWidth;
     }
 
     /**
@@ -328,7 +377,7 @@ class Table extends HTMLTableElement{
             }
         }
         else if ( course == Course.LEFT ) {
-            for (deltaColCount = initColIndex; deltaColCount>0; colIndex--) {
+            for (deltaColCount = initColIndex; deltaColCount>0; deltaColCount--) {
                 let colName = this.getColName(initColName, deltaColCount);
                 if ( (colWidths + this.getColWidth(colName) ) > parentWidth ) break;
                 colWidths += this.getColWidth(colName);
