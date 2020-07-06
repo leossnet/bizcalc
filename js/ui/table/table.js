@@ -217,7 +217,7 @@ class Table extends HTMLTableElement{
         // обновить ячейку со старым положением курсора
         if ( oldCell && ( oldCell !== newCell) ) oldCell.refresh();
 
-        this.updateVisibleCol(oldCell, newCell);
+        this.updateVisibleCells(oldCell, newCell);
     }
 
     /**
@@ -330,35 +330,32 @@ class Table extends HTMLTableElement{
      * @param {Object} oldCell - объект ячейки, в которой расположен курсор
      * @param {Object} newCell - новая ячейка, в которую перемещается курсор
      */
-    updateVisibleCol(oldCell, newCell) {
+    updateVisibleCells(oldCell, newCell) {
         let oldColNum = oldCell ? oldCell.data.colNumber : this.getStartCell().data.colNumber;
         let newColNum = newCell.data.colNumber ;
         let startCell = this.getStartCell().data;
         let startColNum = startCell.colNumber;
         let startRowNum = startCell.rowNumber;
 
-        // console.log("updateVisibleCol: "+oldColNum+" -> "+newColNum);
-        // console.log("(newColNum > oldColNum): "+(newColNum > oldColNum));
-        // console.log("(newColNum < oldColNum): "+(newColNum < oldColNum));
-
         // разобраться, в какой момент возникает course == undefined ?
         let course = (newColNum > oldColNum) ? Course.RIGHT : ( (newColNum < oldColNum) ? Course.LEFT : Course.DEFAULT );
 
-        // console.log("updateVisibleCol: set course - "+course);
+        // console.log("updateVisibleCells: set course - "+course);
         let fullVisibleCols = this.getFullVisibleCols(startCell.name, this.getVisibleWidth(), course);
         let endColNum = startCell.colNumber + fullVisibleCols.count - 1;
 
+        let newStartCol = startColNum;
+        let newStartRow = startRowNum;        
         if ( course == Course.RIGHT && newColNum > endColNum ) {
             let delta = ( newColNum == this.#tableParams.colCount ) ? 1 : 0;
-            let newStartCol = startColNum + newColNum - endColNum - delta;
-            let newStartRow = startRowNum;
-            this.setStartCell(CellData.getCellName(newStartRow, newStartCol));
+            newStartCol = startColNum + newColNum - endColNum - delta;
+            newStartRow = startRowNum;
         }
         else if ( course == Course.LEFT && newColNum < endColNum ) {
-            let newStartCol = newColNum;
-            let newStartRow = startRowNum;
-            this.setStartCell(CellData.getCellName(newStartRow, newStartCol));
+            newStartCol = newColNum;
+            newStartRow = startRowNum;
         }
+        this.setStartCell(CellData.getCellName(newStartRow, newStartCol));
     }    
 
     /**
