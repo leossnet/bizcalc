@@ -28,7 +28,7 @@ class Table extends HTMLTableElement{
         super();
         this.#app = app;
         this.#tableParams = {
-            colCount: params.colCount,
+            colCount: Math.min(params.colCount, MAX_COLUMN_COUNT),
             rowCount: params.rowCount
         };
         this.headers = [];
@@ -78,7 +78,8 @@ class Table extends HTMLTableElement{
         cgData.span = params.colCount;
         for (let c=0; c<params.colCount; c++) {
             let col = document.createElement("col");
-            col.id = String.fromCharCode("A".charCodeAt(0) + c);
+            col.id = Cell.getColName(c+1);
+
             if ( params && params.colWidths ) col.setAttribute("width", params.colWidths[c]);
             else col.setAttribute("width", 80);
             col.setAttribute("index", c);
@@ -97,7 +98,7 @@ class Table extends HTMLTableElement{
         th.innerHTML = "";
         hRow.append(th);
         for (let i = 0; i < this.#tableParams.colCount; i++) {
-            let letter = String.fromCharCode("A".charCodeAt(0) + i);
+            let letter = Cell.getColName(i+1);
             this.headers.push(letter);
             let th = document.createElement("th");
             th.classList.add("cell-header");
@@ -367,7 +368,7 @@ class Table extends HTMLTableElement{
             visibleCols = fullVisibleCols.count + 1;
             let rightColIndex = visibleCols - 1;
             let startCell = this.#tableData.getCell(startCellName);
-            let rightColName = String.fromCharCode(startCell.colName.charCodeAt(0) + rightColIndex);
+            let rightColName = Cell.getColName(startCell.rowNumber + rightColIndex);
             let rightCol = this.#colMap.get(rightColName);
             if ( rightCol ) rightCol.setAttribute("width", rightColWidth);
         }
@@ -430,7 +431,7 @@ class Table extends HTMLTableElement{
      */
     getColName(initColName, deltaColCount) {
         let colName = Cell.getColName(Cell.getColNumber(initColName)+deltaColCount);
-        console.log(Cell.getColNumber(initColName)+" + "+deltaColCount+ " = " +Cell.getColNumber(colName));
+        // console.log(Cell.getColNumber(initColName)+" + "+deltaColCount+ " = " +Cell.getColNumber(colName));
         return this.#colMap.get(colName).id;
     }
 
