@@ -3,7 +3,7 @@ const Course = {
     RIGHT: "right",
     TOP: "top",
     BOTTOM: "bottom",
-    NONE: "none"
+    DEFAULT: "default"
 };
 
 /**
@@ -231,7 +231,7 @@ class Table extends HTMLTableElement{
         if ( colCount > 0 ) newColNum += Math.min(colCount, this.#tableParams.colCount-newColNum);
         else newColNum += Math.max(colCount, 1-newColNum);
 
-        console.log(this.getStartCell().name+": "+currentCell.name+" -> "+Cell.getColName(newColNum)+newRow);
+        console.log("startCell "+this.getStartCell().name+": moveCursor "+currentCell.name+" -> "+Cell.getColName(newColNum)+newRow);
 
         this.setCursor(Cell.getCellName(newRow, newColNum));
     }
@@ -321,32 +321,33 @@ class Table extends HTMLTableElement{
      * @param {Object} newCell - новая ячейка, в которую перемещается курсор
      */
     updateVisibleCol(oldCell, newCell) {
-        let oldColNum = oldCell ? oldCell.colNumber : this.getCell("A1").colNumber;;
+        let oldColNum = oldCell ? oldCell.colNumber : this.getStartCell().colNumber;;
         let newColNum = newCell.colNumber ;
         let startCell = this.getStartCell();
         let startColNum = startCell.colNumber;
         let startRowNum = startCell.rowNumber;
 
-        let course = newColNum>oldColNum ? Course.RIGHT : ( newColNum<oldColNum ? Course.LEFT : Course.NONE );
+        console.log("updateVisibleCol: "+oldColNum+" -> "+newColNum);
+        console.log("(newColNum > oldColNum): "+(newColNum > oldColNum));
+        console.log("(newColNum < oldColNum): "+(newColNum < oldColNum));
+
+        // разобраться, в какой момент возникает course == undefined ?
+        let course = (newColNum > oldColNum) ? Course.RIGHT : ( (newColNum < oldColNum) ? Course.LEFT : Course.DEFAULT );
+
+        console.log("updateVisibleCol: set course - "+course);
         let fullVisibleCols = this.getFullVisibleCols(startCell.name, this.getVisibleWidth(), course);
         let endColNum = startCell.colNumber + fullVisibleCols.count - 1;
 
-        switch (course) {
-            case  Course.RIGHT:
-                if ( newColNum > endColNum ) {
-                    let delta = ( newColNum == this.#tableParams.colCount ) ? 1 : 0;
-                    let newStartCol = startColNum + newColNum - endColNum - delta;
-                    let newStartRow = startRowNum;
-                    this.setStartCell(Cell.getCellName(newStartRow, newStartCol));
-                }
-                break;
-            case Course.LEFT: 
-                if ( newColNum < startColNum ) {
-                    let newStartCol = newColNum;
-                    let newStartRow = startRowNum;
-                    this.setStartCell(Cell.getCellName(newStartRow, newStartCol));
-                }            
-                break;
+        if ( course == Course.RIGHT && newColNum > endColNum ) {
+            let delta = ( newColNum == this.#tableParams.colCount ) ? 1 : 0;
+            let newStartCol = startColNum + newColNum - endColNum - delta;
+            let newStartRow = startRowNum;
+            this.setStartCell(Cell.getCellName(newStartRow, newStartCol));
+        }
+        else if ( course == Course.LEFT && newColNum < endColNum ) {
+            let newStartCol = newColNum;
+            let newStartRow = startRowNum;
+            this.setStartCell(Cell.getCellName(newStartRow, newStartCol));
         }
     }    
 
@@ -393,14 +394,14 @@ class Table extends HTMLTableElement{
      */
     getFullVisibleCols(startCellName, parentWidth, course) {
         let startCell = this.#tableData.getCell(startCellName);
-        let startColIndex = startCell.colNumber;
+        let startColNum = startCell.colNumber;
         let startColName = startCell.colName;
         let colWidths = 0;
         let deltaColCount = 0;
+        console.log("getFullVisibleCols: cource - "+course);
 
         if ( course == Course.RIGHT ) {
-            console.log("right");
-            let rightColCount = this.#tableParams.colCount - startColIndex;
+            let rightColCount = this.#tableParams.colCount - startColNum;
             for (deltaColCount = 0; deltaColCount < rightColCount; deltaColCount++) {
                 let newColName = this.getColName(startColName, deltaColCount);
                 let newColWidth = this.getDefaultColWidth(newColName);
@@ -409,8 +410,7 @@ class Table extends HTMLTableElement{
             }
         }
         else if ( course == Course.LEFT ) {
-            console.log("left");
-            for (deltaColCount = startColIndex; deltaColCount>0; deltaColCount--) {
+            for (deltaColCount = startColNum; deltaColCount>0; deltaColCount--) {
                 let newColName = this.getColName(startColName, 1-deltaColCount);
                 let newColWidth = this.getDefaultColWidth(newColName);
                 if ( ( colWidths + newColWidth ) > parentWidth ) break;
