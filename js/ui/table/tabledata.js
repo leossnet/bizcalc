@@ -4,6 +4,7 @@
 class TableData {
     #app;
     #cellMap;
+    #cellDataMap;
     #tokenMap;
     #valueMap;
     #stringMap; 
@@ -15,6 +16,7 @@ class TableData {
     constructor(app) {
         this.#app = app;
         this.#cellMap = new Map();
+        this.#cellDataMap = new Map();
         this.#tokenMap = new Map();
         this.#valueMap = new Map();
         this.#stringMap = new Map();
@@ -46,6 +48,11 @@ class TableData {
     setCell (cellName, cell) {
         this.#cellMap.set(cellName.toUpperCase(), cell);
     }
+    
+    setCellData (cellName, cellData) {
+        this.#cellDataMap.set(cellName.toUpperCase(), cellData);
+    }
+
 
     /**
      * Получение объекта ячейки по имени ячейки
@@ -53,6 +60,10 @@ class TableData {
      */
     getCell (cellName) {
         return this.#cellMap.get(cellName.toUpperCase());
+    }
+
+    getCellData (cellName) {
+        return this.#cellDataMap.get(cellName.toUpperCase());
     }
 
     /**

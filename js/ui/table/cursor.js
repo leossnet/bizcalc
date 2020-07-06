@@ -39,9 +39,8 @@ class Cursor extends HTMLElement{
      */
     set cell(cell){
         this.#cell = cell;
-        this.#cell.innerHTML = "";
         this.#cell.append(this);
-        this.value = cell.value;
+        this.value = cell.data.value;
         this.setEditableValue(this.#editor);
     }
 

@@ -15,6 +15,7 @@ class App {
      * @params {Object} params различные параметры приложенич
      */
     constructor (appSelector, params) {
+        console.time("app");
         this.#root = document.querySelector(appSelector);
         this.#components = new Map();
         this.#fileName = 'filename.json';
@@ -93,6 +94,7 @@ class App {
 
         // this.getComponent("tablePanel").currentTable.focus();
         this.getComponent("table").focus();
+        console.timeEnd("app");
     }
 
     /**
