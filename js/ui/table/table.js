@@ -42,9 +42,9 @@ class Table extends HTMLTableElement{
         this.tabIndex = -1;
 
         // генерация внешнего вида таблицы
+
         this.generateTable(params);
-        this.#tableStyle = document.createElement("style");
-        this.append(this.#tableStyle);
+
         this.setStartCell("A1");
         this.setCursor("A1");
         if ( params.isFocus ) this.focus();
@@ -63,6 +63,9 @@ class Table extends HTMLTableElement{
      * @param {Object} params - набор параметром, упакованных в объект
      */
     generateTable(params) {
+        this.#tableStyle = document.createElement("style");
+        this.append(this.#tableStyle);
+
         // генерация параметров колонки с номерами строк
         let cgHeader = document.createElement("colgroup");
         cgHeader.classList.add("col-header");
@@ -92,47 +95,44 @@ class Table extends HTMLTableElement{
         let tHead = document.createElement("tHead");
         let hRow = tHead.insertRow(-1);
         hRow.classList.add("row-header");
+        
+        this.createHeader(hRow, ["cell-header"], {}, "");
         this.headers.push("");
-        let th = document.createElement("th");
-        th.classList.add("cell-header");
-        th.innerHTML = "";
-        hRow.append(th);
+
         for (let i = 0; i < this.#tableParams.colCount; i++) {
             let letter = Cell.getColName(i+1);
             this.headers.push(letter);
-            let th = document.createElement("th");
-            th.classList.add("cell-header");
-            th.setAttribute("col", letter);
-            th.innerHTML = letter;
-            hRow.append(th);
+            this.createHeader(hRow, ["cell-header"], {col:letter}, letter);
         }
         this.append(tHead);
 
         // генерация содержимого таблицы
         let tBody = document.createElement("tBody");
         for (let i = 1; i < this.#tableParams.rowCount + 1; i++) {
+            // создание новой строки
             let row = tBody.insertRow(-1);
-            row.setAttribute("row", i);
             row.classList.add("row-data");
-            let th = document.createElement("th");
-            th.classList.add("cell-header");
-            th.setAttribute("row", i);
-            th.innerHTML = i;
-            row.append(th);
+            row.setAttribute("row", i);
+            this.createHeader(row, ["cell-header"], {row:i}, i);
+
+            // добавление ячеек с данными
             for (let j = 1; j <= this.#tableParams.colCount; j++) {
                 let letter = this.headers[j];
                 let cell = new Cell(this, i, letter);
-                cell.setAttribute("row", i);
-                cell.setAttribute("col", letter);
                 this.#tableData.setCell(letter + i, cell);
-                let th = row.insertCell(-1);
-                th.classList.add("cell-case");
-                th.setAttribute("col", letter);
-                th.append(cell);
+                row.append(cell);
             }
         }
 
         this.append(tBody);
+    }
+
+    createHeader(root, classes, attrs, text) {
+        let th = document.createElement("th");
+        classes.forEach( item => th.classList.add(item) );
+        for (let key in attrs) { th.setAttribute(key, attrs[key]); }
+        th.innerHTML = text;
+        root.append(th);
     }
 
     setColWidth(colName, width) {
@@ -232,7 +232,7 @@ class Table extends HTMLTableElement{
         if ( colCount > 0 ) newColNum += Math.min(colCount, this.#tableParams.colCount-newColNum);
         else newColNum += Math.max(colCount, 1-newColNum);
 
-        console.log("startCell "+this.getStartCell().name+": moveCursor "+currentCell.name+" -> "+Cell.getColName(newColNum)+newRow);
+        // console.log("startCell "+this.getStartCell().name+": moveCursor "+currentCell.name+" -> "+Cell.getColName(newColNum)+newRow);
 
         this.setCursor(Cell.getCellName(newRow, newColNum));
     }
@@ -279,9 +279,9 @@ class Table extends HTMLTableElement{
             + ".row-data[row]:nth-child(n+" + endRow + ")" // строки после конечной строки
             + "{display: none;}"
             + ".cell-header[col]:nth-child(-n+" + beginCol + ")," // колонки заголовков до начальной колонки
-            + ".cell-case[col]:nth-child(-n+" + beginCol + ")," // колонки данных до начальной колонки
+            + ".cell-data[col]:nth-child(-n+" + beginCol + ")," // колонки данных до начальной колонки
             + ".cell-header[col]:nth-child(n+" + endCol + ")," // колонки заголовков после конечной колонки
-            + ".cell-case[col]:nth-child(n+" + endCol + ")" + // колонки данных после конечной колонки
+            + ".cell-data[col]:nth-child(n+" + endCol + ")" + // колонки данных после конечной колонки
             "{display: none;}";
         this.#tableStyle.innerHTML = cssText;
     }
@@ -328,14 +328,14 @@ class Table extends HTMLTableElement{
         let startColNum = startCell.colNumber;
         let startRowNum = startCell.rowNumber;
 
-        console.log("updateVisibleCol: "+oldColNum+" -> "+newColNum);
-        console.log("(newColNum > oldColNum): "+(newColNum > oldColNum));
-        console.log("(newColNum < oldColNum): "+(newColNum < oldColNum));
+        // console.log("updateVisibleCol: "+oldColNum+" -> "+newColNum);
+        // console.log("(newColNum > oldColNum): "+(newColNum > oldColNum));
+        // console.log("(newColNum < oldColNum): "+(newColNum < oldColNum));
 
         // разобраться, в какой момент возникает course == undefined ?
         let course = (newColNum > oldColNum) ? Course.RIGHT : ( (newColNum < oldColNum) ? Course.LEFT : Course.DEFAULT );
 
-        console.log("updateVisibleCol: set course - "+course);
+        // console.log("updateVisibleCol: set course - "+course);
         let fullVisibleCols = this.getFullVisibleCols(startCell.name, this.getVisibleWidth(), course);
         let endColNum = startCell.colNumber + fullVisibleCols.count - 1;
 
@@ -399,7 +399,7 @@ class Table extends HTMLTableElement{
         let startColName = startCell.colName;
         let colWidths = 0;
         let deltaColCount = 0;
-        console.log("getFullVisibleCols: cource - "+course);
+        // console.log("getFullVisibleCols: cource - "+course);
 
         if ( course == Course.RIGHT ) {
             let rightColCount = this.#tableParams.colCount - startColNum;

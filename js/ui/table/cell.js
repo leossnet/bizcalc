@@ -13,10 +13,10 @@ const MAX_COLUMN_COUNT = 676; // 26*26, где 26 - число букв в ла�
 /**
  * Класс, реализующий функционал ячейки таблицы
  */
-class Cell extends HTMLElement { 
+class Cell extends HTMLTableCellElement { 
     #table;
-    #tdata;
-    #data;
+    #tableData;
+    #cellData;
     #cell = {};
 
     /**
@@ -28,7 +28,7 @@ class Cell extends HTMLElement {
     constructor(table, rowName, colName) {
         super();
         this.#table = table;
-        this.#tdata = this.#table.tableData;
+        this.#tableData = this.#table.tableData;
 
         this.#cell = {
             name: colName+String(rowName),
@@ -38,13 +38,38 @@ class Cell extends HTMLElement {
             colNumber: Cell.getColNumber(colName),
         };
         this.initCell();
-
-        // this.id = colName+rowName;
-        this.classList.add("cell-data");
-        this.setAttribute("cell", colName+rowName);
-        this.setAttribute("type", this.#data.type);
+        // this.generateCell(this.#cell.colName, this.#cell.rowName);
         this.addEventListener("click", this.handlerClick );
     }
+
+
+    generateCell(colName, rowName) {
+        this.classList.add("cell-data");
+        this.setAttribute("cell", colName + rowName);
+        this.setAttribute("row", rowName);
+        this.setAttribute("col", colName);
+        this.setAttribute("type", this.#cellData.type);
+    }
+
+    /**
+     * Установление первоначальных значений ячейки
+     */
+    initCell() {
+        this.#cellData = {
+            value: null,
+            type: ValueTypes.None,
+            number: 0,
+            formula : "",
+            string: ""
+        };        
+    }
+
+    /**
+     * Обрабочик, вызываемой после добавления компонента в документ
+     */
+    connectedCallback() { 
+        this.generateCell(this.#cell.colName, this.#cell.rowName);
+    }    
 
     /**
      * Получение имени ячейки в формате А1
@@ -59,9 +84,9 @@ class Cell extends HTMLElement {
      * @param {Number} rowNumber - номер строки
      * @param {Number} colNumber - номер колонки
      */
-    getCellName(rowNumber, colNumber) {
-        return Cell.getColName(colNumber)+rowNumber;
-    }
+    // getCellName(rowNumber, colNumber) {
+    //     return Cell.getColName(colNumber)+rowNumber;
+    // }
     
     /**
      * Получение имени строки ячейки в текстовом виде 
@@ -95,26 +120,26 @@ class Cell extends HTMLElement {
      * Получение значения ячейки в числовом формате для числа и текстовом для строки
      */
     get value() {
-        return this.#data.value;
+        return this.#cellData.value;
     }
 
     get type() {
-        return this.#data.type;
+        return this.#cellData.type;
     }
     
     get number() {
-        return this.#data.number;
+        return this.#cellData.number;
     }
 
     /**
      * Получение формулы ячейки, для первичного взначения возврат этого значения в текстовом виде
      */
     get formula() {
-        return this.#data.formula;
+        return this.#cellData.formula;
     }
 
     get string() {
-        return this.#data.string;
+        return this.#cellData.string;
     }
 
     /**
@@ -123,41 +148,41 @@ class Cell extends HTMLElement {
     set value(value){
         let cellName = this.#cell.name;
         if ( value === undefined || Number(value) === 0 ) {
-            this.#data.type = ValueTypes.Number;
-            this.#data.number = 0;
-            this.#tdata.setValue(cellName, this.#data.number);
-            this.#data.value = ( value === undefined ) ? "" : 0;
-            this.#tdata.calcAllCells();
-            this.setAttribute("type", this.#data.type);
+            this.#cellData.type = ValueTypes.Number;
+            this.#cellData.number = 0;
+            this.#tableData.setValue(cellName, this.#cellData.number);
+            this.#cellData.value = ( value === undefined ) ? "" : 0;
+            this.#tableData.calcAllCells();
+            this.setAttribute("type", this.#cellData.type);
         }
         else if ( Number(value) ) {
-            this.#data.type = ValueTypes.Number;
-            this.#data.number = Number(value);
-            this.#tdata.setValue(cellName, this.#data.number);
-            this.#data.value = value;
-            this.#tdata.calcAllCells();
-            this.setAttribute("type", this.#data.type);
+            this.#cellData.type = ValueTypes.Number;
+            this.#cellData.number = Number(value);
+            this.#tableData.setValue(cellName, this.#cellData.number);
+            this.#cellData.value = value;
+            this.#tableData.calcAllCells();
+            this.setAttribute("type", this.#cellData.type);
         }
         else if ( value.toString().charAt(0) === '=' ) {
-            this.#data.type = ValueTypes.Formula;
-            this.#data.formula = value;
-            this.#tdata.setTokens(cellName, this.#data.formula);
-            this.#data.value = this.#tdata.calcCell(cellName);
-            this.setAttribute("type", this.#data.type);
+            this.#cellData.type = ValueTypes.Formula;
+            this.#cellData.formula = value;
+            this.#tableData.setTokens(cellName, this.#cellData.formula);
+            this.#cellData.value = this.#tableData.calcCell(cellName);
+            this.setAttribute("type", this.#cellData.type);
         }
         else if ( Array.isArray(value) ) {
-            this.#data.type = ValueTypes.Formula;
-            this.#data.formula = "="+value.map( (item, index, array) => item.value ).join("");
-            this.#tdata.setTokens(cellName, value);
-            this.#data.value = this.#tdata.calcCell(cellName);
-            this.setAttribute("type", this.#data.type);
+            this.#cellData.type = ValueTypes.Formula;
+            this.#cellData.formula = "="+value.map( (item, index, array) => item.value ).join("");
+            this.#tableData.setTokens(cellName, value);
+            this.#cellData.value = this.#tableData.calcCell(cellName);
+            this.setAttribute("type", this.#cellData.type);
         }
         else {
-            this.#data.type = ValueTypes.String;
-            this.#data.string = value;
-            this.#data.value = value;
-            this.#tdata.setString(cellName, value);
-            this.setAttribute("type", this.#data.type);
+            this.#cellData.type = ValueTypes.String;
+            this.#cellData.string = value;
+            this.#cellData.value = value;
+            this.#tableData.setString(cellName, value);
+            this.setAttribute("type", this.#cellData.type);
         }
         this.refresh();
     }
@@ -197,28 +222,16 @@ class Cell extends HTMLElement {
         return Cell.getColName(colNumber)+rowNumber;
     }
 
-    /**
-     * Установление первоначальных значений ячейки
-     */
-    initCell() {
-        this.#data = {
-            value: null,
-            type: ValueTypes.None,
-            number: 0,
-            formula : "",
-            string: ""
-        };        
-    }
 
     refreshValue() {
         if ( this.type == ValueTypes.Formula ) {
-            this.#data.value = this.#tdata.calcCell(this.name);
+            this.#cellData.value = this.#tableData.calcCell(this.name);
         }
         this.refresh();
     }
 
     refresh() {
-        this.innerHTML = this.#data.value;
+        this.innerHTML = this.#cellData.value;
     }
 
     /**
@@ -231,7 +244,7 @@ class Cell extends HTMLElement {
 }
 
 // регистрация нового html-элемента
-customElements.define('cell-data', Cell);
+customElements.define('cell-data', Cell, {extends:"td"});
 
 // console.log("Cell.getColName(26): "+Cell.getColName(26)); // Z
 // console.log("Cell.getColName(27): "+Cell.getColName(27)); // AA
