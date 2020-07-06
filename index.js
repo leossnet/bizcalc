@@ -76,7 +76,6 @@ class App {
             isFocus: true
         };
         let table = new Table(this, tableParams);
-        console.log(table);
         this.addComponent("table", table);
 
         this.addComponent("infobar", new Infobar(this, {}));

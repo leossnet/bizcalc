@@ -26,7 +26,6 @@ class Table extends HTMLTableElement{
      * @param {Объект} params набор параметров инициализации таблицы
      */
     constructor (app, params) {
-        console.time("init");
         super();
         this.#app = app;
         this.#tableParams = {
@@ -44,11 +43,7 @@ class Table extends HTMLTableElement{
         this.tabIndex = -1;
 
         // генерация внешнего вида таблицы
-        console.time("table");
         this.generateTable(params);
-        console.timeEnd("table");
-
-
         this.setStartCell("A1");
         this.setCursor("A1");
         if ( params.isFocus ) this.focus();
@@ -60,7 +55,6 @@ class Table extends HTMLTableElement{
             this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
             this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
         });
-        console.timeEnd("init");
     }
 
     /**
@@ -112,7 +106,6 @@ class Table extends HTMLTableElement{
         this.append(tHead);
 
         // генерация данных ячеек
-        console.time("cellData");
         for (let i = 1; i < this.#tableParams.rowCount + 1; i++) {
             for (let j = 1; j <= this.#tableParams.colCount; j++) {
                 let letter = this.headers[j];
@@ -120,10 +113,8 @@ class Table extends HTMLTableElement{
                 this.#tableData.setCellData(letter + i, cellData);
             }
         }
-        console.timeEnd("cellData");
 
         // генерация содержимого таблицы
-        console.time("tBody");
         let tBody = document.createElement("tBody");
         for (let i = 1; i < this.#tableParams.rowCount + 1; i++) {
             // создание новой строки
@@ -140,8 +131,6 @@ class Table extends HTMLTableElement{
                 row.append(cell);
             }
         }
-        console.timeEnd("tBody");
-
         this.append(tBody);
     }
 
@@ -280,7 +269,7 @@ class Table extends HTMLTableElement{
         let endCell = this.getCellData(endCellName);
         let endRow = endCell.rowNumber;
         let endCol = endCell.rowNumber;
-        let beginRow = endRow-rowCount;
+        let beginRow = endRow-rowCount+1;
         let beginCol = endCol-colCount+1;
         this.setCssText(beginRow, beginCol, endRow, endCol);
     }
@@ -469,13 +458,21 @@ class Table extends HTMLTableElement{
     }
 
     setVisibleRows() {
-        let visibleRows = this.#tableParams.rowCount;
+        let visibleRows = 0;
         let vh = parseInt(this.getAttribute("view-height"));
-        let hHeader = parseInt(getComputedStyle(document.querySelector("header.flex-item")).height);
-        let hFooter = parseInt(getComputedStyle(document.querySelector("footer.flex-item")).height);
-        let hDocument = parseInt(getComputedStyle(document.querySelector("div#bizcalc")).height);
-        vh = hDocument - hHeader - hFooter;
-        visibleRows = Math.floor(vh / 22);
+        let headers = this.querySelectorAll(".row-header");
+        let rows = this.querySelectorAll(".row-data");
+
+        let visibleRowsHeight = 0;
+        headers.forEach( row => {
+            visibleRowsHeight += Number.parseFloat(getComputedStyle(row).height); 
+            visibleRows++;
+        } );
+        for (let row of rows) {
+            visibleRowsHeight += Number.parseFloat(getComputedStyle(row).height);
+            if ( visibleRowsHeight > vh ) break;
+            visibleRows++;
+        }
         return visibleRows;
     }
 
