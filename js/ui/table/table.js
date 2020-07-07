@@ -43,10 +43,10 @@ class Table extends HTMLTableElement{
         this.tabIndex = -1;
 
         // генерация внешнего вида таблицы
-        this.generateTable(params);
-        this.setStartCell("A1");
-        this.setCursor("A1");
-        if ( params.isFocus ) this.focus();
+        // this.generateTable(params);
+        // this.setStartCell("A1");
+        // this.setCursor("A1");
+        // if ( params.isFocus ) this.focus();
 
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
@@ -92,6 +92,7 @@ class Table extends HTMLTableElement{
 
         // генерация шапки таблицы
         let tHead = document.createElement("tHead");
+        tHead.classList.add("table-head");
         let hRow = tHead.insertRow(-1);
         hRow.classList.add("row-header");
         
@@ -217,12 +218,33 @@ class Table extends HTMLTableElement{
         // установить новое положение курсора
         let newCell = this.getCell(cellName);
         this.#cursor.cell = newCell;
+
+        // установка классов для выделения курсора на заголовках строк и колонок
+        this.selectCursor(oldCell, newCell);
+
         this.setAttribute("cursor-cell", this.#cursor.cell.data.name);
 
         // обновить ячейку со старым положением курсора
         if ( oldCell && ( oldCell !== newCell) ) oldCell.refresh();
 
-        this.updateVisibleCells(oldCell, newCell);
+        this.updateStartCell(oldCell, newCell);
+    }
+
+    selectCursor(oldCell, newCell) {
+        if (oldCell) {
+            let oldRowName = oldCell.data.rowName;
+            let oldColName = oldCell.data.colName;
+            let oldHeaderRow = document.querySelector("th.cell-header[row='"+oldRowName+"']");
+            let oldHeaderCol = document.querySelector("th.cell-header[col='"+oldColName+"']");
+            oldHeaderCol.classList.remove("cursor-col");
+            oldHeaderRow.classList.remove("cursor-row");
+        }
+        let newRowName = newCell.data.rowName;
+        let newColName = newCell.data.colName;
+        let newHeaderRow = document.querySelector("th.cell-header[row='"+newRowName+"']");
+        let newHeaderCol = document.querySelector("th.cell-header[col='"+newColName+"']");
+        newHeaderCol.classList.add("cursor-col");    
+        newHeaderRow.classList.add("cursor-row");    
     }
 
     /**
@@ -289,6 +311,10 @@ class Table extends HTMLTableElement{
      * Обрабочик, вызываемой после добавления компонента в документ
      */
     connectedCallback() { 
+        this.generateTable(this.#tableParams);
+        this.setStartCell("A1");
+        this.setCursor("A1");
+        if ( this.#tableParams.isFocus ) this.focus();
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
         this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
     }
@@ -320,7 +346,7 @@ class Table extends HTMLTableElement{
      * @param {Object} oldCell - объект ячейки, в которой расположен курсор
      * @param {Object} newCell - новая ячейка, в которую перемещается курсор
      */
-    updateVisibleCells(oldCell, newCell) {
+    updateStartCell(oldCell, newCell) {
         let oldColNum = oldCell ? oldCell.data.colNumber : this.getStartCell().data.colNumber;
         let oldRowNum = oldCell ? oldCell.data.rowNumber : this.getStartCell().data.rowNumber;
         let newColNum = newCell.data.colNumber ;
@@ -334,7 +360,7 @@ class Table extends HTMLTableElement{
         let colCourse = (newColNum > oldColNum) ? Course.RIGHT : ( (newColNum < oldColNum) ? Course.LEFT : Course.DEFAULT );
         let rowCourse = (newRowNum > oldRowNum) ? Course.BOTTOM : ( (newRowNum < oldRowNum) ? Course.TOP : Course.DEFAULT );
 
-        // console.log("updateVisibleCells: set course - "+course);
+        // console.log("updateStartCell: set course - "+course);
         let offsetX = this.getOffsetX(startCell.name, this.getVisibleWidth(), colCourse);
         let endColNum = startCell.colNumber + offsetX.cols - 1;
 
@@ -344,10 +370,7 @@ class Table extends HTMLTableElement{
 
         let newStartCol = startColNum;
         let newStartRow = startRowNum;
-
-        console.log("startColNum: "+startColNum+" -> newStartCol: "+newStartCol);
-        console.log("startRowNum: "+startRowNum+" -> newStartRow: "+newStartRow);
-
+        
         if ( colCourse == Course.RIGHT && newColNum > endColNum ) {
             let delta = ( newColNum == this.#tableParams.colCount ) ? 1 : 0;
             newStartCol = startColNum + newColNum - endColNum - delta;
@@ -363,6 +386,7 @@ class Table extends HTMLTableElement{
             newStartRow = newRowNum;
         }
 
+        console.log("R"+startRowNum+":C"+startColNum+" -> R"+newStartRow+":C"+newStartCol);
         this.setStartCell(CellData.getCellName(newStartRow, newStartCol));
     }    
 
@@ -420,7 +444,9 @@ class Table extends HTMLTableElement{
     }
 
     getVisibleHeight() {
-        return parseFloat(getComputedStyle(document.querySelector("div.flex-row")).height); 
+        let headHeight = parseFloat(getComputedStyle(document.querySelector(".table-head")).height);
+        return parseInt(this.getAttribute("view-height")) - headHeight;
+        // return parseFloat(getComputedStyle(document.querySelector("div.flex-row")).height); 
     }
 
 
@@ -447,7 +473,7 @@ class Table extends HTMLTableElement{
         }
         else if ( course == Course.TOP ) {
             for (rowCount = startRowNum; rowCount>0; rowCount--) {
-                let newRowName = this.getRowName(startRowNum, rowCount);
+                let newRowName = this.getRowName(startRowNum, 1-rowCount);
                 let newRowHeight = this.getDefaultRowHeight(newRowName);
                 if ( ( rowHeight + newRowHeight ) > parentHeight ) break;
                 rowHeight += newRowHeight;
