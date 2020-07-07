@@ -146,11 +146,9 @@ class Cursor extends HTMLElement{
      * @param {HTMLElement} target 
      */
     setEditableValue(targetElement) {
-        // console.log(this.#cell.data.type);
         switch(this.#cell.data.type) {
             case ValueTypes.Formula : 
                 targetElement.value = this.#cell.data.formula;
-                // console.log(this.#cell.data.formula);
                 break;
             case ValueTypes.Number :
                 targetElement.value = this.#cell.data.number;
