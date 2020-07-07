@@ -74,9 +74,9 @@
 }
 th.cursor-col {
     background-color: #eee;
-    border-bottom: 2px solid green;
+    border-bottom: 1px solid green;
 }
 th.cursor-row {
     background-color: #eee;
-    border-right: 2px solid green;
+    border-right: 1px solid green;
 }
