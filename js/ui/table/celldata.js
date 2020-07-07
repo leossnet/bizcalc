@@ -143,7 +143,7 @@ class CellData {
             this.#value.type = ValueTypes.Formula;
             this.#value.formula = value;
             this.#tableData.setTokens(cellName, this.#value.formula);
-            this.#value.html = this.#tableData.calcCell(cellName);
+            this.#tableData.calcAllCells();
         }
         else if ( Array.isArray(value) ) {
             this.#value.type = ValueTypes.Formula;
