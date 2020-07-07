@@ -142,6 +142,7 @@ class CellData {
             // this.setAttribute("type", this.#value.type);
         }
         else if ( value.toString().charAt(0) === '=' ) {
+            console.log(value);
             this.#value.type = ValueTypes.Formula;
             this.#value.formula = value;
             this.#tableData.setTokens(cellName, this.#value.formula);
@@ -149,6 +150,7 @@ class CellData {
             // this.setAttribute("type", this.#value.type);
         }
         else if ( Array.isArray(value) ) {
+            console.log(value);
             this.#value.type = ValueTypes.Formula;
             this.#value.formula = "="+value.map( (item, index, array) => item.html ).join("");
             this.#tableData.setTokens(cellName, value);

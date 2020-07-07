@@ -39,6 +39,7 @@ class Cursor extends HTMLElement{
      */
     set cell(cell){
         this.#cell = cell;
+        this.#cell.innerHTML = "";
         this.#cell.append(this);
         this.value = cell.data.value;
         this.setEditableValue(this.#editor);
@@ -145,15 +146,17 @@ class Cursor extends HTMLElement{
      * @param {HTMLElement} target 
      */
     setEditableValue(targetElement) {
-        switch(this.#cell.type) {
+        // console.log(this.#cell.data.type);
+        switch(this.#cell.data.type) {
             case ValueTypes.Formula : 
-                targetElement.value = this.#cell.formula;
+                targetElement.value = this.#cell.data.formula;
+                // console.log(this.#cell.data.formula);
                 break;
             case ValueTypes.Number :
-                targetElement.value = this.#cell.number;
+                targetElement.value = this.#cell.data.number;
                 break;
             case ValueTypes.String :
-                targetElement.value = this.#cell.string;
+                targetElement.value = this.#cell.data.string;
                 break;
             default :
                 targetElement.value = "";
