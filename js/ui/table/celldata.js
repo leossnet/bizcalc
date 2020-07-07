@@ -36,13 +36,27 @@ class CellData {
             rowNumber: Number.parseInt(rowName),
             colNumber: CellData.getColNumber(colName),
         };
+        this.initCell();        
+    }
+    
+    /**
+     * Установление начальный значений ячейки
+     */
+    initCell() {
         this.#value = {
             html: null,
             type: ValueTypes.None,
             number: 0,
-            formula : "",
+            formula: "",
             string: ""
-        };        
+        };
+    }
+
+    /**
+     * Получение ссылки на объект ячейки из объекта TableData
+     */
+    get cell() {
+        return this.#tableData.getCell(this.#param.name);
     }
 
     /**
@@ -117,7 +131,7 @@ class CellData {
             this.#tableData.setValue(cellName, this.#value.number);
             this.#value.html = ( value === undefined ) ? "" : 0;
             this.#tableData.calcAllCells();
-            this.setAttribute("type", this.#value.type);
+            // this.setAttribute("type", this.#value.type);
         }
         else if ( Number(value) ) {
             this.#value.type = ValueTypes.Number;
@@ -125,30 +139,31 @@ class CellData {
             this.#tableData.setValue(cellName, this.#value.number);
             this.#value.html = value;
             this.#tableData.calcAllCells();
-            this.setAttribute("type", this.#value.type);
+            // this.setAttribute("type", this.#value.type);
         }
         else if ( value.toString().charAt(0) === '=' ) {
             this.#value.type = ValueTypes.Formula;
             this.#value.formula = value;
             this.#tableData.setTokens(cellName, this.#value.formula);
             this.#value.html = this.#tableData.calcCell(cellName);
-            this.setAttribute("type", this.#value.type);
+            // this.setAttribute("type", this.#value.type);
         }
         else if ( Array.isArray(value) ) {
             this.#value.type = ValueTypes.Formula;
             this.#value.formula = "="+value.map( (item, index, array) => item.html ).join("");
             this.#tableData.setTokens(cellName, value);
             this.#value.html = this.#tableData.calcCell(cellName);
-            this.setAttribute("type", this.#value.type);
+            // this.setAttribute("type", this.#value.type);
         }
         else {
             this.#value.type = ValueTypes.String;
             this.#value.string = value;
             this.#value.html = value;
             this.#tableData.setString(cellName, value);
-            this.setAttribute("type", this.#value.type);
+            // this.setAttribute("type", this.#value.type);
         }
-        this.refresh();
+        this.cell.setAttribute("type", this.#value.type);
+        this.cell.refresh();
     }
 
     /**

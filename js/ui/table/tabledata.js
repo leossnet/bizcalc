@@ -185,10 +185,10 @@ class TableData {
     setData(json) {
         // очистка старых значений
         for (let cellName of this.#valueMap.keys()){
-            this.getCell(cellName).initCell();
+            this.getCellData(cellName).initCell();
         }
         for (let cellName of this.#tokenMap.keys()){
-            this.getCell(cellName).initCell();
+            this.getCellData(cellName).initCell();
         }
 
         // парсинг json 
@@ -199,7 +199,7 @@ class TableData {
         if ( data.strings ) {
             let strings = new Map(Object.entries(data.strings));
             for (let cellName of strings.keys()){
-                this.getCell(cellName).value = strings.get(cellName);
+                this.getCellData(cellName).value = strings.get(cellName);
             }
         }
 
@@ -208,7 +208,7 @@ class TableData {
         if ( data.values ) {
             let values = new Map(Object.entries(data.values));
             for (let cellName of values.keys()){
-                this.getCell(cellName).value = values.get(cellName);
+                this.getCellData(cellName).value = values.get(cellName);
             }
         }
         
@@ -220,7 +220,7 @@ class TableData {
                 tokens.get(cellName).map( (item, index, array) => {
                     array[index] = new Token(item.type, item.value);
                 } );
-                this.getCell(cellName).value = tokens.get(cellName);
+                this.getCellData(cellName).value = tokens.get(cellName);
             }
         }
     }
