@@ -265,14 +265,14 @@ class Table extends HTMLTableElement{
      * @param {String} initCellName - правая нижняя видимая ячейка таблицы
      * @param {Strinhg} endCellName - левая верхняя видимая ячейка таблицы
      */
-    viewToCell(endCellName, rowCount, colCount) {
-        let endCell = this.getCellData(endCellName);
-        let endRow = endCell.rowNumber;
-        let endCol = endCell.rowNumber;
-        let beginRow = endRow-rowCount+1;
-        let beginCol = endCol-colCount+1;
-        this.setCssText(beginRow, beginCol, endRow, endCol);
-    }
+    // viewToCell(endCellName, rowCount, colCount) {
+    //     let endCell = this.getCellData(endCellName);
+    //     let endRow = endCell.rowNumber;
+    //     let endCol = endCell.rowNumber;
+    //     let beginRow = endRow-rowCount+1;
+    //     let beginCol = endCol-colCount+1;
+    //     this.setCssText(beginRow, beginCol, endRow, endCol);
+    // }
 
 
     /**
@@ -325,6 +325,8 @@ class Table extends HTMLTableElement{
         }
     }
 
+
+
     /**
      * Обновление видимых на экране колонок при перемещении курсора
      * @param {Object} oldCell - объект ячейки, в которой расположен курсор
@@ -332,31 +334,100 @@ class Table extends HTMLTableElement{
      */
     updateVisibleCells(oldCell, newCell) {
         let oldColNum = oldCell ? oldCell.data.colNumber : this.getStartCell().data.colNumber;
+        let oldRowNum = oldCell ? oldCell.data.rowNumber : this.getStartCell().data.rowNumber;
         let newColNum = newCell.data.colNumber ;
+        let newRowNum = newCell.data.rowNumber ;
+
         let startCell = this.getStartCell().data;
         let startColNum = startCell.colNumber;
         let startRowNum = startCell.rowNumber;
 
         // разобраться, в какой момент возникает course == undefined ?
-        let course = (newColNum > oldColNum) ? Course.RIGHT : ( (newColNum < oldColNum) ? Course.LEFT : Course.DEFAULT );
+        let colCourse = (newColNum > oldColNum) ? Course.RIGHT : ( (newColNum < oldColNum) ? Course.LEFT : Course.DEFAULT );
+        let rowCourse = (newRowNum > oldRowNum) ? Course.BOTTOM : ( (newRowNum < oldRowNum) ? Course.TOP : Course.DEFAULT );
 
         // console.log("updateVisibleCells: set course - "+course);
-        let fullVisibleCols = this.getFullVisibleCols(startCell.name, this.getVisibleWidth(), course);
-        let endColNum = startCell.colNumber + fullVisibleCols.count - 1;
+        let offsetX = this.getOffsetX(startCell.name, this.getVisibleWidth(), colCourse);
+        let endColNum = startCell.colNumber + offsetX.cols - 1;
+
+        let fullVisibleRows = this.getFullVisibleRows(startCell.name, this.getVisibleHeight(), rowCourse);
+        let endRowNum = startCell.rowNumber + fullVisibleRows.count - 2;
+        // console.log("startCell.rowNumber: "+startCell.rowNumber+",  fullVisibleRows.count: "+fullVisibleRows.count);
 
         let newStartCol = startColNum;
-        let newStartRow = startRowNum;        
-        if ( course == Course.RIGHT && newColNum > endColNum ) {
+        let newStartRow = startRowNum;
+
+        console.log("startColNum: "+startColNum+" -> newStartCol: "+newStartCol);
+        console.log("startRowNum: "+startRowNum+" -> newStartRow: "+newStartRow);
+
+        if ( colCourse == Course.RIGHT && newColNum > endColNum ) {
             let delta = ( newColNum == this.#tableParams.colCount ) ? 1 : 0;
             newStartCol = startColNum + newColNum - endColNum - delta;
-            newStartRow = startRowNum;
         }
-        else if ( course == Course.LEFT && newColNum < endColNum ) {
+        else if ( colCourse == Course.LEFT && newColNum < endColNum ) {
             newStartCol = newColNum;
-            newStartRow = startRowNum;
         }
+        if ( rowCourse == Course.BOTTOM && newRowNum > endRowNum ) {
+            newStartRow = startRowNum + newRowNum - endRowNum;
+        }
+        else if ( rowCourse == Course.TOP && newRowNum < endRowNum ) {
+            newStartRow = newRowNum;
+        }        
         this.setStartCell(CellData.getCellName(newStartRow, newStartCol));
     }    
+
+    setVisibleRows(startCellName, course) {
+        let startCell = this.getStartCell().data;
+        let fullVisibleRows = this.getFullVisibleRows(startCell.name, this.getVisibleHeight(), Course.BOTTOM);
+        return fullVisibleRows.count;
+
+        // let startCellData = this.#tableData.getCellData(startCellName);
+        // let visibleRows = 0;
+        // let visibleHeight = this.getVisibleHeight();
+        // let headerRows = this.querySelectorAll(".row-header");
+
+        // let dataRows = this.querySelectorAll(".row-data");
+        // // console.log(dataRows);
+
+        // let visibleRowsHeight = 0;
+        // headerRows.forEach( row => {
+        //     visibleRowsHeight += Number.parseFloat(getComputedStyle(row).height); 
+        //     visibleRows++;
+        // } );
+        // for (let row of dataRows) {
+        //     if ( Number.parseInt(row.getAttribute("row")) < startCellData.rowNumber ) continue;
+        //     visibleRowsHeight += Number.parseFloat(getComputedStyle(row).height);
+        //     if ( visibleRowsHeight > visibleHeight ) break;
+        //     visibleRows++;
+        // }
+        // return visibleRows;
+
+    }
+
+    getFullVisibleRows(startCellName, visibleHeight, course) {
+        let startCellData = this.#tableData.getCellData(startCellName);
+        let visibleRows = 0;
+        let headerRows = this.querySelectorAll(".row-header");
+        let dataRows = this.querySelectorAll(".row-data");
+
+        let visibleRowsHeight = 0;
+        headerRows.forEach( row => {
+            visibleRowsHeight += Number.parseFloat(getComputedStyle(row).height); 
+            visibleRows++;
+        } );
+        for (let row of dataRows) {
+            let rowHeight = Number.parseFloat(getComputedStyle(row).height); 
+            let rowNum = Number.parseInt(row.getAttribute("row"));
+            if ( (rowNum>startCellData.rowNumber) && ( (Number(visibleRowsHeight)+rowHeight)<Number.parseFloat(visibleHeight))  ) {
+                visibleRowsHeight += rowHeight;
+                visibleRows++;
+            }
+        }
+        return {
+            count: visibleRows, 
+            height: visibleRowsHeight
+        };            
+    }
 
     /**
      * Определение видимых на экране колонок таблицы
@@ -367,11 +438,11 @@ class Table extends HTMLTableElement{
         let visibleCols = this.#tableParams.colCount;
         let visibleWidth = this.getVisibleWidth();
         this.setDefaultColWidth();
-        let fullVisibleCols = this.getFullVisibleCols(startCellName, visibleWidth, course);
-        let rightColWidth = visibleWidth - fullVisibleCols.width;
+        let offsetX = this.getOffsetX(startCellName, visibleWidth, course);
+        let rightColWidth = visibleWidth - offsetX.width;
 
         if (rightColWidth > 0) {
-            visibleCols = fullVisibleCols.count + 1;
+            visibleCols = offsetX.cols + 1;
             let rightColIndex = visibleCols - 1;
             let startCell = this.#tableData.getCellData(startCellName);
             let rightColName = CellData.getColName(startCell.rowNumber + rightColIndex);
@@ -379,15 +450,21 @@ class Table extends HTMLTableElement{
             if ( rightCol ) rightCol.setAttribute("width", rightColWidth);
         }
         else {
-            visibleCols = fullVisibleCols.count;
+            visibleCols = offsetX.cols;
         }
         return visibleCols;
     }
+
+    getVisibleHeight() {
+        return getComputedStyle(document.querySelector("div.flex-row")).height; 
+    }
+
 
     getVisibleWidth() {
         let headerWidth = 40;
         return parseInt(this.getAttribute("view-width")) - headerWidth;
     }
+
 
     /**
      * Получение объекта полностью видимых колонок в виде:
@@ -399,13 +476,12 @@ class Table extends HTMLTableElement{
      * @param {Number} parentWidth - ширина родительского компонента
      * @param {Object} course - направление отчета видимых колонок: Course.LEFT или Course.RIGHT
      */
-    getFullVisibleCols(startCellName, parentWidth, course) {
+    getOffsetX(startCellName, parentWidth, course) {
         let startCell = this.#tableData.getCellData(startCellName);
         let startColNum = startCell.colNumber;
         let startColName = startCell.colName;
         let colWidths = 0;
         let deltaColCount = 0;
-        // console.log("getFullVisibleCols: cource - "+course);
 
         if ( course == Course.RIGHT ) {
             let rightColCount = this.#tableParams.colCount - startColNum;
@@ -425,7 +501,7 @@ class Table extends HTMLTableElement{
             }
         }
         return {
-            count: deltaColCount, 
+            cols: deltaColCount, 
             width: colWidths 
         };
     }
@@ -452,25 +528,6 @@ class Table extends HTMLTableElement{
                 col.setAttribute("width", this.#colWidthArray[col.getAttribute("index")]);
             });
         }
-    }
-
-    setVisibleRows() {
-        let visibleRows = 0;
-        let vh = parseInt(this.getAttribute("view-height"));
-        let headers = this.querySelectorAll(".row-header");
-        let rows = this.querySelectorAll(".row-data");
-
-        let visibleRowsHeight = 0;
-        headers.forEach( row => {
-            visibleRowsHeight += Number.parseFloat(getComputedStyle(row).height); 
-            visibleRows++;
-        } );
-        for (let row of rows) {
-            visibleRowsHeight += Number.parseFloat(getComputedStyle(row).height);
-            if ( visibleRowsHeight > vh ) break;
-            visibleRows++;
-        }
-        return visibleRows;
     }
 
    /**
