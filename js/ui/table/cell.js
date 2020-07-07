@@ -41,8 +41,8 @@ class Cell extends HTMLTableCellElement {
     }    
 
     refreshValue() {
-        if ( this.type == ValueTypes.Formula ) {
-            this.data.value = this.#tableData.calcCell(this.data.name);
+        if ( this.data.type == ValueTypes.Formula ) {
+            this.data.value = this.#tableData.getTokens(this.data.name);
         }
         this.refresh();
     }

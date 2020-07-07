@@ -131,7 +131,6 @@ class CellData {
             this.#tableData.setValue(cellName, this.#value.number);
             this.#value.html = ( value === undefined ) ? "" : 0;
             this.#tableData.calcAllCells();
-            // this.setAttribute("type", this.#value.type);
         }
         else if ( Number(value) ) {
             this.#value.type = ValueTypes.Number;
@@ -139,7 +138,6 @@ class CellData {
             this.#tableData.setValue(cellName, this.#value.number);
             this.#value.html = value;
             this.#tableData.calcAllCells();
-            // this.setAttribute("type", this.#value.type);
         }
         else if ( value.toString().charAt(0) === '=' ) {
             console.log(value);
@@ -147,7 +145,6 @@ class CellData {
             this.#value.formula = value;
             this.#tableData.setTokens(cellName, this.#value.formula);
             this.#value.html = this.#tableData.calcCell(cellName);
-            // this.setAttribute("type", this.#value.type);
         }
         else if ( Array.isArray(value) ) {
             console.log(value);
@@ -155,14 +152,12 @@ class CellData {
             this.#value.formula = "="+value.map( (item, index, array) => item.html ).join("");
             this.#tableData.setTokens(cellName, value);
             this.#value.html = this.#tableData.calcCell(cellName);
-            // this.setAttribute("type", this.#value.type);
         }
         else {
             this.#value.type = ValueTypes.String;
             this.#value.string = value;
             this.#value.html = value;
             this.#tableData.setString(cellName, value);
-            // this.setAttribute("type", this.#value.type);
         }
         this.cell.setAttribute("type", this.#value.type);
         this.cell.refresh();
