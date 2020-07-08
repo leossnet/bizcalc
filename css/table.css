@@ -80,3 +80,9 @@ th.cursor-row {
     background-color: #eee;
     border-right: 1px solid green;
 }
+.cell-header[row] {
+    cursor: vertical-text;
+}
+.cell-header[col] {
+    cursor: text;
+}
