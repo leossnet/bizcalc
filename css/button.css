@@ -31,9 +31,10 @@ button:focus {
 .svg-icon {
     display: inline-block;
 }
-/* button.button-img {
-
-} */
-button.button-label {
-    font-weight: bold;
+.button-img {
+    height: 24px;
+    width: 24px;
+}
+.button-label {
+    color:  rgb(63, 63, 63);
 }

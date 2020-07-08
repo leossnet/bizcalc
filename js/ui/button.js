@@ -22,7 +22,7 @@ class Button extends HTMLButtonElement {
         }
         if ( params && params.img ) {
             let img = document.createElement("img");
-            img.src = "res/ico/32x32/"+params.img;
+            img.src = "res/ico/"+params.img;
             img.classList.add("button-img");
             this.append(img);
         }
