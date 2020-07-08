@@ -45,11 +45,8 @@ class Table extends HTMLTableElement{
         this.classList.add("table");
         this.tabIndex = -1;
 
-        // генерация внешнего вида таблицы
-        // this.generateTable(this.#params);
-        // this.setStartCell("A1");
-        // this.setCursor("A1");
-        // if ( this.#params.isFocus ) this.focus();
+        // генерация данных ячеек
+        this.generateTableData();
 
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
@@ -59,6 +56,41 @@ class Table extends HTMLTableElement{
             this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
         });
     }
+    
+    /**
+     * Обрабочик, вызываемой после добавления компонента в документ
+     */
+    connectedCallback() { 
+        this.generateTable(this.#params);
+        this.setStartCell("A1");
+        this.setCursor("A1");
+        if ( this.#params.isFocus ) this.focus();
+        this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
+        this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+    }
+
+    /**
+     * Массив пользовательских атрибутов, значения которых отслеживаются процедурой attributeChangedCallback
+     */
+    static get observedAttributes() {
+        return ["cursor-cell", "view-width", "view-height", "start-cell"];
+    }
+
+    /**
+     * Обработчик события изменения значений пользовательских атрибутов, возвращаемых observedAttributes
+     * @param {String} name - имя атрибута 
+     * @param {String} oldValue - предыдущее значение атрибута
+     * @param {String} newValue - новое значение атрибута
+     */
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (name == "view-width" || name == "view-height" || name == "start-cell") {
+            let startCellName = this.getStartCell().data.name;
+            let visibleCols = this.getVisibleCols(startCellName, Course.RIGHT);
+            let visibleRows = this.getVisibleRows(startCellName, Course.BOTTOM);
+            this.viewFromCell(startCellName, visibleRows, visibleCols);
+        }
+    }
+
 
     /**
      * Герерация html-таблицы по заданным в конструкторе Table параметрам
@@ -69,13 +101,10 @@ class Table extends HTMLTableElement{
         this.append(this.#tableStyle);
 
         // генерация параметров колонки с номерами строк
-        let cgHeader = document.createElement("colgroup");
-        cgHeader.classList.add("col-header");
-        cgHeader.span = 1;
+        let cgHeader = this.createColGroup(this, ["col-header"], 1);
         let col = document.createElement("col");
         col.setAttribute("width", 40);
         cgHeader.append(col);
-        this.append(cgHeader);
 
         // генерация параметров колонок с ячейками данных
         let cgData = document.createElement("colgroup");
@@ -96,6 +125,7 @@ class Table extends HTMLTableElement{
         // генерация шапки таблицы
         let tHead = document.createElement("tHead");
         tHead.classList.add("table-head");
+        // let hRow = this.createRow(tHead, ["row-header"], {});
         let hRow = tHead.insertRow(-1);
         hRow.classList.add("row-header");
         
@@ -109,14 +139,6 @@ class Table extends HTMLTableElement{
         }
         this.append(tHead);
 
-        // генерация данных ячеек
-        for (let i = 1; i < this.#params.rowCount + 1; i++) {
-            for (let j = 1; j <= this.#params.colCount; j++) {
-                let letter = this.headers[j];
-                let cellData = new CellData(this, i, letter);
-                this.#tableData.setCellData(letter + i, cellData);
-            }
-        }
 
         // генерация содержимого таблицы
         let tBody = document.createElement("tBody");
@@ -139,6 +161,26 @@ class Table extends HTMLTableElement{
     }
 
     /**
+     * Генерация данных таблицы
+     */
+    generateTableData() {
+        for (let i = 1; i < this.#params.rowCount + 1; i++) {
+            for (let j = 1; j <= this.#params.colCount; j++) {
+                let letter = CellData.getColName(j);
+                let cellData = new CellData(this, i, letter);
+                this.#tableData.setCellData(letter + i, cellData);
+            }
+        }
+    }
+
+    // createRow(root, classes, attrs) {
+    //     let row = document.createElement("tr");
+    //     classes.forEach( item => row.classList.add(item) );
+    //     for (let key in attrs) { row.setAttribute(key, attrs[key]); }
+    //     root.append(row);
+    // }
+    
+    /**
      * Процедура создания заголовка th
      * @param {Object} root - корневой элемент заголовка
      * @param {Array} classes - набор стилевых классов CSS
@@ -151,6 +193,20 @@ class Table extends HTMLTableElement{
         for (let key in attrs) { th.setAttribute(key, attrs[key]); }
         th.innerHTML = text;
         root.append(th);
+    }
+
+    /**
+     * Процедура создания группы колонок
+     * @param {Object} root - корневой элемент заголовка
+     * @param {Array} classes - набор стилевых классов CSS
+     * @param {Number} colCount - число колонок в группе 
+     */
+    createColGroup(root, classes, colCount ) {
+        let colGroup = document.createElement("colgroup");
+        classes.forEach( item => colGroup.classList.add(item) );
+        colGroup.span = colCount;
+        root.append(colGroup);
+        return colGroup;
     }
 
     /**
@@ -252,12 +308,10 @@ class Table extends HTMLTableElement{
 
         // установка классов для выделения курсора на заголовках строк и колонок
         this.selectCursor(oldCell, newCell);
-
         this.setAttribute("cursor-cell", this.#cursor.cell.data.name);
 
         // обновить ячейку со старым положением курсора
         if ( oldCell && ( oldCell !== newCell) ) oldCell.refresh();
-
         this.updateStartCell(oldCell, newCell);
     }
 
@@ -308,20 +362,6 @@ class Table extends HTMLTableElement{
 
         this.setCursor(CellData.getCellName(newRow, newColNum));
     }
-    
-    /**
-     * Установка видимой части таблицы
-     * @param {String} initCellName - левая верхняя видимая ячейка таблицы
-     * @param {Strinhg} endCellName - правая нижняя видимая ячейка таблицы
-     */
-    viewFromCell(initCellName, rowCount, colCount) {
-        let beginCell = this.getCellData(initCellName);
-        let beginRow = beginCell.rowNumber-1;
-        let beginCol = beginCell.colNumber;
-        let endRow = beginRow+rowCount+1;
-        let endCol = beginCol+colCount+1;
-        this.setCssText(beginRow, beginCol, endRow, endCol);
-    }
 
     /**
      * Установка видимости колонок
@@ -344,37 +384,17 @@ class Table extends HTMLTableElement{
     }
 
     /**
-     * Обрабочик, вызываемой после добавления компонента в документ
+     * Установка видимой части таблицы
+     * @param {String} initCellName - левая верхняя видимая ячейка таблицы
+     * @param {Strinhg} endCellName - правая нижняя видимая ячейка таблицы
      */
-    connectedCallback() { 
-        this.generateTable(this.#params);
-        this.setStartCell("A1");
-        this.setCursor("A1");
-        if ( this.#params.isFocus ) this.focus();
-        this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
-        this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
-    }
-
-    /**
-     * Массив пользовательских атрибутов, значения которых отслеживаются процедурой attributeChangedCallback
-     */
-    static get observedAttributes() {
-        return ["cursor-cell", "view-width", "view-height", "start-cell"];
-    }
-
-    /**
-     * Обработчик события изменения значений пользовательских атрибутов, возвращаемых observedAttributes
-     * @param {String} name - имя атрибута 
-     * @param {String} oldValue - предыдущее значение атрибута
-     * @param {String} newValue - новое значение атрибута
-     */
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name == "view-width" || name == "view-height" || name == "start-cell") {
-            let startCellName = this.getStartCell().data.name;
-            let visibleCols = this.getVisibleCols(startCellName, Course.RIGHT);
-            let visibleRows = this.getVisibleRows(startCellName, Course.BOTTOM);
-            this.viewFromCell(startCellName, visibleRows, visibleCols);
-        }
+    viewFromCell(initCellName, rowCount, colCount) {
+        let beginCell = this.getCellData(initCellName);
+        let beginRow = beginCell.rowNumber-1;
+        let beginCol = beginCell.colNumber;
+        let endRow = beginRow+rowCount+1;
+        let endCol = beginCol+colCount+1;
+        this.setCssText(beginRow, beginCol, endRow, endCol);
     }
 
     /**
