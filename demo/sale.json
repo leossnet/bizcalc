@@ -25,102 +25,80 @@
   "tokens": {
     "E3": [
       {
-        "type": "cell",
-        "value": "C3"
+        "cell": "C3"
       },
       {
-        "type": "operator",
-        "value": "*"
+        "operator": "*"
       },
       {
-        "type": "cell",
-        "value": "D3"
+        "cell": "D3"
       }
     ],
     "E4": [
       {
-        "type": "cell",
-        "value": "C4"
+        "cell": "C4"
       },
       {
-        "type": "operator",
-        "value": "*"
+        "operator": "*"
       },
       {
-        "type": "cell",
-        "value": "D4"
+        "cell": "D4"
       }
     ],
     "E5": [
       {
-        "type": "cell",
-        "value": "C5"
+        "cell": "C5"
       },
       {
-        "type": "operator",
-        "value": "*"
+        "operator": "*"
       },
       {
-        "type": "cell",
-        "value": "D5"
+        "cell": "D5"
       }
     ],
     "C6": [
       {
-        "type": "cell",
-        "value": "C3"
+        "cell": "C3"
       },
       {
-        "type": "operator",
-        "value": "+"
+        "operator": "+"
       },
       {
-        "type": "cell",
-        "value": "C4"
+        "cell": "C4"
       },
       {
-        "type": "operator",
-        "value": "+"
+        "operator": "+"
       },
       {
-        "type": "cell",
-        "value": "C5"
+        "cell": "C5"
       }
     ],
     "E6": [
       {
-        "type": "cell",
-        "value": "E3"
+        "cell": "E3"
       },
       {
-        "type": "operator",
-        "value": "+"
+        "operator": "+"
       },
       {
-        "type": "cell",
-        "value": "E4"
+        "cell": "E4"
       },
       {
-        "type": "operator",
-        "value": "+"
+        "operator": "+"
       },
       {
-        "type": "cell",
-        "value": "E5"
+        "cell": "E5"
       }
     ],
     "D6": [
       {
-        "type": "cell",
-        "value": "E6"
+        "cell": "E6"
       },
       {
-        "type": "operator",
-        "value": "/"
+        "operator": "/"
       },
       {
-        "type": "cell",
-        "value": "C6"
+        "cell": "C6"
       }
     ]
   }

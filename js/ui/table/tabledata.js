@@ -175,8 +175,7 @@ class TableData {
 			tokens[key] = [];
 			this.getTokens(key).forEach( ( token ) => {
 				tokens[key].push({
-					type: token.type,
-					value: token.value
+                    [token.type]: token.value   
 				});
 			}) 
 		} );
@@ -228,7 +227,7 @@ class TableData {
             let tokens = new Map(Object.entries(data.tokens));
             for (let cellName of tokens.keys()){
                 tokens.get(cellName).map( (item, index, array) => {
-                    array[index] = new Token(item.type, item.value);
+                    for (let type in item) array[index] = new Token(type, item[type]);
                 } );
                 this.getCellData(cellName).value = tokens.get(cellName);
             }
