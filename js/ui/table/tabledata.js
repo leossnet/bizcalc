@@ -15,6 +15,16 @@ class TableData {
      */
     constructor(app) {
         this.#app = app;
+        this.initTableData();
+        // this.#cellMap = new Map();
+        // this.#cellDataMap = new Map();
+        // this.#tokenMap = new Map();
+        // this.#valueMap = new Map();
+        // this.#stringMap = new Map();
+        // this.#calculator = new Calculator(this);
+    }
+
+    initTableData() {
         this.#cellMap = new Map();
         this.#cellDataMap = new Map();
         this.#tokenMap = new Map();
@@ -224,4 +234,27 @@ class TableData {
             }
         }
     }
+
+    clearData() {
+        console.log("clear data...");
+        // очистка старых значений
+        for (let cellName of this.#valueMap.keys()){
+            this.getCellData(cellName).initCell();
+            this.getCell(cellName).refresh();
+        }
+        for (let cellName of this.#tokenMap.keys()){
+            this.getCellData(cellName).initCell();
+            this.getCell(cellName).refresh();
+        }
+        for (let cellName of this.#stringMap.keys()){
+            this.getCellData(cellName).initCell();
+            this.getCell(cellName).refresh();
+        }
+
+        this.#stringMap.clear();
+        this.#valueMap.clear();
+        this.#tokenMap.clear();
+    }
+
+
 }

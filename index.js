@@ -30,23 +30,24 @@ class App {
             file: { name: "Файл",
                 checked: true,
                 buttons: [
-                    { name: "btOpen", label: "Открыть...", handler: this.handlerClickButton, icon: "folder-open" },
-                    { name: "btSave", label: "Сохранить...", handler: this.handlerClickButton, icon: "save" }
+                    { name: "btOpen", label: "Открыть...", handler: this.handlerClickButton, img: "open.ico" },
+                    { name: "btSave", label: "Сохранить...", handler: this.handlerClickButton, img: "save.ico" },
+                    { name: "btClose", label: "Закрыть", handler: this.handlerClickButton, img: "close.ico" }
                 ]
             },
             main: { name: "Главная",
                 buttons: [
-                    { name: "btCalc", label: "Рассчитать", handler: this.handlerClickButton, icon: "calculator" }
+                    { name: "btCalc", label: "Рассчитать", handler: this.handlerClickButton, img: "calculator.ico" }
                 ]
             },
             view: { name: "Вид", 
                 buttons: [
-                    { name: "btFixArea", label: "Закрепить", handler: this.handlerClickButton, icon: "table" }
+                    { name: "btFixArea", label: "Закрепить", handler: this.handlerClickButton, img: "merge_cells.ico" }
                 ]
             },
             info: { name: "Справка",
                 buttons: [
-                    { name: "btInfo", label: "Справка", handler: this.handlerClickButton, icon: "info-circle" }
+                    { name: "btInfo", label: "Справка", handler: this.handlerClickButton, img: "property.ico" }
                 ]
             }
         };
@@ -148,7 +149,10 @@ class App {
                 // this.app.openJSON(this.app.getComponent("tablePanel").currentTable.tableData);
                 this.app.openJSON(this.app.getComponent("table").tableData);
                 break;
-        }
+            case "btClose" :
+                this.app.getComponent("table").tableData.clearData();
+                break;
+            }
     }
 
     /**

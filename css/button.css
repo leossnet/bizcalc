@@ -17,10 +17,10 @@ button:hover {
 button:hover::after {
     content: attr(data-description);
     background: var(--hover-bg-color);
-    padding: 5px;
-    border: 1px solid var(--hover-border-color);
+    padding: 3px;
+/*     border: 1px solid var(--hover-border-color); */
     position: absolute;
-    top: 18px;
+    top: 25px;
     left: 60px;
     z-index: 1;
    }
@@ -30,4 +30,10 @@ button:focus {
 }
 .svg-icon {
     display: inline-block;
+}
+/* button.button-img {
+
+} */
+button.button-label {
+    font-weight: bold;
 }

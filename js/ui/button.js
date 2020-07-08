@@ -20,8 +20,17 @@ class Button extends HTMLButtonElement {
             let icon = new SvgIcon(app, params.icon, { width: 15, height: 15, color: "cornflowerblue" });
             this.append(icon);
         }
+        if ( params && params.img ) {
+            let img = document.createElement("img");
+            img.src = "res/ico/"+params.img;
+            img.classList.add("button-img");
+            this.append(img);
+        }
         if ( params && params.label ) {
-            this.append(params.label);
+            let label = document.createElement("div");
+            label.classList.add("button-label");
+            label.innerHTML = params.label;
+            this.append(label);
         }
         this.tabIndex = -1;
         this.#app.addComponent(this.id, this);
