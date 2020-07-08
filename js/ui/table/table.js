@@ -135,6 +135,13 @@ class Table extends HTMLTableElement{
         this.append(tBody);
     }
 
+    /**
+     * Процедура создания заголовка th
+     * @param {Object} root - корневой элемент заголовка
+     * @param {Array} classes - набор стилевых классов CSS
+     * @param {Object} attrs - объект атрибутов заголовка
+     * @param {String} text - наименование заголовка, выводимое на экран
+     */
     createHeader(root, classes, attrs, text) {
         let th = document.createElement("th");
         classes.forEach( item => th.classList.add(item) );
@@ -143,19 +150,36 @@ class Table extends HTMLTableElement{
         root.append(th);
     }
 
+    /**
+     * Установка ширины колонки таблицы
+     * @param {String} colName - имя колонки
+     * @param {Number} width - значение ширины колонки таблицы
+     */
     setColWidth(colName, width) {
         this.#colMap.get(colName).setAttribute("width", width);
     }
 
+    /**
+     * Получшение ширины колонки таблицы
+     * @param {String} colName - имя колонки таблицы
+     */
     getColWidth(colName) {
         return Number(this.#colMap.get(colName).getAttribute("width"));
     }
 
+    /**
+     * Получение ширины колонки по умолчанию
+     * @param {String} colName - имя колонки
+     */
     getDefaultColWidth(colName) {
         let colIndex = this.#colMap.get(colName).getAttribute("index");
         return this.#colWidthArray[colIndex];
     }
 
+    /**
+     * Получение высовый строки по умолчанию
+     * @param {String} rowName - имя строки
+     */
     getDefaultRowHeight(rowName) {
         let row = document.querySelector("tr.row-data[row='"+rowName+"']");
         return row ? Number.parseFloat(getComputedStyle(row).height) : 20;
@@ -187,6 +211,10 @@ class Table extends HTMLTableElement{
         return this.#tableData.getCell(cellName);
     }
 
+    /**
+     * Получение данных ячейки
+     * @param {String} cellName - имя ячейки
+     */
     getCellData(cellName) {
         return this.#tableData.getCellData(cellName);
     }
@@ -230,6 +258,11 @@ class Table extends HTMLTableElement{
         this.updateStartCell(oldCell, newCell);
     }
 
+    /**
+     * Выделение положения курсора на панели заголовков строк и колонок
+     * @param {Object} oldCell - объект ячейки, где находился курсор
+     * @param {Object} newCell - объект ячейки, куда перемещается курсор
+     */
     selectCursor(oldCell, newCell) {
         if (oldCell) {
             let oldRowName = oldCell.data.rowName;
@@ -361,10 +394,10 @@ class Table extends HTMLTableElement{
         let rowCourse = (newRowNum > oldRowNum) ? Course.BOTTOM : ( (newRowNum < oldRowNum) ? Course.TOP : Course.DEFAULT );
 
         // console.log("updateStartCell: set course - "+course);
-        let offsetX = this.getOffsetX(startCell.name, this.getVisibleWidth(), colCourse);
+        let offsetX = this.getOffsetX(startCell.name, this.getVisibleCellsWidth(), colCourse);
         let endColNum = startCell.colNumber + offsetX.cols - 1;
 
-        let offsetY = this.getOffsetY(startCell.name, this.getVisibleHeight(), rowCourse);
+        let offsetY = this.getOffsetY(startCell.name, this.getVisibleCellsHeight(), rowCourse);
         let endRowNum = startCell.rowNumber + offsetY.rows - 2;
         // console.log("startCell.rowNumber: "+startCell.rowNumber+",  fullVisibleRows.count: "+fullVisibleRows.count);
 
@@ -390,9 +423,14 @@ class Table extends HTMLTableElement{
         this.setStartCell(CellData.getCellName(newStartRow, newStartCol));
     }    
 
+    /**
+     * Определение видимых на экране строк таблицы
+     * @param {String} startCellName 
+     * @param {String} course - одной из значений атрибута объекта Course - BOTTOM или TOP
+     */
     getVisibleRows(startCellName, course) {
         let visibleRows = this.#tableParams.rowCount;
-        let visibleHeight = this.getVisibleHeight();
+        let visibleHeight = this.getVisibleCellsHeight();
         // this.setDefaultRowHeight();
         let offsetY = this.getOffsetY(startCellName, visibleHeight, course);
         let bottomRowHeight = visibleHeight - offsetY.height;
@@ -410,11 +448,11 @@ class Table extends HTMLTableElement{
     /**
      * Определение видимых на экране колонок таблицы
      * @param {String} startCellName - колонка, от которой ведется отчет видимости
-     * @param {Object} course - направление отчета видимых колонок: Course.LEFT или Course.RIGHT
+     * @param {String} course - одной из значений атрибута объекта Course - LEFT или RIGHT
      */
     getVisibleCols(startCellName, course) {
         let visibleCols = this.#tableParams.colCount;
-        let visibleWidth = this.getVisibleWidth();
+        let visibleWidth = this.getVisibleCellsWidth();
         this.setDefaultColWidth();
         let offsetX = this.getOffsetX(startCellName, visibleWidth, course);
         let rightColWidth = visibleWidth - offsetX.width;
@@ -443,19 +481,30 @@ class Table extends HTMLTableElement{
         if (rightCol) rightCol.setAttribute("width", rightColWidth);
     }
 
-    getVisibleHeight() {
+    /**
+     * Получение видимой высоты ячеек данных таблицы
+     */
+    getVisibleCellsHeight() {
         let headHeight = parseFloat(getComputedStyle(document.querySelector(".table-head")).height);
         return parseInt(this.getAttribute("view-height")) - headHeight;
         // return parseFloat(getComputedStyle(document.querySelector("div.flex-row")).height); 
     }
 
-
-    getVisibleWidth() {
-        let headerWidth = 40;
+    /**
+     * Получение видимой ширины ячеек данных таблицы
+     */
+    getVisibleCellsWidth() {
+        let headerWidth = parseFloat(document.querySelector(".col-header>col").getAttribute("width"));
         return parseInt(this.getAttribute("view-width")) - headerWidth;
     }
 
-    getOffsetY(startCellName, parentHeight, course) {
+    /**
+     * Получение объекта смещения для определения высоты видимой области и пикселях и количесте строк
+     * @param {String} startCellName стартовая ячейка (самая верхняя или самая нижняя в видимой области ячеек)
+     * @param {Number} visibleCellsHeight - видимая вытота ячеек данных таблицы
+     * @param {String} course - одной из значений атрибута объекта Course
+     */
+    getOffsetY(startCellName, visibleCellsHeight, course) {
         let startCell = this.#tableData.getCellData(startCellName);
         let startRowNum = startCell.rowNumber;
         let startRowName = startCell.rowName;
@@ -467,7 +516,7 @@ class Table extends HTMLTableElement{
             for (rowCount = 0; rowCount < bottomRowCount; rowCount++) {
                 let newRowName = this.getRowName(startRowName, rowCount);
                 let newRowHeight = this.getDefaultRowHeight(newRowName);
-                if ( (rowHeight + newRowHeight ) > parentHeight ) break;
+                if ( (rowHeight + newRowHeight ) > visibleCellsHeight ) break;
                 rowHeight += newRowHeight;
             }
         }
@@ -475,7 +524,7 @@ class Table extends HTMLTableElement{
             for (rowCount = startRowNum; rowCount>0; rowCount--) {
                 let newRowName = this.getRowName(startRowNum, 1-rowCount);
                 let newRowHeight = this.getDefaultRowHeight(newRowName);
-                if ( ( rowHeight + newRowHeight ) > parentHeight ) break;
+                if ( ( rowHeight + newRowHeight ) > visibleCellsHeight ) break;
                 rowHeight += newRowHeight;
             }
         }
@@ -492,10 +541,10 @@ class Table extends HTMLTableElement{
      *    width: [общая ширина полностью видимых колонок]
      * }
      * @param {String} startCellName - колонка, от которой ведется отчет видимости
-     * @param {Number} parentWidth - ширина родительского компонента
+     * @param {Number} visibleWidth - ширина видимых ячеее данных таблицы
      * @param {Object} course - направление отчета видимых колонок: Course.LEFT или Course.RIGHT
      */
-    getOffsetX(startCellName, parentWidth, course) {
+    getOffsetX(startCellName, visibleWidth, course) {
         let startCell = this.#tableData.getCellData(startCellName);
         let startColNum = startCell.colNumber;
         let startColName = startCell.colName;
@@ -507,7 +556,7 @@ class Table extends HTMLTableElement{
             for (colCount = 0; colCount < rightColCount; colCount++) {
                 let newColName = this.getColName(startColName, colCount);
                 let newColWidth = this.getDefaultColWidth(newColName);
-                if ( (colWidth + newColWidth ) > parentWidth ) break;
+                if ( (colWidth + newColWidth ) > visibleWidth ) break;
                 colWidth += newColWidth;
             }
         }
@@ -515,7 +564,7 @@ class Table extends HTMLTableElement{
             for (colCount = startColNum; colCount>0; colCount--) {
                 let newColName = this.getColName(startColName, 1-colCount);
                 let newColWidth = this.getDefaultColWidth(newColName);
-                if ( ( colWidth + newColWidth ) > parentWidth ) break;
+                if ( ( colWidth + newColWidth ) > visibleWidth ) break;
                 colWidth += newColWidth;
             }
         }
@@ -525,6 +574,12 @@ class Table extends HTMLTableElement{
         };
     }
 
+    
+    /**
+     * Получение имени строки, расположенной на deltaRowCount строк ниже или выше строки initRowName
+     * @param {String} initRowName - имя строки, от которой ведется поиск
+     * @param {Number} deltaRowCount - смещение от начальнок строки, может быть со знаком "+" или "-"
+     */
     getRowName(initRowName, deltaRowCount) {
         return Number(initRowName)+deltaRowCount;
     }
@@ -532,7 +587,7 @@ class Table extends HTMLTableElement{
     /**
      * Получение имени колонки, расположенной на deltaColCount строк правее или левее колонки initColName
      * @param {String} initColName - имя колонки, от которой ведется поиск
-     * @param {Number} deltaColCount - смещение от начальнок колонки
+     * @param {Number} deltaColCount - смещение от начальнок колонки, может быть со знаком "+" или "-"
      */
     getColName(initColName, deltaColCount) {
         let colName = CellData.getColName(CellData.getColNumber(initColName)+deltaColCount);
