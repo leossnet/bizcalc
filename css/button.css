@@ -20,8 +20,8 @@ button:hover::after {
     padding: 3px;
 /*     border: 1px solid var(--hover-border-color); */
     position: absolute;
-    top: 25px;
-    left: 60px;
+    top: 55px;
+    left: 40px;
     z-index: 1;
    }
 /* Удаление рамки с кнопки в фокусе */

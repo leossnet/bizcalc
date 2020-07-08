@@ -32,12 +32,12 @@ class App {
                 buttons: [
                     { name: "btOpen", label: "Открыть...", handler: this.handlerClickButton, img: "open.ico" },
                     { name: "btSave", label: "Сохранить...", handler: this.handlerClickButton, img: "save.ico" },
-                    { name: "btClose", label: "Закрыть", handler: this.handlerClickButton, img: "close.ico" }
+                    { name: "btClose", label: "Закрыть", handler: this.handlerClickButton, img: "close_file.ico" }
                 ]
             },
             main: { name: "Главная",
                 buttons: [
-                    { name: "btCalc", label: "Рассчитать", handler: this.handlerClickButton, img: "calculator.ico" }
+                    { name: "btCalc", label: "Обновить", handler: this.handlerClickButton, img: "update.ico" }
                 ]
             },
             view: { name: "Вид", 
