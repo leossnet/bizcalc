@@ -140,7 +140,8 @@ class App {
      * @params {ClickEvent} event 
      */
     handlerClickButton(event) {
-        switch(event.target.id) {
+        let button = event.path.filter( item => item.localName == "button").map(item => item.id)[0];
+        switch(button) {
             case "btSave" :
                 // this.app.saveJSON(this.app.getComponent("tablePanel").currentTable.tableData.getData());
                 this.app.saveJSON(this.app.getComponent("table").tableData.getData());
