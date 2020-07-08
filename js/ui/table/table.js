@@ -11,10 +11,9 @@ const Course = {
  */
 class Table extends HTMLTableElement{
     #app;
-    #tableParams = {};
+    #params = {};
     #cursor;
     #tableData;
-    #cellData;
     #editor;
     #tableStyle;
     #colWidthArray = [];
@@ -28,13 +27,17 @@ class Table extends HTMLTableElement{
     constructor (app, params) {
         super();
         this.#app = app;
-        this.#tableParams = {
-            colCount: Math.min(params.colCount, MAX_COLUMN_COUNT),
-            rowCount: params.rowCount
+        this.#params = {
+            colCount: params.colCount ? Math.min(params.colCount, MAX_COLUMN_COUNT) : 26*2,
+            rowCount: params.rowCount ? params.rowCount : 100,
+            isFocus: params.isFocus ? params.isFocus : true,
+            colWidths: params.colWidths ? params.colWidths : []
         };
         this.headers = [];
+        
         if ( params && params.colWidths ) this.#colWidthArray = params.colWidths;
         else for (let c=0; c<params.colCount; c++) this.#colWidthArray[c] = 80;
+
         this.#colMap = new Map();
         this.#tableData = new TableData(app);
         this.#editor = params.editor;
@@ -43,10 +46,10 @@ class Table extends HTMLTableElement{
         this.tabIndex = -1;
 
         // генерация внешнего вида таблицы
-        // this.generateTable(params);
+        // this.generateTable(this.#params);
         // this.setStartCell("A1");
         // this.setCursor("A1");
-        // if ( params.isFocus ) this.focus();
+        // if ( this.#params.isFocus ) this.focus();
 
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
@@ -99,7 +102,7 @@ class Table extends HTMLTableElement{
         this.createHeader(hRow, ["cell-header"], {}, "");
         this.headers.push("");
 
-        for (let i = 0; i < this.#tableParams.colCount; i++) {
+        for (let i = 0; i < this.#params.colCount; i++) {
             let letter = CellData.getColName(i+1);
             this.headers.push(letter);
             this.createHeader(hRow, ["cell-header"], {col:letter}, letter);
@@ -107,8 +110,8 @@ class Table extends HTMLTableElement{
         this.append(tHead);
 
         // генерация данных ячеек
-        for (let i = 1; i < this.#tableParams.rowCount + 1; i++) {
-            for (let j = 1; j <= this.#tableParams.colCount; j++) {
+        for (let i = 1; i < this.#params.rowCount + 1; i++) {
+            for (let j = 1; j <= this.#params.colCount; j++) {
                 let letter = this.headers[j];
                 let cellData = new CellData(this, i, letter);
                 this.#tableData.setCellData(letter + i, cellData);
@@ -117,7 +120,7 @@ class Table extends HTMLTableElement{
 
         // генерация содержимого таблицы
         let tBody = document.createElement("tBody");
-        for (let i = 1; i < this.#tableParams.rowCount + 1; i++) {
+        for (let i = 1; i < this.#params.rowCount + 1; i++) {
             // создание новой строки
             let row = tBody.insertRow(-1);
             row.classList.add("row-data");
@@ -125,7 +128,7 @@ class Table extends HTMLTableElement{
             this.createHeader(row, ["cell-header"], {row:i}, i);
 
             // добавление ячеек с данными
-            for (let j = 1; j <= this.#tableParams.colCount; j++) {
+            for (let j = 1; j <= this.#params.colCount; j++) {
                 let letter = this.headers[j];
                 let cell = new Cell(this, this.#tableData.getCellData(letter+i));
                 this.#tableData.setCell(letter + i, cell);
@@ -189,7 +192,7 @@ class Table extends HTMLTableElement{
      * Возвращает параметры таблицы
      */
     get tableParams() {
-        return this.#tableParams;
+        return this.#params;
     }
     
     /**
@@ -298,9 +301,9 @@ class Table extends HTMLTableElement{
         let newColNum = currentCell.data.colNumber;
         let newRow = currentCell.data.rowNumber;
 
-        if ( rowCount > 0 ) newRow += Math.min(rowCount, this.#tableParams.rowCount-newRow);
+        if ( rowCount > 0 ) newRow += Math.min(rowCount, this.#params.rowCount-newRow);
         else newRow += Math.max(rowCount, 1-newRow);
-        if ( colCount > 0 ) newColNum += Math.min(colCount, this.#tableParams.colCount-newColNum);
+        if ( colCount > 0 ) newColNum += Math.min(colCount, this.#params.colCount-newColNum);
         else newColNum += Math.max(colCount, 1-newColNum);
 
         this.setCursor(CellData.getCellName(newRow, newColNum));
@@ -344,10 +347,10 @@ class Table extends HTMLTableElement{
      * Обрабочик, вызываемой после добавления компонента в документ
      */
     connectedCallback() { 
-        this.generateTable(this.#tableParams);
+        this.generateTable(this.#params);
         this.setStartCell("A1");
         this.setCursor("A1");
-        if ( this.#tableParams.isFocus ) this.focus();
+        if ( this.#params.isFocus ) this.focus();
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
         this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
     }
@@ -405,7 +408,7 @@ class Table extends HTMLTableElement{
         let newStartRow = startRowNum;
         
         if ( colCourse == Course.RIGHT && newColNum > endColNum ) {
-            let delta = ( newColNum == this.#tableParams.colCount ) ? 1 : 0;
+            let delta = ( newColNum == this.#params.colCount ) ? 1 : 0;
             newStartCol = startColNum + newColNum - endColNum - delta;
         }
         else if ( colCourse == Course.LEFT && newColNum < endColNum ) {
@@ -429,7 +432,7 @@ class Table extends HTMLTableElement{
      * @param {String} course - одной из значений атрибута объекта Course - BOTTOM или TOP
      */
     getVisibleRows(startCellName, course) {
-        let visibleRows = this.#tableParams.rowCount;
+        let visibleRows = this.#params.rowCount;
         let visibleHeight = this.getVisibleCellsHeight();
         // this.setDefaultRowHeight();
         let offsetY = this.getOffsetY(startCellName, visibleHeight, course);
@@ -451,7 +454,7 @@ class Table extends HTMLTableElement{
      * @param {String} course - одной из значений атрибута объекта Course - LEFT или RIGHT
      */
     getVisibleCols(startCellName, course) {
-        let visibleCols = this.#tableParams.colCount;
+        let visibleCols = this.#params.colCount;
         let visibleWidth = this.getVisibleCellsWidth();
         this.setDefaultColWidth();
         let offsetX = this.getOffsetX(startCellName, visibleWidth, course);
@@ -512,7 +515,7 @@ class Table extends HTMLTableElement{
         let rowCount = 0;
 
         if ( course == Course.BOTTOM ) {
-            let bottomRowCount = this.#tableParams.rowCount - startRowNum;
+            let bottomRowCount = this.#params.rowCount - startRowNum;
             for (rowCount = 0; rowCount < bottomRowCount; rowCount++) {
                 let newRowName = this.getRowName(startRowName, rowCount);
                 let newRowHeight = this.getDefaultRowHeight(newRowName);
@@ -552,7 +555,7 @@ class Table extends HTMLTableElement{
         let colCount = 0;
 
         if ( course == Course.RIGHT ) {
-            let rightColCount = this.#tableParams.colCount - startColNum;
+            let rightColCount = this.#params.colCount - startColNum;
             for (colCount = 0; colCount < rightColCount; colCount++) {
                 let newColName = this.getColName(startColName, colCount);
                 let newColWidth = this.getDefaultColWidth(newColName);
@@ -628,7 +631,7 @@ class Table extends HTMLTableElement{
                 if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на последнюю строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
-                    rowCount = this.#tableParams.rowCount - currentCell.rowNumber;
+                    rowCount = this.#params.rowCount - currentCell.rowNumber;
                 else rowCount += 1;
                 this.moveCursor(rowCount, colCount);
                 break;
@@ -639,7 +642,7 @@ class Table extends HTMLTableElement{
                     colCount = 1 - currentCell.colNumber;
                 // переход в конец верхней строки при нахождении курсора в первой ачейке строки
                 else if ( currentCell.colNumber == 1 ) {
-                    colCount += this.#tableParams.colCount;
+                    colCount += this.#params.colCount;
                     rowCount -= 1;
                 }
                 else colCount -= 1;
@@ -651,10 +654,10 @@ class Table extends HTMLTableElement{
                     if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на последнюю колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey)
-                    colCount = this.#tableParams.colCount - currentCell.colNumber;
+                    colCount = this.#params.colCount - currentCell.colNumber;
                 // переход в начало нижней строки при нахождении курсора в последней ачейке строки
-                else if ( currentCell.colNumber == this.#tableParams.colCount ) {
-                    colCount -= this.#tableParams.colCount;
+                else if ( currentCell.colNumber == this.#params.colCount ) {
+                    colCount -= this.#params.colCount;
                     rowCount += 1;
                 }
                 else colCount += 1;
@@ -670,8 +673,8 @@ class Table extends HTMLTableElement{
             case "End" :
                 if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на последнюю колонку
-                colCount = this.#tableParams.colCount - currentCell.colNumber;
-                if ( event.ctrlKey ) rowCount = this.#tableParams.rowCount - currentCell.rowNumber;
+                colCount = this.#params.colCount - currentCell.colNumber;
+                if ( event.ctrlKey ) rowCount = this.#params.rowCount - currentCell.rowNumber;
                 this.moveCursor(rowCount, colCount);
                 break;
 
