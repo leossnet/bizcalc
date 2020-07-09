@@ -3,6 +3,7 @@
  */
 class TableData {
     #app;
+    #db;
     #cellMap;
     #cellDataMap;
     #tokenMap;
@@ -15,6 +16,7 @@ class TableData {
      */
     constructor(app) {
         this.#app = app;
+        this.#db = new LocalDB(app);
         this.initTableData();
         // this.#cellMap = new Map();
         // this.#cellDataMap = new Map();
