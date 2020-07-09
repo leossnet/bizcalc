@@ -1,31 +1,28 @@
 /* Глобальные параметры кнопки */
-button {
+.button {
     position: relative;
+    width: 80px;
     font-size: 12px;
     margin: 2px;
-    padding: 2px;
+    padding: 3px;
     border: 1px solid var(--border-button-color);
    }
-button:hover {
+.button:hover {
     background-color: var(--bg-button-sel-color);
-    margin: 2px;
-    padding: 2px;
     cursor: pointer;
-    border: 1px solid var(--border-button-color);
 }
-/* Параметры кнопки при наведении курсора */
-button:hover::after {
+/* Параметры всплывающего сообщения для наведенной кнопки */
+.button:hover::after {
     content: attr(data-description);
     background: var(--hover-bg-color);
     padding: 3px;
-/*     border: 1px solid var(--hover-border-color); */
     position: absolute;
     top: 55px;
     left: 40px;
     z-index: 1;
    }
 /* Удаление рамки с кнопки в фокусе */
-button:focus {
+.button:focus {
     outline: none;
 }
 .svg-icon {
