@@ -180,7 +180,7 @@ class App {
         input.onchange = (event) => { 
             let file = event.target.files[0];
             this.#fileName = file.name;
-            LocalDB.testBase64(file);
+            // LocalDB.testBase64(file);
             this.getComponent("infobar").content = "Последний открытый файл: '"+file.name+"'";
             let reader = new FileReader();
             reader.readAsText(file);

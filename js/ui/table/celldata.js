@@ -36,6 +36,7 @@ class CellData {
             rowNumber: Number.parseInt(rowName),
             colNumber: CellData.getColNumber(colName),
         };
+        this.id = this.#param.name;
         this.initCell();        
     }
     

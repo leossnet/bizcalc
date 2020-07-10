@@ -202,34 +202,39 @@ class TableData {
 
     /**
      * Отображение данных в текущей таблице
-     * @param {Object} data - данные в формате JSON
+     * @param {Object} parseJson - данные в формате JSON
      */
-    viewData(data) {
+    viewData(parseJson) {
         // обновление строковый значений
-        if ( data.strings ) {
-            let strings = new Map(Object.entries(data.strings));
+        if ( parseJson.strings ) {
+            let strings = new Map(Object.entries(parseJson.strings));
             for (let cellName of strings.keys()){
                 this.getCellData(cellName).value = strings.get(cellName);
             }
+            this.#db.put("strings", strings);
         }
 
         // обновление первичных данных
-        if ( data.values ) {
-            let values = new Map(Object.entries(data.values));
+        if ( parseJson.values ) {
+            let values = new Map(Object.entries(parseJson.values));
             for (let cellName of values.keys()){
                 this.getCellData(cellName).value = values.get(cellName);
             }
+            this.#db.put("values", values);
         }
         
         // обновление формул
-        if ( data.tokens ) {
-            let tokens = new Map(Object.entries(data.tokens));
+        if ( parseJson.tokens ) {
+            let tokens = new Map(Object.entries(parseJson.tokens));
+            console.log(tokens);
             for (let cellName of tokens.keys()){
                 tokens.get(cellName).map( (item, index, array) => {
                     for (let type in item) array[index] = new Token(type, item[type]);
                 } );
                 this.getCellData(cellName).value = tokens.get(cellName);
             }
+            console.log(tokens);
+            this.#db.put("tokens", tokens);
         }
     }
 
