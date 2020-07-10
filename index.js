@@ -141,17 +141,18 @@ class App {
      */
     handlerClickButton(event) {
         let button = event.path.filter( item => item.localName == "button").map(item => item.id)[0];
+        let tableData = this.app.getComponent("table").tableData;
         switch(button) {
             case "btSave" :
-                // this.app.saveJSON(this.app.getComponent("tablePanel").currentTable.tableData.getData());
-                this.app.saveJSON(this.app.getComponent("table").tableData.getData());
+                // this.app.saveJSON(this.app.getComponent("tablePanel").currentTable.tableData);
+                this.app.saveJSON(tableData);
                 break;
             case "btOpen" :
                 // this.app.openJSON(this.app.getComponent("tablePanel").currentTable.tableData);
-                this.app.openJSON(this.app.getComponent("table").tableData);
+                this.app.loadJSON(tableData);
                 break;
             case "btClose" :
-                this.app.getComponent("table").tableData.clearData();
+                tableData.clearData();
                 break;
             }
     }
@@ -160,9 +161,9 @@ class App {
      * Сохранение JSON в файл на локальном диске
      * @params {JSON} json 
      */
-    saveJSON(json) {
+    saveJSON(target) {
         let output = document.createElement("a");
-        let jsonData = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
+        let jsonData = 'data:application/json;charset=utf-8,' + encodeURIComponent(target.saveData());
         output.href = jsonData;
         output.target = '_blank';
         output.download = this.#fileName;
@@ -172,18 +173,19 @@ class App {
     /**
      * Выбор файла JSON для его открытия в приложении
      */
-    openJSON(target) {
+    loadJSON(target) {
         let input = document.createElement('input');
         input.type = 'file';
         input.accept=".json";
         input.onchange = (event) => { 
             let file = event.target.files[0];
             this.#fileName = file.name;
+            LocalDB.testBase64(file);
             this.getComponent("infobar").content = "Последний открытый файл: '"+file.name+"'";
             let reader = new FileReader();
             reader.readAsText(file);
-            reader.onload = () => { target.setData(reader.result); }
-            reader.onerror = () => { target.setData(reader.error); }
+            reader.onload = () => { target.loadData(reader.result); }
+            reader.onerror = () => { target.loadData(reader.error); }
         };
         input.click();
     }

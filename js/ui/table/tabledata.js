@@ -168,9 +168,9 @@ class TableData {
     }
 
     /**
-     * Возвращает данные в формате JSON
+     * Подготавливает данные для сохранения в файл формата JSON
      */
-    getData() {
+    saveData() {
 		let table = this.#app.getComponent("table");
 		let tokens = {};
 		this.#tokenMap.forEach( (value, key, map) => { 
@@ -190,23 +190,22 @@ class TableData {
     }
 
     /**
-     * Устанавливает данные таблицы из внешних данных в формате JSON
+     * Загрузка данных из внешнего файла в формате JSON
      * @param {JSON} json - внешние данные в формате JSON
      */
-    setData(json) {
-        // очистка старых значений
-        for (let cellName of this.#valueMap.keys()){
-            this.getCellData(cellName).initCell();
-        }
-        for (let cellName of this.#tokenMap.keys()){
-            this.getCellData(cellName).initCell();
-        }
-
+    loadData(json) {
         // парсинг json 
         let data = JSON.parse(json);
+        this.clearData();
+        this.viewData(data);
+    }
 
+    /**
+     * Отображение данных в текущей таблице
+     * @param {Object} data - данные в формате JSON
+     */
+    viewData(data) {
         // обновление строковый значений
-        this.#stringMap.clear();
         if ( data.strings ) {
             let strings = new Map(Object.entries(data.strings));
             for (let cellName of strings.keys()){
@@ -215,7 +214,6 @@ class TableData {
         }
 
         // обновление первичных данных
-        this.#valueMap.clear();
         if ( data.values ) {
             let values = new Map(Object.entries(data.values));
             for (let cellName of values.keys()){
@@ -224,7 +222,6 @@ class TableData {
         }
         
         // обновление формул
-        this.#tokenMap.clear();
         if ( data.tokens ) {
             let tokens = new Map(Object.entries(data.tokens));
             for (let cellName of tokens.keys()){
@@ -236,6 +233,9 @@ class TableData {
         }
     }
 
+    /**
+     * Очистка данных текущей таблицы
+     */
     clearData() {
         console.log("clear data...");
         // очистка старых значений

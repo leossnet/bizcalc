@@ -19,4 +19,27 @@ class LocalDB {
     }
 
 
+    static testBase64(file) {
+        console.log(file.lastModified);
+        
+            let bt = btoa(encodeURIComponent(file.name+file.lastModified));
+        console.log(bt);
+        
+        let at = decodeURIComponent(atob(bt));
+        console.log(at);
+        
+        let ex = ".json";
+        console.log("length "+ex+" = "+ex.length);
+        
+        let liof = at.lastIndexOf(ex);
+        console.log(liof);
+
+        let fileName = at.substring(0, liof+ex.length);
+        console.log(fileName);
+
+        let lastModified = at.substring(liof+ex.length);
+        console.log(lastModified);
+    }
+
+
 }
