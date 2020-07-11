@@ -210,8 +210,8 @@ class TableData {
             let strings = new Map(Object.entries(parseJson.strings));
             for (let cellName of strings.keys()){
                 this.getCellData(cellName).value = strings.get(cellName);
+                this.#db.put("strings", strings.get(cellName), cellName);
             }
-            this.#db.put("strings", strings);
         }
 
         // обновление первичных данных
@@ -219,22 +219,23 @@ class TableData {
             let values = new Map(Object.entries(parseJson.values));
             for (let cellName of values.keys()){
                 this.getCellData(cellName).value = values.get(cellName);
+                this.#db.put("values", values.get(cellName), cellName);
             }
-            this.#db.put("values", values);
         }
         
         // обновление формул
         if ( parseJson.tokens ) {
             let tokens = new Map(Object.entries(parseJson.tokens));
-            console.log(tokens);
+            // console.log(tokens);
             for (let cellName of tokens.keys()){
                 tokens.get(cellName).map( (item, index, array) => {
                     for (let type in item) array[index] = new Token(type, item[type]);
                 } );
                 this.getCellData(cellName).value = tokens.get(cellName);
+                // console.log(tokens.get(cellName));
+                this.#db.put("tokens", tokens.get(cellName), cellName);
             }
-            console.log(tokens);
-            this.#db.put("tokens", tokens);
+            // console.log(tokens);
         }
     }
 

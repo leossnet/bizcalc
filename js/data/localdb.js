@@ -28,23 +28,21 @@ class LocalDB {
           };
     }
 
-    put(storeName, map ) {
+    put(storeName, obj, key ) {
         this.connectDB((db) => {
             let transaction = db.transaction([storeName], "readwrite"); 
             let store = transaction.objectStore(storeName);
-            console.log(map);
-            for (let cellName of map) {
-                let request = store.put(map.get(cellName), cellName);
-                console.log(request);
 
-                request.onsuccess = function() {
-                    // console.log("Объект добавлен в хранилище", request.result);
-                };
-                  
-                request.onerror = function() {
-                    console.log("Ошибка", request.error);
-                };        
-            }
+            let request = store.put(obj, key);
+            // console.log(request);
+
+            request.onsuccess = function() {
+                console.log("Ok", request);
+            };
+              
+            request.onerror = function() {
+                console.log("Ошибка", request.error);
+            };        
         }); 
     }
 
