@@ -121,7 +121,13 @@ class Token {
         return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 	}    
 	
-	toString() {
-		return this.#value;
-	}
+    /**
+     * Переопределение сериализации объекта в JSON
+     */
+    toJSON() {
+        return {
+            type: this.#type,
+            value: this.#value
+        };
+    }
 }

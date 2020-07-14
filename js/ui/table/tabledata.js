@@ -12,20 +12,17 @@ class TableData {
     #calculator;
 
     /**
-     * Конструктор данных электронной таблицы
+     * Конструктор модели данных таблицы
      */
     constructor(app) {
         this.#app = app;
         this.#db = new LocalDB(app);
         this.initTableData();
-        // this.#cellMap = new Map();
-        // this.#cellDataMap = new Map();
-        // this.#tokenMap = new Map();
-        // this.#valueMap = new Map();
-        // this.#stringMap = new Map();
-        // this.#calculator = new Calculator(this);
     }
 
+    /**
+     * Инициализация переменных модели данных таблицы
+     */
     initTableData() {
         this.#cellMap = new Map();
         this.#cellDataMap = new Map();
@@ -36,7 +33,7 @@ class TableData {
     }
 
     /**
-     * Пересчет значений формульных ячеек электронной таблицы
+     * Пересчет значений формульных ячеек таблицы
      */
     calcAllCells() {
         for (let cellName of this.#tokenMap.keys()) {
@@ -61,6 +58,11 @@ class TableData {
         this.#cellMap.set(cellName.toUpperCase(), cell);
     }
     
+    /**
+     * Установка модели данных ячейки
+     * @param {String} cellName - имя ячейки
+     * @param {Object} cellData - объект данных ячейки CellData
+     */
     setCellData (cellName, cellData) {
         this.#cellDataMap.set(cellName.toUpperCase(), cellData);
     }
@@ -131,6 +133,7 @@ class TableData {
             let f = formula.substring(1).toUpperCase();
             this.#tokenMap.set(cellName.toUpperCase(), Token.getTokens(f));
         }
+        this.#db.put("tokens", JSON.stringify(this.#tokenMap.get(cellName)), cellName);
     }
 
     /**
@@ -140,6 +143,7 @@ class TableData {
      */
     setValue(cellName, value) {
         this.#valueMap.set(cellName.toUpperCase(), value);
+        this.#db.put("values", JSON.stringify(this.#valueMap.get(cellName)), cellName);
     }
 
     /**
@@ -157,6 +161,7 @@ class TableData {
      */
     setString(cellName, string) {
         this.#stringMap.set(cellName.toUpperCase(), string);
+        this.#db.put("strings", this.#stringMap.get(cellName), cellName);
     }
 
     /**
@@ -228,23 +233,51 @@ class TableData {
             let tokens = new Map(Object.entries(parseJson.tokens));
             // console.log(tokens);
             for (let cellName of tokens.keys()){
-                tokens.get(cellName).map( (item, index, array) => {
-                    for (let type in item) array[index] = new Token(type, item[type]);
-                } );
-                this.getCellData(cellName).value = tokens.get(cellName);
-                // console.log(tokens.get(cellName));
-                this.#db.put("tokens", tokens.get(cellName), cellName);
+                let tokenArray = tokens.get(cellName);
+                tokenArray.map( (item, index, array) => {
+                    for (let type in item) {
+                        array[index] = new Token(type, item[type]);
+                    }
+                });
+                this.getCellData(cellName).value = tokenArray;
+                this.#db.put("tokens", JSON.stringify(tokenArray), cellName);
             }
-            // console.log(tokens);
         }
+    }
+
+    /**
+     * Обновление данных таблицы из локальной базы данных
+     */
+    refreshData() {
+        // обновление строковый значений
+        this.#db.get("strings", (strings) => {
+            for (let cellName of strings.keys()) {
+                this.getCellData(cellName).value = strings.get(cellName);
+            }
+        });
+
+        // обновление первичных данных
+        this.#db.get("values", (values) => {
+            for (let cellName of values.keys()) {
+                this.getCellData(cellName).value = values.get(cellName);
+            }
+        });
+        
+        // обновление формул
+        this.#db.get("tokens", (tokens) => {
+            for (let cellName of tokens.keys()) {
+                let tokenArray = JSON.parse(tokens.get(cellName));
+                tokenArray.map( (item, index, array) => array[index] = new Token(item.type, item.value) );
+                this.getCellData(cellName).value = tokenArray;
+            }
+        });
     }
 
     /**
      * Очистка данных текущей таблицы
      */
     clearData() {
-        console.log("clear data...");
-        // очистка старых значений
+        // очистка модели данных и содержимого таблицы от старых значений 
         for (let cellName of this.#valueMap.keys()){
             this.getCellData(cellName).initCell();
             this.getCell(cellName).refresh();
@@ -258,10 +291,15 @@ class TableData {
             this.getCell(cellName).refresh();
         }
 
+        // очистка хешей
         this.#stringMap.clear();
         this.#valueMap.clear();
         this.#tokenMap.clear();
-    }
 
+        // очистка локальной базы данных
+        this.#db.clear("strings");
+        this.#db.clear("values");
+        this.#db.clear("tokens");
+    }
 
 }

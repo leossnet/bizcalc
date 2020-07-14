@@ -21,7 +21,7 @@ class Table extends HTMLTableElement{
 
     /**
      * Конструктор таблицы 
-     * @param {String} rootElement родительский элемент c class='rootElement', в котором размещается таблица
+     * @param {String} app - родительский элемент, в котором размещается таблица
      * @param {Объект} params набор параметров инициализации таблицы
      */
     constructor (app, params) {
@@ -51,6 +51,8 @@ class Table extends HTMLTableElement{
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
         this.addEventListener("keydown", this.handlerKeyEditing);
+        
+        window.addEventListener("load", () => this.#tableData.refreshData() );
         window.addEventListener("resize", () => { 
             this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
             this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
