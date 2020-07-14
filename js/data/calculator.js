@@ -20,41 +20,59 @@ class Calculator {
      *      который получается в результате разбора формулы в виде строки функцией getTokens(String)
      */
     calc(formula){
-        let self = this;
         let tokens = Array.isArray(formula) ? formula : Token.getTokens(formula);
         let operators = [];
         let operands = [];
-        tokens.forEach(function (token) {
+        let funcs = [];
+        let params = new Map();
+        tokens.forEach( token => {
             switch(token.type) {
                 case Types.Number : 
                     operands.push(token);
                     break;
                 case Types.Cell :
-                    if ( self.#tdata.isNumber(token.value) ) {
-                        operands.push(self.#tdata.getNumberToken(token));
+                    if ( this.#tdata.isNumber(token.value) ) {
+                        operands.push(this.#tdata.getNumberToken(token));
                     }
-                    else if ( self.#tdata.isFormula(token.value) ) {
-                        let formula = self.#tdata.getTokens(token.value);
-                        operands.push(new Token(Types.Number, self.calc(formula)));
+                    else if ( this.#tdata.isFormula(token.value) ) {
+                        let formula = this.#tdata.getTokens(token.value);
+                        operands.push(new Token(Types.Number, this.calc(formula)));
                     }
                     else {
                         operands.push(NaN);
                     }
                     break;
+                case Types.Function :
+                    funcs.push(token);
+                    params.set(token, []);
+                    operators.push(token);             
+                    break;
+                case Types.Semicolon :
+                    params.push(token);
+                    operators.pop();
+                    break;
                 case Types.Operator :
-                    self.calcExpression(operands, operators, token.priority);
+                    this.calcExpression(operands, operators, token.priority);
                     operators.push(token);
                     break;
                 case Types.LeftBracket :
                     operators.push(token);
                     break;
                 case Types.RightBracket :
-                    self.calcExpression(operands, operators, 1);
+                    this.calcExpression(operands, operators, 1);
                     operators.pop();
+                    // console.log(operators[operators.length-1].type);
+                    if (operators.length && operators[operators.length-1].type == Types.Function ) {
+                        let funcToken = operators.pop();
+                        // console.log(funcToken);
+                        params.get(funcToken).push(operands.pop());
+                        // console.log(params.get(funcToken));
+                        operands.push(this.calcFunction(funcToken, params.get(funcToken)[0].value));
+                    }
                     break;
             }
         });
-        self.calcExpression(operands, operators, 0);
+        this.calcExpression(operands, operators, 0);
         return operands.pop().value; 
     }
 
@@ -70,11 +88,15 @@ class Calculator {
             let leftOperand = operands.pop().value;
             let operator = operators.pop();
             let result = operator.calc(leftOperand, rightOperand);
+            console.log(leftOperand+" "+operator.value+ " "+rightOperand+" = "+result);
             operands.push(new Token ( Types.Number, result ));
         }
     }
 
-    calcFunction() {
-
+    calcFunction(func, param) {
+        console.log(func.calc);
+        console.log(param);
+        console.log(func.calc(param));
+        return new Token(Types.Number, func.calc(param));
     }
 }

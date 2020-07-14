@@ -8,7 +8,7 @@ const Types = {
     Function: "function",
     LeftBracket: "left bracket" , 
     RightBracket: "right bracket",
-    Comma: "comma",
+    Semicolon: "semicolon",
     Text: "text"
 };
 
@@ -26,10 +26,10 @@ const Operators = {
 };
 
 const Functions = {
-    ["round"]:  {priority: 4, calc: (a)     => Math.round(a) },
-    ["min"]:    {priority: 4, calc: (a, b) => Math.min(a, b) },
-    ["max"]:    {priority: 4, calc: (a, b) => Math.max(a, b) },
-    ["if"]:     {priority: 4, calc: (a, b, c=0) => a ? b : c }
+    ["round"]:  {priority: 4, calc: (a) => Math.round(a) },
+    ["min"]:    {priority: 4, calc: (...args) => Math.min(args[0], args[1]) },
+    ["max"]:    {priority: 4, calc: (...args) => Math.max(args[0], args[1]) },
+    ["if"]:     {priority: 4, calc: (...args) => args[0] ? args[1] : args[2] }
 };
 
 /**
@@ -38,7 +38,7 @@ const Functions = {
  */
 class Token {
 
-    static separators = Object.keys(Operators).join("")+"(),"; // запоминает строку разделителей вида "+-*/^(),""
+    static separators = Object.keys(Operators).join("")+"();"; // запоминает строку разделителей вида "+-*/^();""
     static sepPattern = `[${Token.escape(Token.separators)}]`; // формирует шаблон разделитетей вида "[\+\-\*\/\^\(\)]"
     static funcPattern = new RegExp(`${Object.keys(Functions).join("|").toLowerCase()}`, "g");
 
@@ -113,16 +113,15 @@ class Token {
             .filter(item => item != "");                            // удаление из массива пустых элементов
         
         tokenCodes.forEach(function (tokenCode){
-            console.log(tokenCode);
             if ( tokenCode in Operators ) 
                 tokens.push( new Token ( Types.Operator, tokenCode ));
             else if ( tokenCode === "(" )  
                 tokens.push ( new Token ( Types.LeftBracket, tokenCode ));
             else if ( tokenCode === ")" ) 
                 tokens.push ( new Token ( Types.RightBracket, tokenCode ));
-            else if ( tokenCode === "," ) 
-                tokens.push ( new Token ( Types.Comma, tokenCode ));
-            else if ( tokenCode.match( funcPattern ) !== null  )
+            else if ( tokenCode === ";" ) 
+                tokens.push ( new Token ( Types.Semicolon, tokenCode ));
+            else if ( tokenCode.match( Token.funcPattern ) !== null  )
                 tokens.push ( new Token ( Types.Function, tokenCode ));
             else if ( tokenCode.match(/^\d+[.]?\d*/g) !== null ) 
                 tokens.push ( new Token ( Types.Number, Number(tokenCode) )); 
@@ -151,9 +150,11 @@ class Token {
     }
 }
 
-let funcPattern = new RegExp(`${Object.keys(Functions).join("|").toLowerCase()}`, "g");
-console.log(Functions);
-console.log(funcPattern);
-let formula = "if(A5, round(A1), a1*10,5)";
+
+// let formula = "if( 1; round(10,2); 2*10)";
+let formula = "round(5 + 0.55)";
 console.log(formula);
 console.log(Token.getTokens(formula));
+
+let calculator = new Calculator(null);
+console.log(formula+" = "+calculator.calc(formula));
