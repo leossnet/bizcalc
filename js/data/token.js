@@ -5,8 +5,10 @@ const Types = {
     Cell: "cell" ,
     Number: "number" ,
     Operator: "operator" ,
+    Function: "function",
     LeftBracket: "left bracket" , 
     RightBracket: "right bracket",
+    Comma: "comma",
     Text: "text"
 };
 
@@ -20,7 +22,14 @@ const Operators = {
     ["-"]: { priority: 1, calc: (a, b) => a - b }, 
     ["*"]: { priority: 2, calc: (a, b) => a * b },
     ["/"]: { priority: 2, calc: (a, b) => a / b },
-    ["^"]: { priority: 3, calc: (a, b) => Math.pow(a, b) }
+    ["^"]: { priority: 3, calc: (a, b) => Math.pow(a, b) },
+};
+
+const Functions = {
+    ["round"]:  {priority: 4, calc: (a)     => Math.round(a) },
+    ["min"]:    {priority: 4, calc: (a, b) => Math.min(a, b) },
+    ["max"]:    {priority: 4, calc: (a, b) => Math.max(a, b) },
+    ["if"]:     {priority: 4, calc: (a, b, c=0) => a ? b : c }
 };
 
 /**
@@ -29,8 +38,9 @@ const Operators = {
  */
 class Token {
 
-    static separators = Object.keys(Operators).join("")+"()"; // запоминает строку разделителей вида "+-*/^()""
+    static separators = Object.keys(Operators).join("")+"(),"; // запоминает строку разделителей вида "+-*/^(),""
     static sepPattern = `[${Token.escape(Token.separators)}]`; // формирует шаблон разделитетей вида "[\+\-\*\/\^\(\)]"
+    static funcPattern = new RegExp(`${Object.keys(Functions).join("|").toLowerCase()}`, "g");
 
     #type;
     #value;
@@ -50,6 +60,10 @@ class Token {
         if ( type === Types.Operator ) {
             this.#calc = Operators[value].calc;
             this.#priority = Operators[value].priority;
+        }
+        else if ( type === Types.Function ) {
+            this.#calc = Functions[value].calc;
+            this.#priority = Functions[value].priority;
         }
     }
 
@@ -91,7 +105,7 @@ class Token {
     static getTokens(formula){
         let tokens = [];
         let tokenCodes = formula.replace(/\s+/g, "")                // очистка от пробельных символов
-            .replace(/,/g, ".")                                     // заменяет запятую на точку (для чисел)
+            .replace(/(?<=\d+),(?=\d+)/g, ".")                                     // заменяет запятую на точку (для чисел)
             .replace(/^\-/g, "0-")                                  // подставляет отсутсующий 0 для знака "-" в начале строки
             .replace(/\(\-/g, "(0-")                                // подставляет отсутсующий 0 для знака "-" в середине строки
             .replace(new RegExp (Token.sepPattern, "g"), "&$&&")     // вставка знака & перед разделителями
@@ -99,12 +113,17 @@ class Token {
             .filter(item => item != "");                            // удаление из массива пустых элементов
         
         tokenCodes.forEach(function (tokenCode){
+            console.log(tokenCode);
             if ( tokenCode in Operators ) 
                 tokens.push( new Token ( Types.Operator, tokenCode ));
             else if ( tokenCode === "(" )  
                 tokens.push ( new Token ( Types.LeftBracket, tokenCode ));
             else if ( tokenCode === ")" ) 
                 tokens.push ( new Token ( Types.RightBracket, tokenCode ));
+            else if ( tokenCode === "," ) 
+                tokens.push ( new Token ( Types.Comma, tokenCode ));
+            else if ( tokenCode.match( funcPattern ) !== null  )
+                tokens.push ( new Token ( Types.Function, tokenCode ));
             else if ( tokenCode.match(/^\d+[.]?\d*/g) !== null ) 
                 tokens.push ( new Token ( Types.Number, Number(tokenCode) )); 
             else if ( tokenCode.match(/^[A-Z]+[1-9]+/g) !== null )
@@ -131,3 +150,10 @@ class Token {
         };
     }
 }
+
+let funcPattern = new RegExp(`${Object.keys(Functions).join("|").toLowerCase()}`, "g");
+console.log(Functions);
+console.log(funcPattern);
+let formula = "if(A5, round(A1), a1*10,5)";
+console.log(formula);
+console.log(Token.getTokens(formula));

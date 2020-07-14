@@ -25,29 +25,33 @@ class Calculator {
         let operators = [];
         let operands = [];
         tokens.forEach(function (token) {
-            if ( token.type == Types.Number ) {
-                operands.push(token);
-            }
-            else if ( token.type == Types.Cell ){
-                if ( self.#tdata.isNumber(token.value) ) {
-                    operands.push(self.#tdata.getNumberToken(token));
-                }
-                else if ( self.#tdata.isFormula(token.value) ) {
-                    let formula = self.#tdata.getTokens(token.value);
-                    operands.push(new Token(Types.Number, self.calc(formula)));
-                }
-                else operands.push(NaN);
-            }
-            else if ( token.type == Types.Operator ) {
-                self.calcExpression(operands, operators, token.priority);
-                operators.push(token);
-            }
-            else if ( token.type == Types.LeftBracket ) {
-                operators.push(token);
-            }
-            else if ( token.type == Types.RightBracket ) {
-                self.calcExpression(operands, operators, 1);
-                operators.pop();
+            switch(token.type) {
+                case Types.Number : 
+                    operands.push(token);
+                    break;
+                case Types.Cell :
+                    if ( self.#tdata.isNumber(token.value) ) {
+                        operands.push(self.#tdata.getNumberToken(token));
+                    }
+                    else if ( self.#tdata.isFormula(token.value) ) {
+                        let formula = self.#tdata.getTokens(token.value);
+                        operands.push(new Token(Types.Number, self.calc(formula)));
+                    }
+                    else {
+                        operands.push(NaN);
+                    }
+                    break;
+                case Types.Operator :
+                    self.calcExpression(operands, operators, token.priority);
+                    operators.push(token);
+                    break;
+                case Types.LeftBracket :
+                    operators.push(token);
+                    break;
+                case Types.RightBracket :
+                    self.calcExpression(operands, operators, 1);
+                    operators.pop();
+                    break;
             }
         });
         self.calcExpression(operands, operators, 0);
@@ -68,5 +72,9 @@ class Calculator {
             let result = operator.calc(leftOperand, rightOperand);
             operands.push(new Token ( Types.Number, result ));
         }
+    }
+
+    calcFunction() {
+
     }
 }
