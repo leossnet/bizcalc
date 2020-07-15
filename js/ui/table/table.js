@@ -58,6 +58,10 @@ class Table extends HTMLTableElement{
             this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
         });
     }
+
+    get app() {
+        return this.#app;
+    }
     
     /**
      * Обрабочик, вызываемой после добавления компонента в документ

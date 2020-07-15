@@ -94,7 +94,9 @@ class App {
 
         // this.getComponent("tablePanel").currentTable.focus();
         this.getComponent("table").focus();
+
         console.timeEnd("app");
+        window.addEventListener("keydown", this.handlerKeyDown);
     }
 
     /**
@@ -133,6 +135,31 @@ class App {
      */
     getComponent(componentName) {
         return this.#components.get(componentName);
+    }
+
+    /**
+     * Обработка нажатия клавиш
+     * @param {KeyDownEvent} event - событие нажатия клавиш
+     */
+    handlerKeyDown(event) {
+        let table = document.querySelector("table.table");
+        let tableData = table.tableData;
+        if ( event.ctrlKey ) {
+            switch(event.keyCode) {
+                case 83 : // S - сохранение текущей таблицы в JSON-файл
+                    event.preventDefault();
+                    table.app.saveJSON(tableData);
+                    break;
+                case 79 : // O - загрузка JSON-файла в текущую таблицу
+                    event.preventDefault();
+                    table.app.loadJSON(tableData);
+                    break;
+                case 81 : // Q - отчистка текущей таблицы
+                    event.preventDefault();
+                    tableData.clearData();
+                    break;
+            }
+        }
     }
 
     /**
