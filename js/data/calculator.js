@@ -1,5 +1,6 @@
 /**
- * Класс калькулятора, вычисляющего простые выражения с числами и ячейками электронных таблиц
+ * Класс калькулятора, вычисляющего выражения с функциями, числами и ячейками электронных таблиц.
+ * Аргументы функций указываются в круглых скобках, разделяемые точкой с запятой.
  */
 class Calculator {
     #tdata;
@@ -48,8 +49,11 @@ class Calculator {
                     operators.push(token);             
                     break;
                 case Types.Semicolon :
-                    params.push(token);
-                    operators.pop();
+                    this.calcExpression(operands, operators, 1);
+                    let funcToken = operators[operators.length-2];  // получить имя функции из стека операторов
+                    console.log(funcToken);
+                    console.log(params.get(funcToken));
+                    params.get(funcToken).push(operands.pop());     // извлечь из стека последний операнд и добавить его в параметы функции
                     break;
                 case Types.Operator :
                     this.calcExpression(operands, operators, token.priority);
@@ -61,13 +65,19 @@ class Calculator {
                 case Types.RightBracket :
                     this.calcExpression(operands, operators, 1);
                     operators.pop();
-                    // console.log(operators[operators.length-1].type);
+                    // если последний оператор в стеке является функцией
                     if (operators.length && operators[operators.length-1].type == Types.Function ) {
-                        let funcToken = operators.pop();
-                        // console.log(funcToken);
-                        params.get(funcToken).push(operands.pop());
-                        // console.log(params.get(funcToken));
-                        operands.push(this.calcFunction(funcToken, params.get(funcToken)[0].value));
+                        let funcToken = operators.pop();        // получить имя функции из стека операторов
+                        let funcArgs = params.get(funcToken);   // получить массив токенов аргументов функции
+                        let paramValues = [];
+                        if ( operands.length ) {
+                            // добавить последний аргумент функции
+                            funcArgs.push(operands.pop());     
+                            // получить массив значений всех аргументов функции
+                            paramValues = funcArgs.map( item => item.value ); 
+                        }
+                        // вычислить значение функции и положить в стек операндов
+                        operands.push(this.calcFunction(funcToken.calc, ...paramValues));  
                     }
                     break;
             }
@@ -88,15 +98,18 @@ class Calculator {
             let leftOperand = operands.pop().value;
             let operator = operators.pop();
             let result = operator.calc(leftOperand, rightOperand);
-            console.log(leftOperand+" "+operator.value+ " "+rightOperand+" = "+result);
             operands.push(new Token ( Types.Number, result ));
         }
     }
 
-    calcFunction(func, param) {
-        console.log(func.calc);
-        console.log(param);
-        console.log(func.calc(param));
-        return new Token(Types.Number, func.calc(param));
+    /**
+     * Вычисление значений функции
+     * @param {T} func - функция обработки аргументов
+     * @param  {...Number} params - массив числовых значений аргументов
+     */
+    calcFunction(calc, ...params) {
+        return new Token(Types.Number, calc(...params));
     }
 }
+
+

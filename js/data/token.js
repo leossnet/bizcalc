@@ -26,9 +26,13 @@ const Operators = {
 };
 
 const Functions = {
+    ["random"]: {priority: 4, calc: () => Math.random() },
     ["round"]:  {priority: 4, calc: (a) => Math.round(a) },
-    ["min"]:    {priority: 4, calc: (...args) => Math.min(args[0], args[1]) },
-    ["max"]:    {priority: 4, calc: (...args) => Math.max(args[0], args[1]) },
+    ["round2"]: {priority: 4, calc: (a) => Math.round(a * 100) / 100 },
+    ["round3"]: {priority: 4, calc: (a) => Math.round(a * 1000) / 1000 },
+    ["round4"]: {priority: 4, calc: (a) => Math.round(a * 10000) / 10000 },
+    ["min"]:    {priority: 4, calc: (...args) => Math.min(...args) },
+    ["max"]:    {priority: 4, calc: (...args) => Math.max(...args) },
     ["if"]:     {priority: 4, calc: (...args) => args[0] ? args[1] : args[2] }
 };
 
@@ -121,8 +125,8 @@ class Token {
                 tokens.push ( new Token ( Types.RightBracket, tokenCode ));
             else if ( tokenCode === ";" ) 
                 tokens.push ( new Token ( Types.Semicolon, tokenCode ));
-            else if ( tokenCode.match( Token.funcPattern ) !== null  )
-                tokens.push ( new Token ( Types.Function, tokenCode ));
+            else if ( tokenCode.toLowerCase().match( Token.funcPattern ) !== null  )
+                tokens.push ( new Token ( Types.Function, tokenCode.toLowerCase() ));
             else if ( tokenCode.match(/^\d+[.]?\d*/g) !== null ) 
                 tokens.push ( new Token ( Types.Number, Number(tokenCode) )); 
             else if ( tokenCode.match(/^[A-Z]+[1-9]+/g) !== null )
@@ -152,9 +156,15 @@ class Token {
 
 
 // let formula = "if( 1; round(10,2); 2*10)";
-let formula = "round(5 + 0.55)";
-console.log(formula);
-console.log(Token.getTokens(formula));
+// let formula = "round2(15.542 + 0.5)";
+// let formula1 = "max(2*15; 10; 20)";
+// let formula2 = "min(2; 10; 20)";
+// let formula3 = "random()";
+// let formula4 = "if ( max(0;10) ; 10*5 ; 15 ) ";
 
-let calculator = new Calculator(null);
-console.log(formula+" = "+calculator.calc(formula));
+// let calculator = new Calculator(null);
+// console.log(formula+" = "+calculator.calc(formula));
+// console.log(formula1+" = "+calculator.calc(formula1));
+// console.log(formula2+" = "+calculator.calc(formula2));
+// console.log(formula3+" = "+calculator.calc(formula3));
+// console.log(formula4+" = "+calculator.calc(formula4));
