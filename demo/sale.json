@@ -92,6 +92,12 @@
     ],
     "D6": [
       {
+        "function": "round"
+      },
+      {
+        "left bracket": "("
+      },
+      {
         "cell": "E6"
       },
       {
@@ -99,6 +105,9 @@
       },
       {
         "cell": "C6"
+      },
+      {
+        "right bracket": ")"
       }
     ]
   }
