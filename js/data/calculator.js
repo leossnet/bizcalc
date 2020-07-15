@@ -51,8 +51,6 @@ class Calculator {
                 case Types.Semicolon :
                     this.calcExpression(operands, operators, 1);
                     let funcToken = operators[operators.length-2];  // получить имя функции из стека операторов
-                    console.log(funcToken);
-                    console.log(params.get(funcToken));
                     params.get(funcToken).push(operands.pop());     // извлечь из стека последний операнд и добавить его в параметы функции
                     break;
                 case Types.Operator :
