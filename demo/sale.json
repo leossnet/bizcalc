@@ -20,7 +20,7 @@
     "C5": 25,
     "D3": 140,
     "D4": 60,
-    "D5": 90
+    "D5": 95
   },
   "tokens": {
     "E3": [
@@ -58,41 +58,59 @@
     ],
     "C6": [
       {
+        "function": "sum"
+      },
+      {
+        "left bracket": "("
+      },
+      {
         "cell": "C3"
       },
       {
-        "operator": "+"
+        "semicolon": ";"
       },
       {
         "cell": "C4"
       },
       {
-        "operator": "+"
+        "semicolon": ";"
       },
       {
         "cell": "C5"
+      },
+      {
+        "right bracket": ")"
       }
     ],
     "E6": [
       {
+        "function": "sum"
+      },
+      {
+        "left bracket": "("
+      },
+      {
         "cell": "E3"
       },
       {
-        "operator": "+"
+        "semicolon": ";"
       },
       {
         "cell": "E4"
       },
       {
-        "operator": "+"
+        "semicolon": ";"
       },
       {
         "cell": "E5"
+      },
+      {
+        "right bracket": ")"
       }
     ],
     "D6": [
       {
-        "function": "round"
+        "function": "round2"
       },
       {
         "left bracket": "("

@@ -31,6 +31,7 @@ const Functions = {
     ["round2"]: {priority: 4, calc: (a) => Math.round(a * 100) / 100 },
     ["round3"]: {priority: 4, calc: (a) => Math.round(a * 1000) / 1000 },
     ["round4"]: {priority: 4, calc: (a) => Math.round(a * 10000) / 10000 },
+    ["sum"]:    {priority: 4, calc: (...args) => args.reduce( (sum, current) => sum + current, 0) },
     ["min"]:    {priority: 4, calc: (...args) => Math.min(...args) },
     ["max"]:    {priority: 4, calc: (...args) => Math.max(...args) },
     ["if"]:     {priority: 4, calc: (...args) => args[0] ? args[1] : args[2] }
@@ -161,6 +162,7 @@ class Token {
 // let formula2 = "min(2; 10; 20)";
 // let formula3 = "random()";
 // let formula4 = "if ( max(0;10) ; 10*5 ; 15 ) ";
+// let formula5 = "sum(2*15; 10; 20)";
 
 // let calculator = new Calculator(null);
 // console.log(formula+" = "+calculator.calc(formula));
@@ -168,3 +170,4 @@ class Token {
 // console.log(formula2+" = "+calculator.calc(formula2));
 // console.log(formula3+" = "+calculator.calc(formula3));
 // console.log(formula4+" = "+calculator.calc(formula4));
+// console.log(formula5+" = "+calculator.calc(formula5));
