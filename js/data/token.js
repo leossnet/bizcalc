@@ -34,7 +34,7 @@ const Functions = {
     ["sum"]:    {priority: 4, calc: (...args) => args.reduce( (sum, current) => sum + current, 0) },
     ["min"]:    {priority: 4, calc: (...args) => Math.min(...args) },
     ["max"]:    {priority: 4, calc: (...args) => Math.max(...args) },
-    ["if"]:     {priority: 4, calc: (...args) => args[0] ? args[1] : args[2] }
+    ["if"]:     {priority: 4, calc: (...args) => args[0] ? args[1] : (args[2] ? args[2] : 0) }
 };
 
 /**
