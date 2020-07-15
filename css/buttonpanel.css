@@ -17,13 +17,10 @@
 }
 /* Стили переключателей вкладок (табов) */
 .button-panel>label {
+    width: 80px;
     display: inline-block;
-    padding-right: 12px;
-    padding-left: 12px;
     padding-top: 7px;
     padding-bottom: 7px;
-    margin-left: 5px;
-    margin-right: 5px;
     text-align: center;
     color: var(--font-color);
 }
