@@ -15,9 +15,12 @@
 .button:hover::after {
     content: attr(data-description);
     background: var(--hover-bg-color);
+    border: 1px solid rgb(255, 255, 144);
     padding: 3px;
     position: absolute;
-    top: 55px;
+    width: 120px;
+    height: 16px;
+    top: 45px;
     left: 40px;
     z-index: 1;
    }

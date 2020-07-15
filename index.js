@@ -30,9 +30,9 @@ class App {
             file: { name: "Файл",
                 checked: true,
                 buttons: [
-                    { name: "btOpen", label: "Открыть...", handler: this.handlerClickButton, img: "open.ico" },
-                    { name: "btSave", label: "Сохранить...", handler: this.handlerClickButton, img: "save.ico" },
-                    { name: "btClose", label: "Закрыть", handler: this.handlerClickButton, img: "close_file.ico" }
+                    { name: "btOpen", label: "Открыть...", shortcut: "Ctrl+O", handler: this.handlerClickButton, img: "open.ico" },
+                    { name: "btSave", label: "Сохранить...", shortcut: "Ctrl+S", handler: this.handlerClickButton, img: "save.ico" },
+                    { name: "btClose", label: "Закрыть", shortcut: "Ctrl+W", handler: this.handlerClickButton, img: "close_file.ico" }
                 ]
             },
             main: { name: "Главная",

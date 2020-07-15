@@ -16,7 +16,6 @@ class Button extends HTMLButtonElement {
         this.id = params.name;
         this.classList.add("button");
         if ( params && params.handler ) this.addEventListener("click", params.handler);
-        if ( params && params.label ) this.dataset.description = params.label;
         if ( params && params.icon ) {
             let icon = new SvgIcon(app, params.icon, { width: 15, height: 15, color: "cornflowerblue" });
             this.append(icon);
@@ -32,6 +31,7 @@ class Button extends HTMLButtonElement {
             label.classList.add("button-label");
             label.innerHTML = params.label;
             this.append(label);
+            this.dataset.description = params.label + (params.shortcut ? " ("+params.shortcut+")" : "" );
         }
         this.tabIndex = -1;
         this.#app.addComponent(this.id, this);
