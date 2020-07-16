@@ -345,6 +345,7 @@ class Table extends HTMLTableElement{
         // обновить ячейку со старым положением курсора
         if ( oldCell && ( oldCell !== newCell) ) oldCell.refresh();
         this.updateStartCell(oldCell, newCell);
+        this.#cursor.focus();
     }
 
     /**
@@ -700,10 +701,8 @@ class Table extends HTMLTableElement{
                 else colCount -= 1;
                 this.moveCursor(rowCount, colCount);
                 break;
-            case "Tab" :
-                this.focus();
             case "ArrowRight" :
-                    if ( this.#cursor.isEdit ) this.#cursor.endEditing();
+                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 // переход на последнюю колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey)
                     colCount = this.#params.colCount - currentCell.colNumber;
@@ -729,9 +728,15 @@ class Table extends HTMLTableElement{
                 if ( event.ctrlKey ) rowCount = this.#params.rowCount - currentCell.rowNumber;
                 this.moveCursor(rowCount, colCount);
                 break;
-
+            case "Tab" :
+                console.log(event);
+                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
+                colCount += 1;
+                this.moveCursor(rowCount, colCount);                
+                event.preventDefault();
+                break;
             }
-    }
+        }
 
     /**
      * Обработка событий нажатия клавиш включения/отключения режима редактирования ячейки
