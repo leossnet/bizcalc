@@ -124,11 +124,16 @@ class CellData {
      */
     set value(value){
         let cellName = this.#param.name;
-        if ( value === undefined || Number(value) === 0 ) {
+        if ( value === undefined ) {
+            this.initCell();
+            this.#tableData.deleteCellValue(cellName);
+            this.#tableData.calcAllCells();
+        }
+        else if ( Number(value) === 0 ) {
             this.#value.type = ValueTypes.Number;
             this.#value.number = 0;
             this.#tableData.setValue(cellName, this.#value.number);
-            this.#value.html = ( value === undefined ) ? "" : 0;
+            this.#value.html = 0;
             this.#tableData.calcAllCells();
         }
         else if ( Number(value) ) {
@@ -138,7 +143,7 @@ class CellData {
             this.#value.html = value;
             this.#tableData.calcAllCells();
         }
-        else if ( value.toString().charAt(0) === '=' ) {
+        else if ( String(value).charAt(0) === '=' ) {
             this.#value.type = ValueTypes.Formula;
             this.#value.formula = value;
             this.#tableData.setTokens(cellName, this.#value.formula);

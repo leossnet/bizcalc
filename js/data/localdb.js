@@ -84,6 +84,23 @@ class LocalDB {
     }
 
     /**
+     * Удаление ячейки из хранилища
+     * @param {String} storeName - имя хранилища
+     * @param {*} key - имя удаляемой ячейки
+     */
+    delete(storeName, key) {
+        this.connectDB((db) => {
+            let transaction = db.transaction([storeName], "readwrite"); 
+            let store = transaction.objectStore(storeName);
+            let request = store.delete(key);
+
+            request.onerror = function() {
+                console.log("Ошибка", request.error);
+            };        
+        });         
+    }    
+
+    /**
      * Очистка хранилища от данных
      * @param {String} storeName - имя хранилища
      */

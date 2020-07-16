@@ -40,7 +40,7 @@ class Calculator {
                         operands.push(new Token(Types.Number, this.calc(formula)));
                     }
                     else {
-                        operands.push(NaN);
+                        operands.push(new Token(Types.Number, 0));
                     }
                     break;
                 case Types.Function :

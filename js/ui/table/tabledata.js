@@ -67,6 +67,24 @@ class TableData {
         this.#cellDataMap.set(cellName.toUpperCase(), cellData);
     }
 
+    /**
+     * Удаляет значение ячейки
+     * @param {String} cellName - имя удаляемой ячейки
+     */
+    deleteCellValue(cellName) {
+        if (this.#valueMap.has(cellName.toUpperCase())) {
+            this.#valueMap.delete(cellName.toUpperCase());
+            this.#db.delete("values", cellName);
+        }
+        if (this.#stringMap.has(cellName.toUpperCase())) {
+            this.#stringMap.delete(cellName.toUpperCase());
+            this.#db.delete("strings", cellName);
+        }
+        if (this.#tokenMap.has(cellName.toUpperCase())) {
+            this.#tokenMap.delete(cellName.toUpperCase());
+            this.#db.delete("tokens", cellName);
+        }
+    }
 
     /**
      * Получение объекта ячейки по имени ячейки
