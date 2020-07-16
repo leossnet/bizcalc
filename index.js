@@ -73,7 +73,7 @@ class App {
         const tableParams = {
             colCount: params.colCount,
             rowCount: params.rowCount,
-            // colWidths: [50,60,70,80,90,100,50,60,70,80,90,100,50,60,70,80,90,100,50,60,70,80,90,100,50],
+            colWidths: [40, 240],  // ширина первых двух колонок таблицы
             isFocus: true
         };
         let table = new Table(this, tableParams);

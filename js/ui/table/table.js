@@ -6,6 +6,9 @@ const Course = {
     DEFAULT: "default"
 };
 
+const DEFAULT_COL_WIDTH = 80;   // ширина колонки по умолчанию в пикселях
+const MAX_COLUMN_COUNT = 676;   // 26*26, где 26 - число букв в латинском алфавите
+
 /**
  * Класс, расширяющий функциональность базового класса таблицы
  */
@@ -33,10 +36,10 @@ class Table extends HTMLTableElement{
             isFocus: params.isFocus ? params.isFocus : true,
             colWidths: params.colWidths ? params.colWidths : []
         };
+        if ( params && params.colWidths ) {
+            this.#colWidthArray = this.getColWidthArray(params.colWidths, this.#params.colCount);
+        }
         this.headers = [];
-        
-        if ( params && params.colWidths ) this.#colWidthArray = params.colWidths;
-        else for (let c=0; c<params.colCount; c++) this.#colWidthArray[c] = 80;
 
         this.#colMap = new Map();
         this.#tableData = new TableData(app);
@@ -59,12 +62,34 @@ class Table extends HTMLTableElement{
         });
     }
 
+    /**
+     * Возврат объекта приложения 
+     * @returns {Object} - объект приложения
+     */
     get app() {
         return this.#app;
+    }
+
+    /**
+     * Возврат массива со значениями ширины колонок таблицы
+     * @param {Array} colWidths - массив со значениями ширин первых колонок таблицы
+     * @param {Number} colCount - общее количество колонок в таблице
+     * @returns {Array} - массив со значениями ширин всех колонок таблицы
+     */
+    getColWidthArray(colWidths, colCount) {
+        let res = [];
+        for (let i=0; i<colWidths.length; i++) {
+            res.push(colWidths[i]);
+        }
+        for (let i=colWidths.length; i<colCount; i++) {
+            res.push(DEFAULT_COL_WIDTH);
+        }
+        return res;
     }
     
     /**
      * Обрабочик, вызываемой после добавления компонента в документ
+     * @returns {undefined}
      */
     connectedCallback() { 
         this.generateTable(this.#params);
@@ -77,6 +102,7 @@ class Table extends HTMLTableElement{
 
     /**
      * Массив пользовательских атрибутов, значения которых отслеживаются процедурой attributeChangedCallback
+     * @returns {Array} - массив наименований отслеживаемых атрибутов
      */
     static get observedAttributes() {
         return ["cursor-cell", "view-width", "view-height", "start-cell"];
