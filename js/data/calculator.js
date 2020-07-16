@@ -96,6 +96,7 @@ class Calculator {
             let leftOperand = operands.pop().value;
             let operator = operators.pop();
             let result = operator.calc(leftOperand, rightOperand);
+            if ( isNaN(result) || !isFinite(result) ) result = 0;
             operands.push(new Token ( Types.Number, result ));
         }
     }
