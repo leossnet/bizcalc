@@ -232,7 +232,7 @@ class TableData {
         if ( parseJson.strings ) {
             let strings = new Map(Object.entries(parseJson.strings));
             for (let cellName of strings.keys()){
-                this.getCellData(cellName).value = strings.get(cellName);
+                this.getCellData(cellName).setValue(strings.get(cellName), false);
                 this.#db.put("strings", strings.get(cellName), cellName);
             }
         }
@@ -241,7 +241,7 @@ class TableData {
         if ( parseJson.values ) {
             let values = new Map(Object.entries(parseJson.values));
             for (let cellName of values.keys()){
-                this.getCellData(cellName).value = values.get(cellName);
+                this.getCellData(cellName).setValue(values.get(cellName), false);
                 this.#db.put("values", values.get(cellName), cellName);
             }
         }
@@ -257,10 +257,12 @@ class TableData {
                         array[index] = new Token(type, item[type]);
                     }
                 });
-                this.getCellData(cellName).value = tokenArray;
+                this.getCellData(cellName).setValue(tokenArray, false);
                 this.#db.put("tokens", JSON.stringify(tokenArray), cellName);
             }
         }
+
+        this.calcAllCells();
     }
 
     /**
@@ -270,14 +272,14 @@ class TableData {
         // обновление строковый значений
         this.#db.get("strings", (strings) => {
             for (let cellName of strings.keys()) {
-                this.getCellData(cellName).value = strings.get(cellName);
+                this.getCellData(cellName).setValue(strings.get(cellName), false);
             }
         });
 
         // обновление первичных данных
         this.#db.get("values", (values) => {
             for (let cellName of values.keys()) {
-                this.getCellData(cellName).value = values.get(cellName);
+                this.getCellData(cellName).setValue(values.get(cellName), false);
             }
         });
         
@@ -286,9 +288,11 @@ class TableData {
             for (let cellName of tokens.keys()) {
                 let tokenArray = JSON.parse(tokens.get(cellName));
                 tokenArray.map( (item, index, array) => array[index] = new Token(item.type, item.value) );
-                this.getCellData(cellName).value = tokenArray;
+                this.getCellData(cellName).setValue(tokenArray, false);
             }
         });
+
+        this.calcAllCells();
     }
 
     /**

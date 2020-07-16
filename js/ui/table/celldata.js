@@ -123,35 +123,44 @@ class CellData {
      * Установка нового значения ячейки
      */
     set value(value){
+        this.setValue(value, true);
+    }
+
+    /**
+     * Установка нового значения ячейки таблицы
+     * @param {any} value - новое значение ячейки таблицы
+     * @param {Boolean} isCalcAllCells - нужно ли пересчитывать все ячейки таблицы после обновления текущей ячейки
+     */
+    setValue(value, isCalcAllCells) {
         let cellName = this.#param.name;
         if ( value === undefined ) {
             this.initCell();
             this.#tableData.deleteCellValue(cellName);
-            this.#tableData.calcAllCells();
+            if( isCalcAllCells ) this.#tableData.calcAllCells();
         }
         else if ( Number(value) === 0 ) {
             this.#value.type = ValueTypes.Number;
             this.#value.number = 0;
             this.#tableData.setValue(cellName, this.#value.number);
             this.#value.html = 0;
-            this.#tableData.calcAllCells();
+            if( isCalcAllCells ) this.#tableData.calcAllCells();
         }
         else if ( Number(value) ) {
             this.#value.type = ValueTypes.Number;
             this.#value.number = Number(value);
             this.#tableData.setValue(cellName, this.#value.number);
             this.#value.html = value;
-            this.#tableData.calcAllCells();
+            if( isCalcAllCells ) this.#tableData.calcAllCells();
         }
         else if ( String(value).charAt(0) === '=' ) {
             this.#value.type = ValueTypes.Formula;
             this.#value.formula = value;
             this.#tableData.setTokens(cellName, this.#value.formula);
-            this.#tableData.calcAllCells();
+            if( isCalcAllCells ) this.#tableData.calcAllCells();
         }
         else if ( Array.isArray(value) ) {
             this.#value.type = ValueTypes.Formula;
-            this.#value.formula = "="+value.map( (item, index, array) => item.value ).join("");
+            this.#value.formula = "="+value.map( item => item.value ).join("");
             this.#tableData.setTokens(cellName, value);
             this.#value.html = this.#tableData.calcCell(cellName);
         }
