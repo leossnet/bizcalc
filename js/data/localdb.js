@@ -18,9 +18,9 @@ class LocalDB {
      */
     connect() {
         return new Promise( (resolve, reject) => {
-            this.connectDB( (error, db) => {
+            this.connectDB( (error, result) => {
                 if ( error ) reject(error);
-                else resolve(db);
+                else resolve(result);
             });
         });
     }
@@ -52,7 +52,7 @@ class LocalDB {
 
     /**
      * Обертка над getData, возвращающая Promise
-     * @param {Object} db - объекты открытой базы данных
+     * @param {Object} db - объект открытой базы данных
      * @param {String} storeName - имя хранилиза
      * @returns {Promise} - промис
      */
@@ -156,19 +156,41 @@ class LocalDB {
         });         
     }    
 
+
     /**
-     * Очистка хранилища от данных
+     * Обектка над clearData, возвращающая Promise, очищающая указанное хранилище
+     * @param {Object} db - объект открытой базы данных
      * @param {String} storeName - имя хранилища
+     * @returns {Promise} - промис
      */
-    clearDB(storeName) {
-        this.connectDB( (error, db) => {
-            let transaction = db.transaction([storeName], "readwrite"); 
-            let store = transaction.objectStore(storeName);      
-            store.clear();
-        });
+    clear(db, storeName) {
+        return new Promise( (resolve, reject) => {
+            this.clearData(db, storeName, (error, result) => {
+                if ( error ) reject(error);
+                else resolve (result);
+            });
+        }); 
     }
+    
+    /**
+     * Очистка указанного хранилища
+     * @param {Object} db - объект открытой базы данных
+     * @param {String} storeName - имя хранилища
+     * @param {Function} callback - функция обратного вызова вида function (resolve, reject)
+     */
+    clearData(db, storeName, callback) {
+        let transaction = db.transaction([storeName], "readwrite"); 
+        let store = transaction.objectStore(storeName);      
+        let request = store.clear();    
 
-
+        request.onsuccess = function() {
+            callback(null, request.result);
+        };
+          
+        request.onerror = function() {
+            callback(new Error(`Ошибка очистки хранилища ${storeName}: ${request.error}`));
+        };
+    }
 
     /**
      * Преобразование имени файла в строку и обратно (заготовка на будущее)

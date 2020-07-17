@@ -325,9 +325,15 @@ class TableData {
         this.#tokenMap.clear();
 
         // очистка локальной базы данных
-        this.#db.clearDB("strings");
-        this.#db.clearDB("values");
-        this.#db.clearDB("tokens");
+        this.#db.connect()
+            .then( db => {
+                Promise.all([
+                    this.#db.clear(db, "strings"),
+                    this.#db.clear(db, "values"),
+                    this.#db.clear(db, "tokens")
+                ])
+            })
+        ;
     }
 
 }
