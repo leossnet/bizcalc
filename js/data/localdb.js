@@ -77,7 +77,7 @@ class LocalDB {
         let request = store.openCursor();
         let dataMap = new Map();
 
-        request.onsuccess = function(event) {
+        request.onsuccess = (event) => {
             let cursor = request.result;
             if (cursor) {
                 let key = cursor.key;
@@ -90,7 +90,7 @@ class LocalDB {
             }
         };
           
-        request.onerror = () => {
+        request.onerror = (event) => {
             callback(new Error(`"Ошибка выборки из базы данных ${request.error}`));
         };        
     }
@@ -125,32 +125,51 @@ class LocalDB {
         let store = transaction.objectStore(storeName);
         let request = store.put(value, key);
 
-        request.onsuccess = function() {
-            // console.log(request);
+        request.onsuccess = (event) => {
             callback(null, request.result);
         };
           
-        request.onerror = function() {
+        request.onerror = (event) => {
             callback(new Error(`Ошибка вставки данных в хранилище ${storeName}: ${request.error}`));
         };
     }
 
     /**
-     * Удаление ячейки из хранилища
-     * @param {String} storeName - имя хранилища
-     * @param {*} key - имя удаляемой ячейки
+     * Обертка над deleteData, возвращающая Promise, удаляющая ячейку из хранилища
+     * @param {Object} db - объект открытой базы данных
+     * @param {String} storeName - имя хранилиза
+     * @param {String} key - имя ячейки
+     * @returns {Promise} - промис
      */
-    deleteDB(storeName, key) {
-        this.connectDB((error, db) => {
-            let transaction = db.transaction([storeName], "readwrite"); 
-            let store = transaction.objectStore(storeName);
-            let request = store.delete(key);
-
-            request.onerror = function() {
-                console.log("Ошибка", request.error);
-            };        
+    delete(db, storeName, key) {
+        return new Promise( (resolve, reject) => {
+            this.deleteData(db, storeName, key, (error, result) => {
+                if ( error ) reject(error);
+                else resolve (result);
+            });
         });         
-    }    
+    }
+    
+    /**
+     * Удаление значения ячейки
+     * @param {Object} db - объект открытой базы данных
+     * @param {String} storeName - имя хранилиза
+     * @param {String} key - имя ячейки
+     * @param {Function} callback - функция обратного вызова вида function (resolve, reject)
+     */
+    deleteData(db, storeName, key, callback) {
+        let transaction = db.transaction([storeName], "readwrite"); 
+        let store = transaction.objectStore(storeName);
+        let request = store.delete(key);
+
+        request.onsuccess = (event) => {
+            callback(null, request.result);
+        };
+          
+        request.onerror = (event) => {
+            callback(new Error(`Ошибка удаления данных в хранилище ${storeName}: ${request.error}`));
+        };
+    }
 
     /**
      * Обектка над clearData, возвращающая Promise, очищающая указанное хранилище
@@ -178,11 +197,11 @@ class LocalDB {
         let store = transaction.objectStore(storeName);      
         let request = store.clear();    
 
-        request.onsuccess = function() {
+        request.onsuccess = (event) => {
             callback(null, request.result);
         };
           
-        request.onerror = function() {
+        request.onerror = (event) => {
             callback(new Error(`Ошибка очистки хранилища ${storeName}: ${request.error}`));
         };
     }

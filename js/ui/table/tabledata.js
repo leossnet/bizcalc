@@ -72,18 +72,23 @@ class TableData {
      * @param {String} cellName - имя удаляемой ячейки
      */
     deleteCellValue(cellName) {
-        if (this.#valueMap.has(cellName.toUpperCase())) {
-            this.#valueMap.delete(cellName.toUpperCase());
-            this.#idb.deleteDB("values", cellName);
-        }
-        if (this.#stringMap.has(cellName.toUpperCase())) {
-            this.#stringMap.delete(cellName.toUpperCase());
-            this.#idb.deleteDB("strings", cellName);
-        }
-        if (this.#tokenMap.has(cellName.toUpperCase())) {
-            this.#tokenMap.delete(cellName.toUpperCase());
-            this.#idb.deleteDB("tokens", cellName);
-        }
+        this.#idb.connect()
+            .then( db => {
+                let cell = cellName.toUpperCase();
+                if (this.#valueMap.has(cell)) {
+                    this.#valueMap.delete(cell);
+                    this.#idb.delete(db, "values", cell);
+                }
+                if (this.#stringMap.has(cell)) {
+                    this.#stringMap.delete(cell);
+                    this.#idb.delete(db, "strings", cell);
+                }
+                if (this.#tokenMap.has(cell)) {
+                    this.#tokenMap.delete(cell);
+                    this.#idb.delete(db, "tokens", cell);
+                }
+            })
+        ;
     }
 
     /**
