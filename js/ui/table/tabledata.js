@@ -3,7 +3,7 @@
  */
 class TableData {
     #app;
-    #db;
+    #idb;
     #cellMap;
     #cellDataMap;
     #tokenMap;
@@ -16,7 +16,7 @@ class TableData {
      */
     constructor(app) {
         this.#app = app;
-        this.#db = new LocalDB(app);
+        this.#idb = new LocalDB(app);
         this.initTableData();
     }
 
@@ -74,15 +74,15 @@ class TableData {
     deleteCellValue(cellName) {
         if (this.#valueMap.has(cellName.toUpperCase())) {
             this.#valueMap.delete(cellName.toUpperCase());
-            this.#db.deleteDB("values", cellName);
+            this.#idb.deleteDB("values", cellName);
         }
         if (this.#stringMap.has(cellName.toUpperCase())) {
             this.#stringMap.delete(cellName.toUpperCase());
-            this.#db.deleteDB("strings", cellName);
+            this.#idb.deleteDB("strings", cellName);
         }
         if (this.#tokenMap.has(cellName.toUpperCase())) {
             this.#tokenMap.delete(cellName.toUpperCase());
-            this.#db.deleteDB("tokens", cellName);
+            this.#idb.deleteDB("tokens", cellName);
         }
     }
 
@@ -151,7 +151,9 @@ class TableData {
             let f = formula.substring(1).toUpperCase();
             this.#tokenMap.set(cellName.toUpperCase(), Token.getTokens(f));
         }
-        this.#db.putDB("tokens", JSON.stringify(this.#tokenMap.get(cellName)), cellName);
+        this.#idb.connect().then ( db => {
+            this.#idb.put(db, "tokens", cellName, JSON.stringify(this.#tokenMap.get(cellName)));
+        });
     }
 
     /**
@@ -161,7 +163,9 @@ class TableData {
      */
     setValue(cellName, value) {
         this.#valueMap.set(cellName.toUpperCase(), value);
-        this.#db.putDB("values", JSON.stringify(this.#valueMap.get(cellName)), cellName);
+        this.#idb.connect().then ( db => {
+            this.#idb.put(db, "values", cellName, JSON.stringify(this.#valueMap.get(cellName)));
+        });        
     }
 
     /**
@@ -179,7 +183,9 @@ class TableData {
      */
     setString(cellName, string) {
         this.#stringMap.set(cellName.toUpperCase(), string);
-        this.#db.putDB("strings", this.#stringMap.get(cellName), cellName);
+        this.#idb.connect().then ( db => {
+            this.#idb.put(db, "strings", cellName, this.#stringMap.get(cellName));
+        });         
     }
 
     /**
@@ -228,53 +234,57 @@ class TableData {
      * @param {Object} parseJson - данные в формате JSON
      */
     viewData(parseJson) {
-        // обновление строковый значений
-        if ( parseJson.strings ) {
-            let strings = new Map(Object.entries(parseJson.strings));
-            for (let cellName of strings.keys()){
-                this.getCellData(cellName).setValue(strings.get(cellName), false);
-                this.#db.putDB("strings", strings.get(cellName), cellName);
-            }
-        }
-
-        // обновление первичных данных
-        if ( parseJson.values ) {
-            let values = new Map(Object.entries(parseJson.values));
-            for (let cellName of values.keys()){
-                this.getCellData(cellName).setValue(values.get(cellName), false);
-                this.#db.putDB("values", values.get(cellName), cellName);
-            }
-        }
-        
-        // обновление формул
-        if ( parseJson.tokens ) {
-            let tokens = new Map(Object.entries(parseJson.tokens));
-            // console.log(tokens);
-            for (let cellName of tokens.keys()){
-                let tokenArray = tokens.get(cellName);
-                tokenArray.map( (item, index, array) => {
-                    for (let type in item) {
-                        array[index] = new Token(type, item[type]);
+        this.#idb.connect()
+            .then( db => {
+                if ( parseJson.strings ) {
+                    let strings = new Map(Object.entries(parseJson.strings));
+                    for (let cellName of strings.keys()){
+                        this.getCellData(cellName).setValue(strings.get(cellName), false);
+                        // this.#idb.put(db, "strings", cellName, strings.get(cellName));
                     }
-                });
-                this.getCellData(cellName).setValue(tokenArray, false);
-                this.#db.putDB("tokens", JSON.stringify(tokenArray), cellName);
-            }
-        }
-
-        this.calcAllCells();
+                }
+        
+                // обновление первичных данных
+                if ( parseJson.values ) {
+                    let values = new Map(Object.entries(parseJson.values));
+                    for (let cellName of values.keys()){
+                        this.getCellData(cellName).setValue(values.get(cellName), false);
+                        // this.#idb.put(db, "values", cellName, values.get(cellName));
+                    }
+                }
+                
+                // обновление формул
+                if ( parseJson.tokens ) {
+                    let tokens = new Map(Object.entries(parseJson.tokens));
+                    // console.log(tokens);
+                    for (let cellName of tokens.keys()){
+                        let tokenArray = tokens.get(cellName);
+                        tokenArray.map( (item, index, array) => {
+                            for (let type in item) {
+                                array[index] = new Token(type, item[type]);
+                            }
+                        });
+                        this.getCellData(cellName).setValue(tokenArray, false);
+                        // this.#idb.put(db, "tokens", cellName, JSON.stringify(tokenArray));
+                    }
+                }
+            })
+            .then( db => {
+                this.calcAllCells();                
+            }) 
+        ;
     }
 
     /**
      * Обновление данных таблицы из локальной базы данных
      */
     refreshData() {
-        this.#db.connect()
+        this.#idb.connect()
             .then( db => {
                 Promise.all([
-                    this.#db.get(db, "strings"),
-                    this.#db.get(db, "values"),
-                    this.#db.get(db, "tokens")
+                    this.#idb.get(db, "strings"),
+                    this.#idb.get(db, "values"),
+                    this.#idb.get(db, "tokens")
                 ])
                 .then(responses => {
                     responses.forEach((data, index, array) => {
@@ -325,12 +335,12 @@ class TableData {
         this.#tokenMap.clear();
 
         // очистка локальной базы данных
-        this.#db.connect()
+        this.#idb.connect()
             .then( db => {
                 Promise.all([
-                    this.#db.clear(db, "strings"),
-                    this.#db.clear(db, "values"),
-                    this.#db.clear(db, "tokens")
+                    this.#idb.clear(db, "strings"),
+                    this.#idb.clear(db, "values"),
+                    this.#idb.clear(db, "tokens")
                 ])
             })
         ;

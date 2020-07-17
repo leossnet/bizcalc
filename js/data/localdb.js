@@ -64,8 +64,13 @@ class LocalDB {
             });
         }); 
     }
-
     
+    /**
+     * Получение данных хранилища
+     * @param {Object} db - объект открытой базы данных
+     * @param {String} storeName - имя хранилиза
+     * @param {Function} callback - функция обратного вызова вида function (resolve, reject)
+     */
     getData(db, storeName, callback) {
         let transaction = db.transaction([storeName], "readonly"); 
         let store = transaction.objectStore(storeName);
@@ -91,52 +96,43 @@ class LocalDB {
     }
 
     /**
-     * Установка нового значения ячейки в локальном хранилище
-     * @param {String} storeName - имя хранилища
-     * @param {Object} obj - значение ячейки
+     * Обертка над putData, возвращающая Promise, устанавливающая новое значение ячейки в хранилище
+     * @param {Object} db - объект открытой базы данных
+     * @param {String} storeName - имя хранилиза
      * @param {String} key - имя ячейки
+     * @param {any} value - значение ячейки
+     * @returns {Promise} - промис
      */
-    putDB(storeName, obj, key ) {
-        this.connectDB((error, db) => {
-            let transaction = db.transaction([storeName], "readwrite"); 
-            let store = transaction.objectStore(storeName);
-            let request = store.put(obj, key);
-              
-            request.onerror = function() {
-                console.log("Ошибка", request.error);
-            };        
+    put (db, storeName, key, value) {
+        return new Promise( (resolve, reject) => {
+            this.putData(db, storeName, key, value, (error, result) => {
+                if ( error ) reject(error);
+                else resolve (result);
+            });
         }); 
     }
-
-
-
+    
     /**
-     * Получение данных из хранилица
-     * @param {String} storeName - имя хранилища
-     * @param {Function} call - функция обратного вызова для обработки результатов запроса
+     * Установка нового значения ячейки
+     * @param {Object} db - объект открытой базы данных
+     * @param {String} storeName - имя хранилиза
+     * @param {String} key - имя ячейки
+     * @param {any} value - значение ячейки
+     * @param {Function} callback - функция обратного вызова вида function (resolve, reject)
      */
-    getDB(storeName, callback) {
-        this.connectDB((error, db) => {
-            let transaction = db.transaction([storeName], "readonly"); 
-            let store = transaction.objectStore(storeName);
-            let request = store.openCursor();
+    putData(db, storeName, key, value, callback) {
+        let transaction = db.transaction([storeName], "readwrite"); 
+        let store = transaction.objectStore(storeName);
+        let request = store.put(value, key);
 
-            request.onsuccess = function(event) {
-                let cursor = request.result;
-                let dataMap = new Map();
-                if (cursor) {
-                    let key = cursor.key;
-                    let value = cursor.value;
-                    dataMap.set(key, value);
-                    cursor.continue();
-                }
-                callback(dataMap);
-            };
-              
-            request.onerror = () => {
-                callback(new Error(`"Ошибка выборки из базы данных ${request.error}`));
-            };        
-        });         
+        request.onsuccess = function() {
+            // console.log(request);
+            callback(null, request.result);
+        };
+          
+        request.onerror = function() {
+            callback(new Error(`Ошибка вставки данных в хранилище ${storeName}: ${request.error}`));
+        };
     }
 
     /**
@@ -155,7 +151,6 @@ class LocalDB {
             };        
         });         
     }    
-
 
     /**
      * Обектка над clearData, возвращающая Promise, очищающая указанное хранилище
