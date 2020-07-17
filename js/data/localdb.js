@@ -13,14 +13,28 @@ class LocalDB {
     }
 
     /**
+     * Обектка над connectDВ, возвращающая Promise
+     * @returns {Promise} - промис, передающий созданный объект базы данных
+     */
+    connect() {
+        return new Promise( (resolve, reject) => {
+            this.connectDB( (error, db) => {
+                if ( error ) reject(error);
+                else resolve(db);
+            });
+        });
+    }
+    
+    /**
      * Соединение с локальной базой данных
      * @param {Function} call - фукнция обратного вызова для работы с полученным соединением с локальной БД
      */
-    connectDB(call) {
+    connectDB(callback) {
         let openRequest = indexedDB.open(this.#app.root.id+"DB", 1);
 
         openRequest.onsuccess = (event) => {
-            call(event.target.result);
+            let db = event.target.result;
+            callback(null, db);
         };
 
         openRequest.onupgradeneeded = (event) => {
@@ -28,12 +42,52 @@ class LocalDB {
             db.createObjectStore('strings'); 
             db.createObjectStore('values'); 
             db.createObjectStore('tokens'); 
-            this.connectDB(call);
+            this.connectDB(callback);
         };            
 
         openRequest.onerror = (event) => {
-            console.error("Error", event.target.errorCode);
+            callback(new Error(`"Ошибка подключения к базе данных ${event.target.errorCode}`));
         };
+    }
+
+    /**
+     * Обертка над getData, возвращающая Promise
+     * @param {Object} db - объекты открытой базы данных
+     * @param {String} storeName - имя хранилиза
+     * @returns {Promise} - промис
+     */
+    get(db, storeName) {
+        return new Promise( (resolve, reject) => {
+            this.getData(db, storeName, (error, data) => {
+                if ( error ) reject(error);
+                else resolve (data);
+            });
+        }); 
+    }
+
+    
+    getData(db, storeName, callback) {
+        let transaction = db.transaction([storeName], "readonly"); 
+        let store = transaction.objectStore(storeName);
+        let request = store.openCursor();
+        let dataMap = new Map();
+
+        request.onsuccess = function(event) {
+            let cursor = request.result;
+            if (cursor) {
+                let key = cursor.key;
+                let value = cursor.value;
+                dataMap.set(key, value);
+                cursor.continue();
+            } 
+            else {
+                callback(null, dataMap);
+            }
+        };
+          
+        request.onerror = () => {
+            callback(new Error(`"Ошибка выборки из базы данных ${request.error}`));
+        };        
     }
 
     /**
@@ -42,8 +96,8 @@ class LocalDB {
      * @param {Object} obj - значение ячейки
      * @param {String} key - имя ячейки
      */
-    put(storeName, obj, key ) {
-        this.connectDB((db) => {
+    putDB(storeName, obj, key ) {
+        this.connectDB((error, db) => {
             let transaction = db.transaction([storeName], "readwrite"); 
             let store = transaction.objectStore(storeName);
             let request = store.put(obj, key);
@@ -54,31 +108,33 @@ class LocalDB {
         }); 
     }
 
+
+
     /**
      * Получение данных из хранилица
      * @param {String} storeName - имя хранилища
      * @param {Function} call - функция обратного вызова для обработки результатов запроса
      */
-    get(storeName, call) {
-        this.connectDB((db) => {
+    getDB(storeName, callback) {
+        this.connectDB((error, db) => {
             let transaction = db.transaction([storeName], "readonly"); 
             let store = transaction.objectStore(storeName);
             let request = store.openCursor();
 
             request.onsuccess = function(event) {
                 let cursor = request.result;
-                let stringMap = new Map();
+                let dataMap = new Map();
                 if (cursor) {
                     let key = cursor.key;
                     let value = cursor.value;
-                    stringMap.set(key, value);
+                    dataMap.set(key, value);
                     cursor.continue();
                 }
-                call(stringMap);
+                callback(dataMap);
             };
               
-            request.onerror = function() {
-                console.log("Ошибка", request.error);
+            request.onerror = () => {
+                callback(new Error(`"Ошибка выборки из базы данных ${request.error}`));
             };        
         });         
     }
@@ -88,8 +144,8 @@ class LocalDB {
      * @param {String} storeName - имя хранилища
      * @param {*} key - имя удаляемой ячейки
      */
-    delete(storeName, key) {
-        this.connectDB((db) => {
+    deleteDB(storeName, key) {
+        this.connectDB((error, db) => {
             let transaction = db.transaction([storeName], "readwrite"); 
             let store = transaction.objectStore(storeName);
             let request = store.delete(key);
@@ -104,8 +160,8 @@ class LocalDB {
      * Очистка хранилища от данных
      * @param {String} storeName - имя хранилища
      */
-    clear(storeName) {
-        this.connectDB(db => {
+    clearDB(storeName) {
+        this.connectDB( (error, db) => {
             let transaction = db.transaction([storeName], "readwrite"); 
             let store = transaction.objectStore(storeName);      
             store.clear();
