@@ -13,7 +13,7 @@ class Button extends HTMLButtonElement {
     constructor(app, params) {
         super();
         this.#app = app;
-        this.id = params.name;
+        if ( params && params.name ) this.id = params.name;
         this.classList.add("button");
         if ( params && params.handler ) this.addEventListener("click", params.handler);
         if ( params && params.icon ) {
