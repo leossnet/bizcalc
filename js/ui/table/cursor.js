@@ -43,6 +43,7 @@ class Cursor extends HTMLElement{
         this.#cell.append(this);
         this.value = cell.data.value;
         this.setEditableValue(this.#editor);
+        this.#editor.cellName = this.#cell.data.name;
     }
 
 

@@ -36,9 +36,8 @@ class Editor extends HTMLDivElement {
         // this.id = this.#app.root.id+"Editor";
         this.classList.add("table-editor");
 
-        this.#cellName = document.createElement("select");
+        this.#cellName = document.createElement("input");
         this.#cellName.classList.add("cell-name");
-        // this.#cellName.setAttribute("disabled", true);
         this.append(this.#cellName);
 
         this.#cellType = document.createElement("div");
@@ -68,12 +67,7 @@ class Editor extends HTMLDivElement {
     }
 
     set cellName(cellName) {
-        let option = document.createElement("option");
-        option.value = cellName;
-        option.innerHTML = cellName;
-        option.setAttribute("selected", true);
-        this.#cellName.append(option);
-        // this.#cellName.value = cellName;
+        this.#cellName.value = cellName;
     }
 
     get value() {
