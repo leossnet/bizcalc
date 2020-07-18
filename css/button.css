@@ -6,7 +6,8 @@
     margin: 2px;
     padding: 3px;
     border: 1px solid var(--border-button-color);
-   }
+    user-select: none;
+}
 .button:hover {
     background-color: var(--bg-button-sel-color);
     cursor: pointer;

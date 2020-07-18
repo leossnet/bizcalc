@@ -4,6 +4,7 @@
     margin: 0 auto;
     background: var(--bg-color);
     font-size: 13px;
+    user-select: none;
 }
 /* Стили секций с содержанием */
 .button-panel>section {

@@ -4,4 +4,5 @@
     color: rgb(63, 63, 63);
     padding: 3px;
     border: 1px solid lightgrey;
+    user-select: none;
 }

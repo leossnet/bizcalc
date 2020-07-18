@@ -2,6 +2,7 @@
     table-layout: fixed ;
     border-collapse: collapse;  
     background-color: #eee;
+    user-select: none;
 }
 .table:focus {
     outline: none;
