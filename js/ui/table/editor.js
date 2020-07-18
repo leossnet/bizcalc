@@ -17,14 +17,10 @@ class Editor extends HTMLDivElement {
     constructor(app, params) {
         super();
         this.#app = app;
-
         this.generateEditor();
-        this.cellName = "A1"
-
         this.tabIndex = -1;
 
-        addEventListener("input", this.handlerInput);
-        addEventListener("change", this.handlerChange);
+        this.addEventListener("change", this.handlerChange);
 
         window.addEventListener("resize", () => { 
             this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
@@ -58,6 +54,7 @@ class Editor extends HTMLDivElement {
 
         this.#cellInput = document.createElement("input");
         this.#cellInput.classList.add("cell-input");
+        this.#cellInput.tabIndex = -1;
         this.append(this.#cellInput);
     }
 
@@ -78,6 +75,10 @@ class Editor extends HTMLDivElement {
         this.#cellInput.value = value;
     }
 
+    focus() {
+        this.#cellInput.focus();
+    }
+
 
     /**
      * Обрабочик, вызываемой после добавления компонента в документ
@@ -95,28 +96,22 @@ class Editor extends HTMLDivElement {
     } 
 
     /**
-     * Обработка событий нажатия клавиш 
-     * @param {KeyEvent} event 
+     * Обработка окончания ввода данных в строке формул
+     * @param {Event} Event 
      */
-    handlerInput(Event) {
-        console.log(Event);
-        // let currentCellName = this.#cursor.cell.data.name;
-        switch(Event.key) {
-            case "Escape" : 
-                break;
-            case "Enter" : 
-                console.log(event.returnValue);
-                break;
-       }
+    handlerChange(event) {
+        let cursor = this.#app.getComponent("table").getCursor();
+        cursor.value = this.value;
+        cursor.endEditing();
+        cursor.cell = cursor.cell;
     }
 
-    handlerChange(Event) {
-        console.log(Event);
-        console.log(this);
-
-    }
-
-    handlerClickButton(Event) {
+    /**
+     * Обработка нажатия кнопко на панели типов данных строки формул
+     * @param {Event} Event 
+     */
+    handlerClickButton(event) {
+        console.log(event);
 
     }
 

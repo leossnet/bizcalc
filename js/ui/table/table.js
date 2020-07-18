@@ -43,7 +43,7 @@ class Table extends HTMLTableElement{
 
         this.#colMap = new Map();
         this.#tableData = new TableData(app);
-        this.#editor = params.editor;
+        this.#editor = params.editor ? params.editor : new Editor(this.#app);
         this.#cursor = new Cursor(app, this);
         this.classList.add("table");
         this.tabIndex = -1;
@@ -747,6 +747,10 @@ class Table extends HTMLTableElement{
         switch(keyEvent.key) {
             case "F2" : 
                 this.#cursor.beginEditing();
+                break;
+            case "F4" : 
+                console.log(this.#editor);
+                this.#editor.focus();
                 break;
             case "Escape" : 
                 this.#cursor.escapeEditing();
