@@ -22,10 +22,10 @@ class Editor extends HTMLDivElement {
 
         this.addEventListener("change", this.handlerChange);
 
-        window.addEventListener("resize", () => { 
-            this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
-            this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
-        });
+        // window.addEventListener("resize", () => { 
+        //     this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
+        //     this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+        // });
     }
     
     generateEditor() {
