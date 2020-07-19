@@ -21,11 +21,8 @@ class Editor extends HTMLDivElement {
         this.tabIndex = -1;
 
         this.addEventListener("change", this.handlerChange);
+        this.addEventListener("keydown", this.handlerKeyDown);
 
-        // window.addEventListener("resize", () => { 
-        //     this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
-        //     this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
-        // });
     }
     
     generateEditor() {
@@ -54,7 +51,7 @@ class Editor extends HTMLDivElement {
 
         this.#cellInput = document.createElement("input");
         this.#cellInput.classList.add("cell-input");
-        this.#cellInput.tabIndex = -1;
+        // this.#cellInput.tabIndex = -1;
         this.append(this.#cellInput);
     }
 
@@ -76,6 +73,7 @@ class Editor extends HTMLDivElement {
     }
 
     focus() {
+        console.log(this.#cellInput);
         this.#cellInput.focus();
     }
 
@@ -110,10 +108,17 @@ class Editor extends HTMLDivElement {
      * Обработка нажатия кнопко на панели типов данных строки формул
      * @param {Event} Event 
      */
-    handlerClickButton(event) {
-        console.log(event);
+    handlerKeyDown(event) {
+        switch(event.key) {
+            case "Escape" : 
+                let cursor = this.#app.getComponent("table").getCursor();
+                cursor.cell = cursor.cell;
+                cursor.focus();
+                break;
+        }
 
     }
+
 
 }
 

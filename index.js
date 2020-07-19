@@ -56,7 +56,8 @@ class App {
 
         // регистрация простых компонентов
         this.addComponent("navbar", new Navbar(this, {}));
-        this.addComponent("editor", new Editor(this, {}));
+        let editor = new Editor(this, {});
+        this.addComponent("editor", editor);
         // const tablePanelParams = {
         //     table1: {
         //         name: "Лист 1",
@@ -74,6 +75,7 @@ class App {
             colCount: params.colCount,
             rowCount: params.rowCount,
             colWidths: [40, 240],  // ширина первых двух колонок таблицы
+            editor: editor,
             isFocus: true
         };
         let table = new Table(this, tableParams);

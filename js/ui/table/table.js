@@ -729,7 +729,6 @@ class Table extends HTMLTableElement{
                 this.moveCursor(rowCount, colCount);
                 break;
             case "Tab" :
-                console.log(event);
                 if ( this.#cursor.isEdit ) this.#cursor.endEditing();
                 colCount += 1;
                 this.moveCursor(rowCount, colCount);                
@@ -749,7 +748,7 @@ class Table extends HTMLTableElement{
                 this.#cursor.beginEditing();
                 break;
             case "F4" : 
-                console.log(this.#editor);
+                // console.log(this.#editor);
                 this.#editor.focus();
                 break;
             case "Escape" : 
