@@ -19,12 +19,12 @@ class Editor extends HTMLDivElement {
         this.#app = app;
         this.generateEditor();
         this.tabIndex = -1;
-
-        this.addEventListener("change", this.handlerChange);
         this.addEventListener("keydown", this.handlerKeyDown);
-
     }
     
+    /**
+     * Генерация внешнего вида редактора содержимого текущей ячейки таблицы
+     */
     generateEditor() {
         // this.id = this.#app.root.id+"Editor";
         this.classList.add("table-editor");
@@ -55,25 +55,47 @@ class Editor extends HTMLDivElement {
         this.append(this.#cellInput);
     }
 
+    /**
+     * Получение объекта приложения 
+     * @returns {Object} - объект приложения
+     */
+    get app() {
+        return this.#app;
+    }
 
+    /**
+     * Получение имени редактируемой ячейки
+     * @returns {String} - имя ячейки
+     */
     get cellName() {
         return this.#cellName.value;
     }
 
+    /**
+     * Установление имени редактируемой ячейки в окне текущей ячейки
+     */
     set cellName(cellName) {
         this.#cellName.value = cellName;
     }
 
+    /**
+     * Получение введенного значения ячейки
+     */
     get value() {
         return this.#cellInput.value;
     }
 
+    /**
+     * Установление значения ячейки для редактирования
+     */
     set value(value) {
         this.#cellInput.value = value;
     }
 
+    /**
+     * Установление фокуса в форму ввода панели редактирования формул
+     */
     focus() {
-        console.log(this.#cellInput);
         this.#cellInput.focus();
     }
 
@@ -94,31 +116,44 @@ class Editor extends HTMLDivElement {
     } 
 
     /**
-     * Обработка окончания ввода данных в строке формул
-     * @param {Event} Event 
-     */
-    handlerChange(event) {
-        let cursor = this.#app.getComponent("table").getCursor();
-        cursor.value = this.value;
-        cursor.endEditing();
-        cursor.cell = cursor.cell;
-    }
-
-    /**
-     * Обработка нажатия кнопко на панели типов данных строки формул
-     * @param {Event} Event 
+     * Обработка нажатия кнопок в строке формул
+     * @param {KeyboardEvent} Event - событие нажатия клавиши
      */
     handlerKeyDown(event) {
+        let cursor = this.#app.getComponent("table").getCursor();
         switch(event.key) {
+            case "Enter" :
+                cursor.value = this.value;
+                cursor.endEditing();
+                cursor.cell = cursor.cell;
+                break;
             case "Escape" : 
-                let cursor = this.#app.getComponent("table").getCursor();
                 cursor.cell = cursor.cell;
                 cursor.focus();
                 break;
         }
-
     }
 
+    /**
+     * Обработка щелчка мыши при нажатии на кнопки панели формул
+     * @param {MouseEvent} event - событие щелчка мыши
+     */
+    handlerClickButton(event) {
+        let button = event.path.filter( item => item.localName == "button").map(item => item.id)[0];
+        let editor = document.querySelector(".table-editor");
+        let cursor = editor.app.getComponent("table").getCursor();
+        switch(button) {
+            case "btEnter" :
+                cursor.value = editor.value;
+                cursor.endEditing();
+                cursor.cell = cursor.cell;
+                break;
+            case "btEscape" :
+                cursor.cell = cursor.cell;
+                cursor.focus();
+                break;
+        }
+    }
 
 }
 
