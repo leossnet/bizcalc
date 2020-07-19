@@ -2,14 +2,15 @@
  * Класс, реализующий поддержку расчетов ячеек по формулам
  */
 class TableData {
-    #app;
-    #idb;
-    #cellMap;
-    #cellDataMap;
-    #tokenMap;
-    #valueMap;
-    #stringMap; 
-    #calculator;
+    #app;           // объект приложения
+    #idb;           // локальная база данных IndexedDB
+    #cellMap;       // видимые ячейки таблицы
+    #cellDataMap;   // данные видимых ячеек таблицы
+    #tokenMap;      // массивы токенов ячеек с формулами
+    #valueMap;      // числовые значения ячеек с числами
+    #stringMap;     // строковые значения ячеек со строками
+    #bufferArray;   // стек измененных ячеек
+    #calculator;    // расчетчик
 
     /**
      * Конструктор модели данных таблицы
@@ -29,6 +30,7 @@ class TableData {
         this.#tokenMap = new Map();
         this.#valueMap = new Map();
         this.#stringMap = new Map();
+        this.#bufferArray = [];
         this.#calculator = new Calculator(this);
     }
 
@@ -199,6 +201,23 @@ class TableData {
      */
     getString(cellName) {
         return this.#stringMap.get(cellName.toUpperCase());
+    }
+
+    pushBuffer(cellData) {
+        this.#bufferArray.push({[cellData.name]:cellData.value});
+        let cell = this.getCell(cellData.name);
+        cell.classList.add("change-value");
+    }
+
+    popBuffer() {
+        let bufferCell = this.#bufferArray.pop();
+        let cell = this.getCell(Object.keys(bufferCell)[0]);
+        cell.classList.remove("change-value");
+        return bufferCell;
+    }
+
+    hasBuffer() {
+        return this.#bufferArray.length;
     }
 
     /**

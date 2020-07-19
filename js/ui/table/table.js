@@ -54,6 +54,7 @@ class Table extends HTMLTableElement{
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
         this.addEventListener("keydown", this.handlerKeyEditing);
+        this.addEventListener("keydown", this.handlerKeyEvent);
         
         window.addEventListener("load", () => this.#tableData.refreshData() );
         window.addEventListener("resize", () => { 
@@ -774,6 +775,26 @@ class Table extends HTMLTableElement{
                 if ( this.#cursor.isPrintKey(keyEvent.keyCode) && !keyEvent.ctrlKey ) {
                     if ( !this.#cursor.isEdit ) this.#cursor.beginInput();
                     this.#cursor.addKey(keyEvent);
+                }
+                break;
+        }
+    }
+
+    /**
+     * Обработка сочетаний клавиш
+     * @param {KeyEvent} keyEvent - событие нажатия клавиш
+     */
+    handlerKeyEvent(keyEvent) {
+        switch(keyEvent.keyCode) {
+            case 90 : // Z
+                if ( event.ctrlKey ) {
+                    if (this.#tableData.hasBuffer()) {
+                        let oldCell = this.#tableData.popBuffer();
+                        let oldCellName = Object.keys(oldCell)[0];
+                        let oldCellValue = Object.values(oldCell)[0];
+                        this.#tableData.getCell(oldCellName).data.value = oldCellValue;
+                        this.setCursor(oldCellName);
+                    } 
                 }
                 break;
         }

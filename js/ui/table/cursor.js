@@ -178,7 +178,10 @@ class Cursor extends HTMLElement{
      */
     endEditing() {
         this.isEdit = false;
-        this.#cell.data.value = this.value;
+        if ( this.#cell.data.value !== this.value ) {
+            this.#table.tableData.pushBuffer(this.#cell.data);
+            this.#cell.data.value = this.value;
+        }
         this.#table.focus();
     }
 

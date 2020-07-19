@@ -89,3 +89,6 @@ th.cursor-row {
 .cell-header[col] {
     cursor: text;
 }
+td.change-value {
+    background-color: rgb(255, 241, 243);
+}
