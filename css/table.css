@@ -92,3 +92,6 @@ th.cursor-row {
 td.change-value {
     background-color: rgb(255, 241, 243);
 }
+.change-value>.table-cursor {
+    background-color: rgb(255, 241, 243);
+}
