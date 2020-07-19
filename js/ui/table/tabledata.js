@@ -329,8 +329,7 @@ class TableData {
                 Promise.all([
                     this.#idb.get(db, "strings"),
                     this.#idb.get(db, "values"),
-                    this.#idb.get(db, "tokens"),
-                    this.#idb.get(db, "cells")
+                    this.#idb.get(db, "tokens")
                 ])
                 .then(responses => {
                     responses.forEach((data, index, array) => {
@@ -347,12 +346,6 @@ class TableData {
                                 this.getCellData(cellName).setValue(tokenArray, false);
                             }
                         }
-                        else if ( index == 3 ) {
-                            // console.log(data);
-                            this.#table.setStartCell(data.get("startCell"));
-                            this.#table.setCursor(data.get("cursorCell"));
-                        }
-
                     })
                 })
                 .then(responses => {
@@ -360,6 +353,24 @@ class TableData {
                 })
             })
         ;
+    }
+
+    refreshCursorCell() {
+        this.#idb.connect()
+        .then( db => {
+            this.#idb.get(db, "cells")
+                .then(responses => {
+                    responses.forEach((data, index, array) => {
+                        let startCellName = data.get("startCell");
+                        this.#table.setStartCell(startCellName ? startCellName : "A1");
+                        let cursorCellName = data.get("cursorCell");
+                        console.log(cursorCellName);
+                        this.#table.setCursorCell(cursorCellName ? cursorCellName : "A1");
+                })
+            })
+        })
+    ;
+   
     }
     
     /**

@@ -92,11 +92,12 @@ class Table extends HTMLTableElement{
      * Обрабочик, вызываемой после добавления компонента в документ
      * @returns {undefined}
      */
-    connectedCallback() { 
+    async connectedCallback() { 
         this.generateTable(this.#params);
 
         this.setStartCell("A1", false);
         this.setCursor("A1", false);
+        // await this.#tableData.refreshCursorCell();
 
         if ( this.#params.isFocus ) this.focus();
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
@@ -124,6 +125,9 @@ class Table extends HTMLTableElement{
             let visibleRows = this.getVisibleRows(startCellName, Course.BOTTOM);
             this.viewFromCell(startCellName, visibleRows, visibleCols);
         }
+        else if ( name == "cursor-cell" ) {
+            console.log(this.getCursorCell().data.name);
+        } 
     }
 
 
@@ -319,7 +323,7 @@ class Table extends HTMLTableElement{
      */
     setStartCell(cellName, isSaveIDB=true) {
         this.setAttribute("start-cell", cellName);
-        if (isSaveIDB) this.#tableData.startCellName = cellName;
+        // if (isSaveIDB) this.#tableData.startCellName = cellName;
     }
 
     /**
@@ -327,6 +331,22 @@ class Table extends HTMLTableElement{
      */
     getStartCell() {
         return this.#tableData.getCell(this.getAttribute("start-cell"));
+    }
+
+    /**
+     * Установка крайней левой верхней видимой ячейки
+     * @param {String} cellName имя ячейки в формате А1
+     */
+    setCursorCell(cellName, isSaveIDB=true) {
+        this.setAttribute("cursor-cell", cellName);
+        // if (isSaveIDB) this.#tableData.startCellName = cellName;
+    }
+
+    /**
+     * Получение объекта крайней левой верхней видимой ячейки таблицы
+     */
+    getCursorCell() {
+        return this.#tableData.getCell(this.getAttribute("cursor-cell"));
     }
 
     /**
@@ -341,11 +361,12 @@ class Table extends HTMLTableElement{
         // установить новое положение курсора
         let newCell = this.getCell(cellName);
         this.#cursor.cell = newCell;
-        if (isSaveIDB) this.#tableData.cursorCellName = cellName;
+        // if (isSaveIDB) this.#tableData.cursorCellName = cellName;
 
         // установка классов для выделения курсора на заголовках строк и колонок
         this.selectCursor(oldCell, newCell);
-        this.setAttribute("cursor-cell", this.#cursor.cell.data.name);
+        this.setCursorCell(cellName);
+        // this.setAttribute("cursor-cell", this.#cursor.cell.data.name);
 
         // обновить ячейку со старым положением курсора
         if ( oldCell && ( oldCell !== newCell) ) oldCell.refresh();

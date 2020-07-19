@@ -32,7 +32,6 @@ class Cursor extends HTMLElement{
         this.classList.add("table-cursor");
         this.#editor = this.#app.editor;
         this.tabIndex = -1;
-        console.log(this);
     }
 
     /**
