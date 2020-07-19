@@ -3,6 +3,7 @@
  */
 class TableData {
     #app;           // объект приложения
+    #table;         // компонент таблицы
     #idb;           // локальная база данных IndexedDB
     #cellMap;       // видимые ячейки таблицы
     #cellDataMap;   // данные видимых ячеек таблицы
@@ -15,8 +16,9 @@ class TableData {
     /**
      * Конструктор модели данных таблицы
      */
-    constructor(app) {
+    constructor(app, table) {
         this.#app = app;
+        this.#table = table;
         this.#idb = new LocalDB(app);
         this.initTableData();
     }
@@ -92,6 +94,25 @@ class TableData {
             })
         ;
     }
+
+    /**
+     * Записть позации курсора в базу данных
+     */
+    set cursorCellName(cellName) {
+        this.#idb.connect().then ( db => {
+            this.#idb.put(db, "cells", "cursorCell", cellName);
+        });
+    }
+
+    /**
+     * Запись стартовой позизции в базу данных
+     */
+    set startCellName(cellName) {
+        this.#idb.connect().then ( db => {
+            this.#idb.put(db, "cells", "startCell", cellName);
+        });
+    }
+
 
     /**
      * Получение объекта ячейки по имени ячейки
@@ -308,23 +329,29 @@ class TableData {
                 Promise.all([
                     this.#idb.get(db, "strings"),
                     this.#idb.get(db, "values"),
-                    this.#idb.get(db, "tokens")
+                    this.#idb.get(db, "tokens"),
+                    this.#idb.get(db, "cells")
                 ])
                 .then(responses => {
                     responses.forEach((data, index, array) => {
-                        if ( index < responses.length-1 ) { // для хранилищ strings, values
+                        if ( index == 0 || index == 1 ) { // для хранилищ strings, values
                             for (let cellName of data.keys()) {
                                 let value = data.get(cellName);
                                 this.getCellData(cellName).setValue(value, false);
                             }
                         }
-                        else { // для хранилища tokens
+                        else if ( index == 2 )  { // для хранилища tokens
                             for (let cellName of data.keys()) {
                                 let tokenArray = JSON.parse(data.get(cellName));
                                 tokenArray.map( (item, index, array) => array[index] = new Token(item.type, item.value) );
                                 this.getCellData(cellName).setValue(tokenArray, false);
                             }
-                        }                        
+                        }
+                        else if ( index == 3 ) {
+                            // console.log(data);
+                            this.#table.setStartCell(data.get("startCell"));
+                            this.#table.setCursor(data.get("cursorCell"));
+                        }
 
                     })
                 })
@@ -368,6 +395,8 @@ class TableData {
                 ])
             })
         ;
+        this.#table.setStartCell("A1");
+        this.#table.setCursor("A1");        
     }
 
 }

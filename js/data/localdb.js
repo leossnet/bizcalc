@@ -42,6 +42,7 @@ class LocalDB {
             db.createObjectStore('strings'); 
             db.createObjectStore('values'); 
             db.createObjectStore('tokens'); 
+            db.createObjectStore('cells'); 
             this.connectDB(callback);
         };            
 

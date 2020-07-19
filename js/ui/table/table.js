@@ -42,7 +42,7 @@ class Table extends HTMLTableElement{
         this.headers = [];
 
         this.#colMap = new Map();
-        this.#tableData = new TableData(app);
+        this.#tableData = new TableData(app, this);
         this.#editor = params.editor ? params.editor : new Editor(this.#app);
         this.#cursor = new Cursor(app, this);
         this.classList.add("table");
@@ -94,8 +94,10 @@ class Table extends HTMLTableElement{
      */
     connectedCallback() { 
         this.generateTable(this.#params);
-        this.setStartCell("A1");
-        this.setCursor("A1");
+
+        this.setStartCell("A1", false);
+        this.setCursor("A1", false);
+
         if ( this.#params.isFocus ) this.focus();
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
         this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
@@ -315,8 +317,9 @@ class Table extends HTMLTableElement{
      * Установка крайней левой верхней видимой ячейки
      * @param {String} cellName имя ячейки в формате А1
      */
-    setStartCell(cellName) {
+    setStartCell(cellName, isSaveIDB=true) {
         this.setAttribute("start-cell", cellName);
+        if (isSaveIDB) this.#tableData.startCellName = cellName;
     }
 
     /**
@@ -330,7 +333,7 @@ class Table extends HTMLTableElement{
      * Установление курсора в позицию ячейки с именем cellName
      * @param {String} cellName имя ячейки в формате А1
      */
-    setCursor(cellName) {
+    setCursor(cellName, isSaveIDB=true) {
         // запомнить текущее положение курсора
         let oldCell;
         if  ( this.#cursor.cell ) oldCell = this.#cursor.cell;
@@ -338,6 +341,7 @@ class Table extends HTMLTableElement{
         // установить новое положение курсора
         let newCell = this.getCell(cellName);
         this.#cursor.cell = newCell;
+        if (isSaveIDB) this.#tableData.cursorCellName = cellName;
 
         // установка классов для выделения курсора на заголовках строк и колонок
         this.selectCursor(oldCell, newCell);
