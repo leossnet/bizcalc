@@ -37,9 +37,9 @@ class Editor extends HTMLDivElement {
         this.#cellType.classList.add("cell-type");
         this.append(this.#cellType);
 
-        this.#btEscape = new Button(this.#app, { name: "btEscape", handler: this.handlerClickButton, img: "escape.ico" });
+        this.#btEscape = new Button(this.#app, { name: "btEscape", shortcut: "Escape", handler: this.handlerClickButton, img: "escape.ico" });
         this.#cellType.append(this.#btEscape);
-        this.#btEnter = new Button(this.#app, { name: "btEnter", handler: this.handlerClickButton, img: "enter.ico" });
+        this.#btEnter = new Button(this.#app, { name: "btEnter", shortcut: "Enter", handler: this.handlerClickButton, img: "enter.ico" });
         this.#cellType.append(this.#btEnter);
         
         let img = document.createElement("img");

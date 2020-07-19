@@ -26,12 +26,12 @@ class Button extends HTMLButtonElement {
             img.classList.add("button-img");
             this.append(img);
         }
-        if ( params && params.label ) {
+        if ( params && ( params.label || params.shortcut ) ) {
             let label = document.createElement("div");
             label.classList.add("button-label");
-            label.innerHTML = params.label;
+            label.innerHTML = params.label ? params.label : "";
             this.append(label);
-            this.dataset.description = params.label + (params.shortcut ? " ("+params.shortcut+")" : "" );
+            this.dataset.description = (params.label ? params.label : "")+(params.shortcut ? params.shortcut : "");
         }
         this.tabIndex = -1;
         this.#app.addComponent(this.id, this);

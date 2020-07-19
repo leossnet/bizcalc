@@ -11,6 +11,7 @@
     width: 80px;
     border: none;
     margin: 2px;
+    padding-left: 3px;
     background-color: white;
 }
 .cell-type {
@@ -21,6 +22,7 @@
 .cell-input {
     border: none;
     margin: 2px;
+    padding-left: 5px;
     width: 100%;
 }
 .cell-name:focus {
@@ -32,6 +34,12 @@
 .cell-input-img {
     height: 20px;
     width: 20px;
+}
+.cell-type .button:hover::after {
+    width: 40px;
+    height: 12px;
+    top: 20px;
+    left: 20px;
 }
 .cell-type .button {
     padding: 0;
