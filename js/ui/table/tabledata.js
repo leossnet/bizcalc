@@ -395,9 +395,18 @@ class TableData {
                         this.#table.setCursorCell(cursorCellName ? cursorCellName : "A1");
                 })
             })
-        })
-    ;
-   
+        });   
+    }
+
+    async asyncRefreshCursorCell() {
+        let db = await this.#idb.connect();
+        let cells = await this.#idb.get(db, "cells");
+
+        let startCellName = cells.get("startCell");
+        this.#table.setStartCell(startCellName ? startCellName : "A1");
+
+        let cursorCellName = cells.get("cursorCell");
+        this.#table.setCursorCell(cursorCellName ? cursorCellName : "A1");
     }
     
     /**

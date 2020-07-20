@@ -98,7 +98,7 @@ class Table extends HTMLTableElement{
 
         this.setStartCell("A1", false);
         this.setCursor("A1", false);
-        // await this.#tableData.refreshCursorCell();
+        // await this.#tableData.asyncRefreshCursorCell();
 
         if ( this.#params.isFocus ) this.focus();
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
