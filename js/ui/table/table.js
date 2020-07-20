@@ -57,7 +57,7 @@ class Table extends HTMLTableElement{
         this.addEventListener("keydown", this.handlerKeyEvent);
         this.addEventListener("click", this.handlerClickCell);
         
-        window.addEventListener("load", () => this.#tableData.refreshData() );
+        window.addEventListener("load", () => this.#tableData.asyncRefreshData() );
         window.addEventListener("resize", () => { 
             this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
             this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
@@ -303,6 +303,13 @@ class Table extends HTMLTableElement{
     }
 
     /**
+     * Получение объекта курсора 
+     */
+    get cursor() {
+        return this.#cursor;
+    }
+
+    /**
      * Получение объекта ячейки по имени ячейки
      * @param {String} cellName имя ячейки в формате А1
      */
@@ -357,22 +364,41 @@ class Table extends HTMLTableElement{
     setCursor(cellName, isSaveIDB=true) {
         // запомнить текущее положение курсора
         let oldCell;
-        if  ( this.#cursor.cell ) oldCell = this.#cursor.cell;
+        if  ( this.cursor.cell ) oldCell = this.cursor.cell;
 
         // установить новое положение курсора
         let newCell = this.getCell(cellName);
-        this.#cursor.cell = newCell;
+        this.cursor.cell = newCell;
         // if (isSaveIDB) this.#tableData.cursorCellName = cellName;
 
         // установка классов для выделения курсора на заголовках строк и колонок
         this.selectCursor(oldCell, newCell);
         this.setCursorCell(cellName);
-        // this.setAttribute("cursor-cell", this.#cursor.cell.data.name);
+        // this.setAttribute("cursor-cell", this.cursor.cell.data.name);
 
         // обновить ячейку со старым положением курсора
         if ( oldCell && ( oldCell !== newCell) ) oldCell.refresh();
         this.updateStartCell(oldCell, newCell);
-        this.#cursor.focus();
+        this.cursor.focus();
+    }
+
+    /**
+     * Перемещение курсора со сдвигом на количество строк и колонок относительно текущей позиции
+     * @param {Number} rowCount - количество строк смещения 
+     * @param {Number} colCount - количество колонок смещения
+     * @param {String} cellName - имя ячейки, относительно которой производится перемещение курсора
+     */
+    moveCursor(rowCount, colCount, initCellName) {
+        let currentCell = initCellName ? this.getCell(initCellName) : this.cursor.cell;
+        let newColNum = currentCell.data.colNumber;
+        let newRow = currentCell.data.rowNumber;
+
+        if ( rowCount > 0 ) newRow += Math.min(rowCount, this.#params.rowCount-newRow);
+        else newRow += Math.max(rowCount, 1-newRow);
+        if ( colCount > 0 ) newColNum += Math.min(colCount, this.#params.colCount-newColNum);
+        else newColNum += Math.max(colCount, 1-newColNum);
+
+        this.setCursor(CellData.getCellName(newRow, newColNum));
     }
 
     /**
@@ -395,32 +421,6 @@ class Table extends HTMLTableElement{
         let newHeaderCol = document.querySelector("th.cell-header[col='"+newColName+"']");
         newHeaderCol.classList.add("cursor-col");    
         newHeaderRow.classList.add("cursor-row");    
-    }
-
-    /**
-     * Получение объекта курсора 
-     */
-    getCursor() {
-        return this.#cursor;
-    }
-
-    /**
-     * Перемещение курсора со сдвигом на количество строк и колонок относительно текущей позиции
-     * @param {Number} rowCount - количество строк смещения 
-     * @param {Number} colCount - количество колонок смещения
-     * @param {String} cellName - имя ячейки, относительно которой производится перемещение курсора
-     */
-    moveCursor(rowCount, colCount, initCellName) {
-        let currentCell = initCellName ? this.getCell(initCellName) : this.#cursor.cell;
-        let newColNum = currentCell.data.colNumber;
-        let newRow = currentCell.data.rowNumber;
-
-        if ( rowCount > 0 ) newRow += Math.min(rowCount, this.#params.rowCount-newRow);
-        else newRow += Math.max(rowCount, 1-newRow);
-        if ( colCount > 0 ) newColNum += Math.min(colCount, this.#params.colCount-newColNum);
-        else newColNum += Math.max(colCount, 1-newColNum);
-
-        this.setCursor(CellData.getCellName(newRow, newColNum));
     }
 
     /**
@@ -697,10 +697,10 @@ class Table extends HTMLTableElement{
      */
     handlerKeyMoving(event) {
         let rowCount=0, colCount=0;
-        let currentCell = this.#cursor.cell.data;
+        let currentCell = this.cursor.cell.data;
         switch(event.key) {
             case "ArrowUp" : 
-                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
+                if ( this.cursor.isEdit ) this.cursor.endEditing();
             // переход на первую строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
                     rowCount = 1 - currentCell.rowNumber;
@@ -708,7 +708,7 @@ class Table extends HTMLTableElement{
                 this.moveCursor(rowCount, colCount);
                 break;
             case "ArrowDown" :
-                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
+                if ( this.cursor.isEdit ) this.cursor.endEditing();
                 // переход на последнюю строку при нажатой клавише Ctrl
                 if ( event.ctrlKey ) 
                     rowCount = this.#params.rowCount - currentCell.rowNumber;
@@ -717,7 +717,7 @@ class Table extends HTMLTableElement{
                 break;
             case "ArrowLeft" :
                 // переход на первую колонку при нажатой клавише Ctrl
-                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
+                if ( this.cursor.isEdit ) this.cursor.endEditing();
                 if ( event.ctrlKey )
                     colCount = 1 - currentCell.colNumber;
                 // переход в конец верхней строки при нахождении курсора в первой ачейке строки
@@ -729,7 +729,7 @@ class Table extends HTMLTableElement{
                 this.moveCursor(rowCount, colCount);
                 break;
             case "ArrowRight" :
-                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
+                if ( this.cursor.isEdit ) this.cursor.endEditing();
                 // переход на последнюю колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey)
                     colCount = this.#params.colCount - currentCell.colNumber;
@@ -742,21 +742,21 @@ class Table extends HTMLTableElement{
                 this.moveCursor(rowCount, colCount);
                 break;
             case "Home" :
-                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
+                if ( this.cursor.isEdit ) this.cursor.endEditing();
                 // переход на первую колонку 
                 colCount = 1 - currentCell.colNumber;
                 if ( event.ctrlKey ) rowCount = 1 - currentCell.rowNumber;
                 this.moveCursor(rowCount, colCount);
                 break;
             case "End" :
-                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
+                if ( this.cursor.isEdit ) this.cursor.endEditing();
                 // переход на последнюю колонку
                 colCount = this.#params.colCount - currentCell.colNumber;
                 if ( event.ctrlKey ) rowCount = this.#params.rowCount - currentCell.rowNumber;
                 this.moveCursor(rowCount, colCount);
                 break;
             case "Tab" :
-                if ( this.#cursor.isEdit ) this.#cursor.endEditing();
+                if ( this.cursor.isEdit ) this.cursor.endEditing();
                 colCount += 1;
                 this.moveCursor(rowCount, colCount);                
                 event.preventDefault();
@@ -769,38 +769,38 @@ class Table extends HTMLTableElement{
      * @param {KeyEvent} event 
      */
     handlerKeyEditing(keyEvent) {
-        let currentCellName = this.#cursor.cell.data.name;
+        let currentCellName = this.cursor.cell.data.name;
         switch(keyEvent.key) {
             case "F2" : 
-                this.#cursor.beginEditing();
+                this.cursor.beginEditing();
                 break;
             case "F4" : 
                 // console.log(this.#editor);
                 this.#editor.focus();
                 break;
             case "Escape" : 
-                this.#cursor.escapeEditing();
+                this.cursor.escapeEditing();
                 this.setCursor(currentCellName);
                 break;
             case "Enter" : 
-                if ( this.#cursor.isEdit ) {
-                    this.#cursor.endEditing();
+                if ( this.cursor.isEdit ) {
+                    this.cursor.endEditing();
                     this.moveCursor(1, 0, currentCellName);
                 }
                 break;
             case "Delete" :
-                this.#cursor.clearValue();
+                this.cursor.clearValue();
                 this.setCursor(currentCellName);
                 break;
             case "Backspace" :
-                if ( this.#cursor.isEdit ) {
-                    this.#cursor.removeLastKey();
+                if ( this.cursor.isEdit ) {
+                    this.cursor.removeLastKey();
                 }
                 break;
             default: 
-                if ( this.#cursor.isPrintKey(keyEvent.keyCode) && !keyEvent.ctrlKey ) {
-                    if ( !this.#cursor.isEdit ) this.#cursor.beginInput();
-                    this.#cursor.addKey(keyEvent);
+                if ( this.cursor.isPrintKey(keyEvent.keyCode) && !keyEvent.ctrlKey ) {
+                    if ( !this.cursor.isEdit ) this.cursor.beginInput();
+                    this.cursor.addKey(keyEvent);
                 }
                 break;
         }
@@ -832,8 +832,8 @@ class Table extends HTMLTableElement{
      */
     handlerClickCell(event) {
         console.log(event);
-        if ( this.#cursor.isEdit ) {
-            this.#cursor.endEditing();
+        if ( this.cursor.isEdit ) {
+            this.cursor.endEditing();
         }
     }
 

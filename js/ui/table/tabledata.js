@@ -355,6 +355,33 @@ class TableData {
         ;
     }
 
+    /**
+     * Обновление данных таблицы из локальной базы данных
+     */
+    async asyncRefreshData() {
+        let db = await this.#idb.connect();
+
+        let stringMap = await this.#idb.get(db, "strings");
+        for (let cellName of stringMap.keys()) {
+            let value = stringMap.get(cellName);
+            this.getCellData(cellName).setValue(value, false);
+        }
+
+        let valueMap = await this.#idb.get(db, "values");
+        for (let cellName of valueMap.keys()) {
+            let value = valueMap.get(cellName);
+            this.getCellData(cellName).setValue(value, false);
+        }
+
+        let tokenMap = await this.#idb.get(db, "tokens");
+        for (let cellName of tokenMap.keys()) {
+            let tokenArray = JSON.parse(tokenMap.get(cellName));
+            tokenArray.map( (item, index, array) => array[index] = new Token(item.type, item.value) );
+            this.getCellData(cellName).setValue(tokenArray, false);
+        }
+        this.calcAllCells();
+    }
+
     refreshCursorCell() {
         this.#idb.connect()
         .then( db => {
