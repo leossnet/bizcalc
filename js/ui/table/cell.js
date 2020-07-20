@@ -31,7 +31,11 @@ class Cell extends HTMLTableCellElement {
 
     get data() {
         return this.#cellData;
-    } 
+    }
+
+    get name() {
+        return this.#cellData.name;
+    }
 
     /**
      * Обрабочик, вызываемой после добавления компонента в документ
@@ -48,8 +52,8 @@ class Cell extends HTMLTableCellElement {
     }
 
     refresh() {
-        // this.innerHTML = this.data.value;
-        this.textContent = this.data.value;
+        if ( this.childElementCount == 0 ) this.innerHTML = this.data.value;
+        else this.firstChild.value = this.data.value
     }
 
     /**

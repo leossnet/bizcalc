@@ -204,7 +204,6 @@ class Table extends HTMLTableElement{
             }
         }
         this.append(tBody);
-        console.log("end generateTable");
     }
 
     /**
@@ -366,15 +365,12 @@ class Table extends HTMLTableElement{
      * @param {String} cellName имя ячейки в формате А1
      */
     setCursor(cellName) {
-        console.log("setCursor -> "+cellName+", isCacheCursor = "+this.#isCacheCursor);
         // запомнить текущее положение курсора
         let oldCell;
         if  ( this.cursor.cell ) oldCell = this.cursor.cell;
 
         // установить новое положение курсора
         let newCell = this.getCell(cellName);
-        // console.log(newCell);
-        console.log(this.cursor);
         this.cursor.cell = newCell;
 
         // установка классов для выделения курсора на заголовках строк и колонок
@@ -382,7 +378,9 @@ class Table extends HTMLTableElement{
         this.setCursorCell(cellName);
 
         // обновить ячейку со старым положением курсора
-        if ( oldCell && ( oldCell !== newCell) ) oldCell.refresh();
+        if ( oldCell && ( oldCell.name !== newCell.name ) ) {
+            oldCell.refresh();
+        }
         this.updateStartCell(oldCell, newCell);
         this.cursor.focus();
     }
@@ -780,7 +778,6 @@ class Table extends HTMLTableElement{
                 this.cursor.beginEditing();
                 break;
             case "F4" : 
-                // console.log(this.#editor);
                 this.#editor.focus();
                 break;
             case "Escape" : 
