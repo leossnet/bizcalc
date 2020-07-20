@@ -46,12 +46,12 @@ class Table extends HTMLTableElement{
         this.#colMap = new Map();
         this.#tableData = new TableData(app, this);
         this.#editor = params.editor ? params.editor : new Editor(this.#app);
-        this.#cursor = new Cursor(app, this);
-        this.classList.add("table");
-        this.tabIndex = -1;
 
         // генерация данных ячеек
         this.generateTableData();
+        this.#cursor = new Cursor(app, this);
+        this.classList.add("table");
+        this.tabIndex = -1;
 
         // обработчики событий
         this.addEventListener("keydown", this.handlerKeyMoving);
@@ -204,6 +204,7 @@ class Table extends HTMLTableElement{
             }
         }
         this.append(tBody);
+        console.log("end generateTable");
     }
 
     /**
@@ -346,7 +347,11 @@ class Table extends HTMLTableElement{
      */
     async setCursorCell(cellName) {
         this.setAttribute("cursor-cell", cellName);
-        if ( this.#isCacheCursor ) await this.#tableData.asyncSetCursorCellName(cellName);
+        this.#cursor.setAttribute("cell", cellName);
+        if ( this.#isCacheCursor ) {
+            await this.#tableData.asyncSetCursorCellName(cellName);
+            // this.#isCacheCursor = true;
+        } 
     }
 
     /**
@@ -361,12 +366,15 @@ class Table extends HTMLTableElement{
      * @param {String} cellName имя ячейки в формате А1
      */
     setCursor(cellName) {
+        console.log("setCursor -> "+cellName+", isCacheCursor = "+this.#isCacheCursor);
         // запомнить текущее положение курсора
         let oldCell;
         if  ( this.cursor.cell ) oldCell = this.cursor.cell;
 
         // установить новое положение курсора
         let newCell = this.getCell(cellName);
+        // console.log(newCell);
+        console.log(this.cursor);
         this.cursor.cell = newCell;
 
         // установка классов для выделения курсора на заголовках строк и колонок
@@ -499,7 +507,7 @@ class Table extends HTMLTableElement{
             newStartRow = newRowNum;
         }
 
-        console.log("R"+startRowNum+":C"+startColNum+" -> R"+newStartRow+":C"+newStartCol);
+        // console.log("R"+startRowNum+":C"+startColNum+" -> R"+newStartRow+":C"+newStartCol);
         this.setStartCell(CellData.getCellName(newStartRow, newStartCol));
     }    
 

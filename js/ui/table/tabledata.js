@@ -377,6 +377,7 @@ class TableData {
         let cursorCellName = cells.get("cursorCell");
         if ( cursorCellName ) {
             this.#table.setCursor(cursorCellName);
+            console.log("end asyncRefreshCursorCell");
         }
     }
     

@@ -120,7 +120,7 @@ class Editor extends HTMLDivElement {
      * @param {KeyboardEvent} Event - событие нажатия клавиши
      */
     handlerKeyDown(event) {
-        let cursor = this.#app.getComponent("table").getCursor();
+        let cursor = this.#app.getComponent("table").cursor;
         switch(event.key) {
             case "Enter" :
                 cursor.value = this.value;
@@ -141,7 +141,7 @@ class Editor extends HTMLDivElement {
     handlerClickButton(event) {
         let button = event.path.filter( item => item.localName == "button").map(item => item.id)[0];
         let editor = document.querySelector(".table-editor");
-        let cursor = editor.app.getComponent("table").getCursor();
+        let cursor = editor.app.getComponent("table").cursor;
         switch(button) {
             case "btEnter" :
                 cursor.value = editor.value;

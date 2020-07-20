@@ -38,12 +38,15 @@ class Cursor extends HTMLElement{
      * Присвоение курсору нового объекта ячейки Cell
      */
     set cell(cell){
+        console.log("set cell:");
+        console.log(cell);
         this.#cell = cell;
-        this.#cell.innerHTML = "";
-        this.#cell.append(this);
+        // this.#cell.innerHTML = "";
+        this.#cell.textContent = "";
         this.value = cell.data.value;
         this.setEditableValue(this.#editor);
         this.#editor.cellName = this.#cell.data.name;
+        this.#cell.append(this);
     }
 
 

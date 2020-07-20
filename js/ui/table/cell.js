@@ -48,7 +48,8 @@ class Cell extends HTMLTableCellElement {
     }
 
     refresh() {
-        this.innerHTML = this.data.value;
+        // this.innerHTML = this.data.value;
+        this.textContent = this.data.value;
     }
 
     /**
