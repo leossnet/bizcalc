@@ -55,6 +55,7 @@ class Table extends HTMLTableElement{
         this.addEventListener("keydown", this.handlerKeyMoving);
         this.addEventListener("keydown", this.handlerKeyEditing);
         this.addEventListener("keydown", this.handlerKeyEvent);
+        this.addEventListener("click", this.handlerClickCell);
         
         window.addEventListener("load", () => this.#tableData.refreshData() );
         window.addEventListener("resize", () => { 
@@ -824,7 +825,19 @@ class Table extends HTMLTableElement{
                 break;
         }
     }
+
+    /**
+     * Снятие редактирования при щелчке мыши по таблице
+     * @param {MouseEvent} event 
+     */
+    handlerClickCell(event) {
+        console.log(event);
+        if ( this.#cursor.isEdit ) {
+            this.#cursor.endEditing();
+        }
+    }
+
 }
 
 // регистрация нового html-элемента
-customElements.define('b-table', Table, {extends: 'table'});
+customElements.define('calc-table', Table, {extends: 'table'});
