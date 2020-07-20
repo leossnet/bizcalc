@@ -723,11 +723,6 @@ class Table extends HTMLTableElement{
                 if ( this.cursor.isEdit ) this.cursor.endEditing();
                 if ( event.ctrlKey )
                     colCount = 1 - currentCell.colNumber;
-                // переход в конец верхней строки при нахождении курсора в первой ачейке строки
-                else if ( currentCell.colNumber == 1 ) {
-                    colCount += this.#params.colCount;
-                    rowCount -= 1;
-                }
                 else colCount -= 1;
                 this.moveCursor(rowCount, colCount);
                 break;
@@ -736,11 +731,6 @@ class Table extends HTMLTableElement{
                 // переход на последнюю колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey)
                     colCount = this.#params.colCount - currentCell.colNumber;
-                // переход в начало нижней строки при нахождении курсора в последней ачейке строки
-                else if ( currentCell.colNumber == this.#params.colCount ) {
-                    colCount -= this.#params.colCount;
-                    rowCount += 1;
-                }
                 else colCount += 1;
                 this.moveCursor(rowCount, colCount);
                 break;
