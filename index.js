@@ -148,17 +148,17 @@ class App {
         let tableData = table.tableData;
         if ( event.ctrlKey ) {
             switch(event.keyCode) {
-                case 83 : // S - сохранение текущей таблицы в JSON-файл
+                case 83 : // Ctrl+S - сохранение текущей таблицы в JSON-файл
                     event.preventDefault();
                     table.app.saveJSON(tableData);
                     break;
-                case 79 : // O - загрузка JSON-файла в текущую таблицу
+                case 79 : // Ctrl+O - загрузка JSON-файла в текущую таблицу
                     event.preventDefault();
                     table.app.loadJSON(tableData);
                     break;
-                case 81 : // Q - отчистка текущей таблицы
+                case 81 : // Ctrl+Q - отчистка текущей таблицы
                     event.preventDefault();
-                    tableData.clearData();
+                    tableData.asyncClearData();
                     break;
             }
         }
@@ -181,7 +181,7 @@ class App {
                 this.app.loadJSON(tableData);
                 break;
             case "btClose" :
-                tableData.clearData();
+                tableData.asyncClearData();
                 break;
             }
     }
