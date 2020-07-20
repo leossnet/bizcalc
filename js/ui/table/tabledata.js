@@ -104,12 +104,6 @@ class TableData {
         await this.#idb.put(db, "cells", "cursorCell", cellName);
     } 
 
-    set cursorCellName(cellName) {
-        this.#idb.connect().then ( db => {
-            this.#idb.put(db, "cells", "cursorCell", cellName);
-        });
-    }
-
     /**
      * Запись стартовой позизции в базу данных
      */
@@ -117,13 +111,6 @@ class TableData {
         let db = await this.#idb.connect();
         await this.#idb.put(db, "cells", "startCell", cellName);
     } 
-
-    set startCellName(cellName) {
-        this.#idb.connect().then ( db => {
-            this.#idb.put(db, "cells", "startCell", cellName);
-        });
-    }
-
 
     /**
      * Получение объекта ячейки по имени ячейки
@@ -387,11 +374,10 @@ class TableData {
         let db = await this.#idb.connect();
         let cells = await this.#idb.get(db, "cells");
 
-        let startCellName = cells.get("startCell");
-        this.#table.setStartCell(startCellName ? startCellName : "A1");
-
         let cursorCellName = cells.get("cursorCell");
-        this.#table.setCursorCell(cursorCellName ? cursorCellName : "A1");
+        if ( cursorCellName ) {
+            this.#table.setCursor(cursorCellName);
+        }
     }
     
     /**

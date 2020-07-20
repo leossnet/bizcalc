@@ -21,6 +21,8 @@ class Table extends HTMLTableElement{
     #tableStyle;
     #colWidthArray = [];
     #colMap;
+    #isCacheCursor;
+    #isCacheStart;
 
     /**
      * Конструктор таблицы 
@@ -96,9 +98,10 @@ class Table extends HTMLTableElement{
     async connectedCallback() { 
         this.generateTable(this.#params);
 
+        this.#isCacheCursor = false;
+        this.#isCacheStart = false;
         this.setStartCell("A1", false);
         this.setCursor("A1", false);
-        // await this.#tableData.asyncRefreshCursorCell();
 
         if ( this.#params.isFocus ) this.focus();
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
@@ -119,7 +122,7 @@ class Table extends HTMLTableElement{
      * @param {String} oldValue - предыдущее значение атрибута
      * @param {String} newValue - новое значение атрибута
      */
-    attributeChangedCallback(name, oldValue, newValue) {
+    async attributeChangedCallback(name, oldValue, newValue) {
         if (name == "view-width" || name == "view-height" || name == "start-cell") {
             let startCellName = this.getStartCell().data.name;
             let visibleCols = this.getVisibleCols(startCellName, Course.RIGHT);
@@ -127,7 +130,10 @@ class Table extends HTMLTableElement{
             this.viewFromCell(startCellName, visibleRows, visibleCols);
         }
         else if ( name == "cursor-cell" ) {
-            // console.log(this.getCursorCell().data.name);
+            if ( !this.#isCacheCursor ) {
+                await this.#tableData.asyncRefreshCursorCell();
+                this.#isCacheCursor = true;
+            }
         } 
     }
 
@@ -212,13 +218,6 @@ class Table extends HTMLTableElement{
             }
         }
     }
-
-    // createRow(root, classes, attrs) {
-    //     let row = document.createElement("tr");
-    //     classes.forEach( item => row.classList.add(item) );
-    //     for (let key in attrs) { row.setAttribute(key, attrs[key]); }
-    //     root.append(row);
-    // }
     
     /**
      * Процедура создания заголовка th
@@ -329,9 +328,9 @@ class Table extends HTMLTableElement{
      * Установка крайней левой верхней видимой ячейки
      * @param {String} cellName имя ячейки в формате А1
      */
-    setStartCell(cellName, isSaveIDB=true) {
+    async setStartCell(cellName) {
         this.setAttribute("start-cell", cellName);
-        // if (isSaveIDB) this.#tableData.startCellName = cellName;
+        if ( this.#isCacheStart ) await this.#tableData.asyncSetStartCellName(cellName);
     }
 
     /**
@@ -345,9 +344,9 @@ class Table extends HTMLTableElement{
      * Установка крайней левой верхней видимой ячейки
      * @param {String} cellName имя ячейки в формате А1
      */
-    setCursorCell(cellName, isSaveIDB=true) {
+    async setCursorCell(cellName) {
         this.setAttribute("cursor-cell", cellName);
-        // if (isSaveIDB) this.#tableData.startCellName = cellName;
+        if ( this.#isCacheCursor ) await this.#tableData.asyncSetCursorCellName(cellName);
     }
 
     /**
@@ -361,7 +360,7 @@ class Table extends HTMLTableElement{
      * Установление курсора в позицию ячейки с именем cellName
      * @param {String} cellName имя ячейки в формате А1
      */
-    setCursor(cellName, isSaveIDB=true) {
+    setCursor(cellName) {
         // запомнить текущее положение курсора
         let oldCell;
         if  ( this.cursor.cell ) oldCell = this.cursor.cell;
@@ -369,12 +368,10 @@ class Table extends HTMLTableElement{
         // установить новое положение курсора
         let newCell = this.getCell(cellName);
         this.cursor.cell = newCell;
-        // if (isSaveIDB) this.#tableData.cursorCellName = cellName;
 
         // установка классов для выделения курсора на заголовках строк и колонок
         this.selectCursor(oldCell, newCell);
         this.setCursorCell(cellName);
-        // this.setAttribute("cursor-cell", this.cursor.cell.data.name);
 
         // обновить ячейку со старым положением курсора
         if ( oldCell && ( oldCell !== newCell) ) oldCell.refresh();
