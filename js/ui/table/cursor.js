@@ -127,6 +127,7 @@ class Cursor extends HTMLElement{
      */    
     clearValue() {
         this.value = "";
+        this.#table.tableData.pushBuffer(this.#cell.data);
         this.#cell.data.value = undefined;
         this.setEditableValue(this.#editor);
         this.#editor.value = this.value;

@@ -75,29 +75,35 @@ class TableData {
      * Удаляет значение ячейки
      * @param {String} cellName - имя удаляемой ячейки
      */
-    deleteCellValue(cellName) {
-        this.#idb.connect()
-            .then( db => {
-                let cell = cellName.toUpperCase();
-                if (this.#valueMap.has(cell)) {
-                    this.#valueMap.delete(cell);
-                    this.#idb.delete(db, "values", cell);
-                }
-                if (this.#stringMap.has(cell)) {
-                    this.#stringMap.delete(cell);
-                    this.#idb.delete(db, "strings", cell);
-                }
-                if (this.#tokenMap.has(cell)) {
-                    this.#tokenMap.delete(cell);
-                    this.#idb.delete(db, "tokens", cell);
-                }
-            })
-        ;
+    async asyncDeleteCellValue(cellName) {
+
+        let cell = cellName.toUpperCase();
+        let store = "";
+        if (this.#valueMap.has(cell)) {
+            this.#valueMap.delete(cell);
+            store = "values";
+        }
+        else if (this.#stringMap.has(cell)) {
+            this.#stringMap.delete(cell);
+            store = "strings";
+        }
+        else if (this.#tokenMap.has(cell)) {
+            this.#tokenMap.delete(cell);
+            store = "tokens";
+        }
+
+        let db = await this.#idb.connect();
+        await this.#idb.delete(db, store, cell);
     }
 
     /**
      * Записть позации курсора в базу данных
      */
+    async asyncSetCursorCellName(cellName) {
+        let db = await this.#idb.connect();
+        await this.#idb.put(db, "cells", "cursorCell", cellName);
+    } 
+
     set cursorCellName(cellName) {
         this.#idb.connect().then ( db => {
             this.#idb.put(db, "cells", "cursorCell", cellName);
@@ -107,6 +113,11 @@ class TableData {
     /**
      * Запись стартовой позизции в базу данных
      */
+    async asyncSetStartCellName(cellName) {
+        let db = await this.#idb.connect();
+        await this.#idb.put(db, "cells", "startCell", cellName);
+    } 
+
     set startCellName(cellName) {
         this.#idb.connect().then ( db => {
             this.#idb.put(db, "cells", "startCell", cellName);
@@ -171,7 +182,7 @@ class TableData {
      * @param {String} cellName 
      * @param {Array} formula 
      */
-    setTokens(cellName, formula) {
+    async setTokens(cellName, formula) {
         if ( Array.isArray(formula) ) {
             this.#tokenMap.set(cellName.toUpperCase(), formula);
         }
@@ -179,9 +190,8 @@ class TableData {
             let f = formula.substring(1).toUpperCase();
             this.#tokenMap.set(cellName.toUpperCase(), Token.getTokens(f));
         }
-        this.#idb.connect().then ( db => {
-            this.#idb.put(db, "tokens", cellName, JSON.stringify(this.#tokenMap.get(cellName)));
-        });
+        let db = await this.#idb.connect();        
+        await this.#idb.put(db, "tokens", cellName, JSON.stringify(this.#tokenMap.get(cellName)));
     }
 
     /**
@@ -189,11 +199,11 @@ class TableData {
      * @param {String} cellName 
      * @param {Number} value 
      */
-    setValue(cellName, value) {
+    async setValue(cellName, value) {
         this.#valueMap.set(cellName.toUpperCase(), value);
-        this.#idb.connect().then ( db => {
-            this.#idb.put(db, "values", cellName, JSON.stringify(this.#valueMap.get(cellName)));
-        });        
+
+        let db = await this.#idb.connect();        
+        await this.#idb.put(db, "values", cellName, JSON.stringify(this.#valueMap.get(cellName)));
     }
 
     /**
@@ -209,11 +219,11 @@ class TableData {
      * @param {String} cellName 
      * @param {String} string 
      */
-    setString(cellName, string) {
+    async setString(cellName, string) {
         this.#stringMap.set(cellName.toUpperCase(), string);
-        this.#idb.connect().then ( db => {
-            this.#idb.put(db, "strings", cellName, this.#stringMap.get(cellName));
-        });         
+
+        let db = await this.#idb.connect();        
+        await this.#idb.put(db, "strings", cellName, this.#stringMap.get(cellName));
     }
 
     /**
@@ -224,12 +234,20 @@ class TableData {
         return this.#stringMap.get(cellName.toUpperCase());
     }
 
+    /**
+     * Положить значение ячейки в буфеф редактирования
+     * @param {CellData} cellData - объект значения ячейки
+     */
     pushBuffer(cellData) {
         this.#bufferArray.push({[cellData.name]:cellData.value});
         let cell = this.getCell(cellData.name);
         cell.classList.add("change-value");
     }
 
+    /**
+     * Вернуть последний объект значения ячейки из буфера редактирования
+     * @returns {CellData} - объект значения ячейки
+     */
     popBuffer() {
         let bufferCell = this.#bufferArray.pop();
         let cell = this.getCell(Object.keys(bufferCell)[0]);
@@ -237,6 +255,9 @@ class TableData {
         return bufferCell;
     }
 
+    /**
+     * Проверка на наличие значений ячеек в буфере редактирования
+     */
     hasBuffer() {
         return this.#bufferArray.length;
     }
@@ -269,8 +290,8 @@ class TableData {
      */
     async loadData(json) {
         this.clearData();
-        this.viewData(JSON.parse(json));
         await this.asyncIndexedClear();
+        this.viewData(JSON.parse(json));
         await this.asyncIndexedData();        
     }
 
@@ -315,17 +336,19 @@ class TableData {
 
         for (let cellName of this.#stringMap.keys()) {
             let value = this.#stringMap.get(cellName);
-            await this.#idb.put(db, "strings", cellName, this.#stringMap.get(cellName));
+            await this.#idb.put(db, "strings", cellName, value);
         }
 
         for (let cellName of this.#valueMap.keys()) {
             let value = this.#valueMap.get(cellName);
-            await this.#idb.put(db, "values", cellName, this.#valueMap.get(cellName));
+            await this.#idb.put(db, "values", cellName, value);
         }
 
         for (let cellName of this.#tokenMap.keys()) {
             let tokenArray = this.#tokenMap.get(cellName);
-            tokenArray.map((item, index, array) => array[index] = new Token(item.type, item.value));
+            tokenArray.map((item, index, array) => {
+                array[index] = new Token(item.type, item.value)
+            });
             await this.#idb.put(db, "tokens", cellName, JSON.stringify(tokenArray));
         }
     }

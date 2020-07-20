@@ -135,7 +135,7 @@ class CellData {
         let cellName = this.#param.name;
         if ( value === undefined ) {
             this.initCell();
-            this.#tableData.deleteCellValue(cellName);
+            this.#tableData.asyncDeleteCellValue(cellName);
             if( isCalcAllCells ) this.#tableData.calcAllCells();
         }
         else if ( Number(value) === 0 ) {
