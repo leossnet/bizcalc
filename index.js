@@ -157,8 +157,8 @@ class App {
                     table.app.loadJSON(tableData);
                     break;
                 case 81 : // Ctrl+Q - отчистка текущей таблицы
-                    event.preventDefault();
-                    tableData.asyncClearData();
+                    tableData.clearData();
+                    tableData.asyncIndexedClear();
                     break;
             }
         }
@@ -181,7 +181,8 @@ class App {
                 this.app.loadJSON(tableData);
                 break;
             case "btClose" :
-                tableData.asyncClearData();
+                tableData.clearData();
+                tableData.asyncIndexedClear();
                 break;
             }
     }

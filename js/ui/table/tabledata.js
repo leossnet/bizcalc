@@ -268,7 +268,8 @@ class TableData {
      * @param {JSON} json - внешние данные в формате JSON
      */
     async loadData(json) {
-        await this.asyncClearData();
+        this.clearData();
+        await this.asyncIndexedClear();
         this.viewData(JSON.parse(json));
         await this.asyncIndexedData();        
     }
@@ -295,7 +296,6 @@ class TableData {
         // обновление формул
         if ( parseJson.tokens ) {
             let tokens = new Map(Object.entries(parseJson.tokens));
-            console.log(tokens);
             for (let cellName of tokens.keys()){
                 let tokenArray = tokens.get(cellName);
                 tokenArray.map( (item, index, array) => {
@@ -374,7 +374,7 @@ class TableData {
     /**
      * Очистка данных текущей таблицы
      */
-    async asyncClearData() {
+    clearData() {
         // очистка модели данных и содержимого таблицы от старых значений 
         for (let cellName of this.#valueMap.keys()){
             this.getCellData(cellName).initCell();
@@ -394,13 +394,18 @@ class TableData {
         this.#valueMap.clear();
         this.#tokenMap.clear();
 
-        let db = await this.#idb.connect();
-        await this.#idb.clear(db, "strings");
-        await this.#idb.clear(db, "values");
-        await this.#idb.clear(db, "tokens");
-
         this.#table.setStartCell("A1");
         this.#table.setCursor("A1");        
     }
 
+
+    /**
+     * Очистка локальной базы данных IndexedDb от данных ячеек таблицы
+     */
+    async asyncIndexedClear() {
+        let db = await this.#idb.connect();
+        await this.#idb.clear(db, "strings");
+        await this.#idb.clear(db, "values");
+        await this.#idb.clear(db, "tokens");
+    }
 }

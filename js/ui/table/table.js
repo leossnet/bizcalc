@@ -127,7 +127,7 @@ class Table extends HTMLTableElement{
             this.viewFromCell(startCellName, visibleRows, visibleCols);
         }
         else if ( name == "cursor-cell" ) {
-            console.log(this.getCursorCell().data.name);
+            // console.log(this.getCursorCell().data.name);
         } 
     }
 
@@ -831,7 +831,6 @@ class Table extends HTMLTableElement{
      * @param {MouseEvent} event 
      */
     handlerClickCell(event) {
-        console.log(event);
         if ( this.cursor.isEdit ) {
             this.cursor.endEditing();
         }
