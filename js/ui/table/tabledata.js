@@ -269,8 +269,8 @@ class TableData {
      */
     async loadData(json) {
         this.clearData();
-        await this.asyncIndexedClear();
         this.viewData(JSON.parse(json));
+        await this.asyncIndexedClear();
         await this.asyncIndexedData();        
     }
 
