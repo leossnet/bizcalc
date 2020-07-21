@@ -159,6 +159,7 @@ class Table extends HTMLTableElement{
         for (let c=0; c<params.colCount; c++) {
             let col = document.createElement("col");
             col.id = CellData.getColName(c+1);
+            col.classList.add("col-param");
 
             if ( params && params.colWidths ) col.setAttribute("width", params.colWidths[c]);
             else col.setAttribute("width", 80);
@@ -440,6 +441,7 @@ class Table extends HTMLTableElement{
             + "{display: none;}"
             + ".cell-header[col]:nth-child(-n+" + beginCol + ")," // колонки заголовков до начальной колонки
             + ".cell-data[col]:nth-child(-n+" + beginCol + ")," // колонки данных до начальной колонки
+            + ".col-param[width]:nth-child(-n+" + (beginCol-1) + ")," // колонки данных до начальной колонки
             + ".cell-header[col]:nth-child(n+" + endCol + ")," // колонки заголовков после конечной колонки
             + ".cell-data[col]:nth-child(n+" + endCol + ")" + // колонки данных после конечной колонки
             "{display: none;}";
