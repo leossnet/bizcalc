@@ -182,7 +182,8 @@ class Table extends HTMLTableElement{
         for (let i = 0; i < this.#params.colCount; i++) {
             let letter = CellData.getColName(i+1);
             this.headers.push(letter);
-            this.createHeader(hRow, ["cell-header"], {col:letter}, letter);
+            // this.createHeader(hRow, ["cell-header"], {col:letter}, letter);
+            this.createHeader(hRow, ["cell-header"], {col:letter}, i+1);
         }
         this.append(tHead);
 
@@ -362,14 +363,14 @@ class Table extends HTMLTableElement{
     moveCursor(rowCount, colCount, initCellName) {
         let currentCell = initCellName ? this.getCell(initCellName) : this.cursor.cell;
         let newColNum = currentCell.data.colNumber;
-        let newRow = currentCell.data.rowNumber;
+        let newRowNum = currentCell.data.rowNumber;
 
-        if ( rowCount > 0 ) newRow += Math.min(rowCount, this.#params.rowCount-newRow);
-        else newRow += Math.max(rowCount, 1-newRow);
+        if ( rowCount > 0 ) newRowNum += Math.min(rowCount, this.#params.rowCount-newRowNum);
+        else newRowNum += Math.max(rowCount, 1-newRowNum);
         if ( colCount > 0 ) newColNum += Math.min(colCount, this.#params.colCount-newColNum);
         else newColNum += Math.max(colCount, 1-newColNum);
 
-        this.setCursor(CellData.getCellName(newRow, newColNum));
+        this.setCursor(CellData.getCellName(newRowNum, newColNum));
     }
 
     /**
@@ -378,22 +379,22 @@ class Table extends HTMLTableElement{
      */
     setCursor(cellName) {
         // запомнить текущее положение курсора
-        let oldCell;
-        if  ( this.cursor.cell ) oldCell = this.cursor.cell;
+        let beginCell;
+        if  ( this.cursor.cell ) beginCell = this.cursor.cell;
 
         // установить новое положение курсора
         let endCell = this.getCell(cellName);
         this.cursor.cell = endCell;
 
         // установка классов для выделения курсора на заголовках строк и колонок
-        this.selectCursor(oldCell, endCell);
+        this.selectCursor(beginCell, endCell);
         this.setCursorCell(cellName);
 
         // обновить ячейку со старым положением курсора
-        if ( oldCell && ( oldCell.name !== endCell.name ) ) {
-            oldCell.refresh();
+        if ( beginCell && ( beginCell.name !== endCell.name ) ) {
+            beginCell.refresh();
         }
-        this.updateStartCell(oldCell, endCell);
+        this.updateStartCell(beginCell, endCell);
         this.cursor.focus();
     }
 
@@ -425,13 +426,13 @@ class Table extends HTMLTableElement{
      */
     updateVisibleCells() {
         let startCell = this.getStartCell().data;
-        let colCount = this.getVisibleCols(startCell.name, Course.RIGHT);
-        let rowCount = this.getVisibleRows(startCell.name, Course.BOTTOM);
+        let colCount = this.updateVisibleCols(startCell.name, Course.RIGHT);
+        let rowCount = this.updateVisibleRows(startCell.name, Course.BOTTOM);
 
         let beginRow = startCell.rowNumber-1;
         let beginCol = startCell.colNumber;
-        let endRow = beginRow+rowCount+1;
-        let endCol = beginCol+colCount+1;
+        let endRow = beginRow+rowCount;
+        let endCol = beginCol+colCount;
 
         this.setCssText(beginRow, beginCol, endRow, endCol);
     }
@@ -457,6 +458,76 @@ class Table extends HTMLTableElement{
         this.#tableStyle.innerHTML = cssText;
     }
 
+
+    /**
+     * Определение видимых на экране колонок таблицы
+     * @param {String} startCellName - колонка, от которой ведется отчет видимости
+     * @param {String} course - одной из значений атрибута объекта Course - LEFT или RIGHT
+     */
+    updateVisibleCols(startCellName, course) {
+        // установка ширины колонок значениями по умолчанию из массива colWidthArray
+        this.setDefaultColWidth();
+
+        let visibleCols = this.#params.colCount;
+        let visibleWidth = this.getDataWidth();
+
+        // определение числа и ширины видимых колонок начиная со стартовой ячейки
+        let offsetCols = this.getOffsetCols(startCellName, visibleWidth, course);
+        console.log(offsetCols);
+
+        // определение ширины крайней правой колонки
+        let rightColWidth = visibleWidth - offsetCols.width;
+
+        console.log("visibleWidth: "+visibleWidth+", offsetCols.width: "+offsetCols.width+", rightColWidth: "+rightColWidth);
+
+        // если ширина крайней правой колонки 
+        if (rightColWidth > 0) {
+            visibleCols = offsetCols.cols + 1;
+            this.setRightColWidth(visibleCols, startCellName, rightColWidth);
+        }
+        else {
+            visibleCols = offsetCols.cols;
+        }
+        return visibleCols;
+    }
+
+
+    /**
+     * Установка ширины колонок по умолчанию, определенных в атрибуте widht элемента col
+     */
+    setDefaultColWidth() {
+        for (let colName of this.#colMap.keys() ) {
+            let col = this.#colMap.get(colName);
+            let width = this.#colWidthArray[col.getAttribute("index")];
+            col.setAttribute("width", width);
+        }
+    }
+
+
+    /**
+     * Получение видимой ширины ячеек данных таблицы
+     */
+    getDataWidth() {
+        // ширина колонки с номерами строк
+        let headerWidth = parseFloat(document.querySelector(".col-header>col").getAttribute("width"));
+        // разница между видимой шириной экрана и шириной колонки с номерами строк
+        let dataWidth = parseInt(this.getAttribute("view-width")) - headerWidth;
+        console.log("dataWidth: "+dataWidth);
+
+        // let cols = document.querySelectorAll(".cell-header[col]");
+        // let totalWidth = 0;
+        // let width = 0;
+        // for (let col of cols.values()) {
+        //     width = parseFloat(getComputedStyle(col).width);
+        //     if ( isNaN(width) ) break;
+        //     console.log(width);
+        //     totalWidth += width;
+        // }
+        // console.log("dataWidth: "+dataWidth+", totalWidth: "+totalWidth);
+
+        return dataWidth;
+    }
+
     /**
      * Обновление видимых на экране ячеек при перемещении курсора
      * @param {Object} beginCell - объект ячейки, в которой расположен курсор
@@ -473,8 +544,11 @@ class Table extends HTMLTableElement{
         // направление перемещения курсора по горизонтали
         let colCourse = (newColNum > oldColNum) ? Course.RIGHT : ( (newColNum < oldColNum) ? Course.LEFT : Course.STOP );
         
+        console.log("oldColNum: "+oldColNum+", newColNum: "+newColNum+", colCourse: "+colCourse);
+        
         // на сколько колонок нужно переместить курсор
         let offsetCols = this.getOffsetCols(startCell.name, this.getDataWidth(), colCourse);
+        console.log(offsetCols);
 
         // конечная колонка курсора
         let endColNum = startCell.colNumber + offsetCols.cols - 1;
@@ -516,13 +590,6 @@ class Table extends HTMLTableElement{
         this.setStartCell(CellData.getCellName(newStartRow, newStartCol));
     }    
 
-    /**
-     * Получение видимой ширины ячеек данных таблицы
-     */
-    getDataWidth() {
-        let headerWidth = parseFloat(document.querySelector(".col-header>col").getAttribute("width"));
-        return parseInt(this.getAttribute("view-width")) - headerWidth;
-    }
 
     /**
      * Получение объекта полностью видимых колонок в виде:
@@ -536,31 +603,38 @@ class Table extends HTMLTableElement{
      */
     getOffsetCols(startCellName, visibleWidth, course) {
         let startCell = this.#tableData.getCellData(startCellName);
-        let startColNum = startCell.colNumber;
+        let startColNum = startCell.colNumber; // номер колонки начиная с 1
         let startColName = startCell.colName;
-        let colWidth = 0;
-        let colCount = 0;
+        let totalColWidth = 0;
+        let totalColCount = 0;
 
         if ( course == Course.RIGHT ) {
-            let rightColCount = this.#params.colCount - startColNum;
-            for (colCount = 0; colCount < rightColCount; colCount++) {
-                let newColName = this.getColName(startColName, colCount);
-                let newColWidth = this.getDefaultColWidth(newColName);
-                if ( (colWidth + newColWidth ) > visibleWidth ) break;
-                colWidth += newColWidth;
+            // количестов колонок справа от стартовой
+            let rightColCount = this.#params.colCount - startColNum ;
+
+            console.log("#params.colCount: "+this.#params.colCount+", startColNum: "+startColNum+", rightColCount: "+rightColCount);
+
+            for (let deltaCol = 0; deltaCol < rightColCount; deltaCol++) {
+                let colName = this.getColName(startColName, deltaCol);
+                let colWidth = this.getDefaultColWidth(colName);
+
+                if ( (totalColWidth + colWidth ) > visibleWidth ) break;
+                totalColWidth += colWidth;
+                totalColCount++;
+                // console.log("width col "+CellData.getColNumber(colName)+"  = "+colWidth+", totalColWidth = "+totalColWidth);
             }
         }
         else if ( course == Course.LEFT ) {
-            for (colCount = startColNum; colCount>0; colCount--) {
-                let newColName = this.getColName(startColName, 1-colCount);
-                let newColWidth = this.getDefaultColWidth(newColName);
-                if ( ( colWidth + newColWidth ) > visibleWidth ) break;
-                colWidth += newColWidth;
+            for (let deltaCol = startColNum; deltaCol>0; deltaCol--) {
+                let colName = this.getColName(startColName, 1-deltaCol);
+                let colWidth = this.getDefaultColWidth(colName);
+                if ( ( totalColWidth + colWidth ) > visibleWidth ) break;
+                totalColWidth += colWidth;
             }
         }
         return {
-            cols: colCount, 
-            width: colWidth 
+            cols: totalColCount, 
+            width: totalColWidth 
         };
     }
 
@@ -572,50 +646,6 @@ class Table extends HTMLTableElement{
         let colIndex = this.#colMap.get(colName).getAttribute("index");
         return this.#colWidthArray[colIndex];
     }    
-
-    /**
-     * Определение видимых на экране колонок таблицы
-     * @param {String} startCellName - колонка, от которой ведется отчет видимости
-     * @param {String} course - одной из значений атрибута объекта Course - LEFT или RIGHT
-     */
-    getVisibleCols(startCellName, course) {
-        let visibleCols = this.#params.colCount;
-        let visibleWidth = this.getDataWidth();
-        this.setDefaultColWidth();
-        let offsetCols = this.getOffsetCols(startCellName, visibleWidth, course);
-        let rightColWidth = visibleWidth - offsetCols.width;
-
-        if (rightColWidth > 0) {
-            visibleCols = offsetCols.cols + 1;
-            this.setRightColWidth(visibleCols, startCellName, rightColWidth);
-        }
-        else {
-            visibleCols = offsetCols.cols;
-        }
-        return visibleCols;
-    }
-
-    /**
-     * Определение видимых на экране строк таблицы
-     * @param {String} startCellName 
-     * @param {String} course - одной из значений атрибута объекта Course - BOTTOM или TOP
-     */
-    getVisibleRows(startCellName, course) {
-        let visibleRows = this.#params.rowCount;
-        let visibleHeight = this.getDataHeight();
-        // this.setDefaultRowHeight();
-        let offsetRows = this.getOffsetRows(startCellName, visibleHeight, course);
-        let bottomRowHeight = visibleHeight - offsetRows.height;
-
-        if (bottomRowHeight > 0) {
-            visibleRows = offsetRows.rows + 1;
-            // this.setBottomRowHeight(visibleCols, startCellName, bottomRowHeight);
-        }
-        else {
-            visibleRows = offsetRows.rows;
-        }
-        return visibleRows;
-    }
 
 
     /**
@@ -630,6 +660,28 @@ class Table extends HTMLTableElement{
         let rightColName = CellData.getColName(startCell.rowNumber + rightColIndex);
         let rightCol = this.#colMap.get(rightColName);
         if (rightCol) rightCol.setAttribute("width", rightColWidth);
+    }
+
+    /**
+     * Определение видимых на экране строк таблицы
+     * @param {String} startCellName 
+     * @param {String} course - одной из значений атрибута объекта Course - BOTTOM или TOP
+     */
+    updateVisibleRows(startCellName, course) {
+        let visibleRows = this.#params.rowCount;
+        let visibleHeight = this.getDataHeight();
+        // this.setDefaultRowHeight();
+        let offsetRows = this.getOffsetRows(startCellName, visibleHeight, course);
+        let bottomRowHeight = visibleHeight - offsetRows.height;
+
+        if (bottomRowHeight > 0) {
+            visibleRows = offsetRows.rows + 1;
+            // this.setBottomRowHeight(visibleCols, startCellName, bottomRowHeight);
+        }
+        else {
+            visibleRows = offsetRows.rows;
+        }
+        return visibleRows;
     }
 
     /**
@@ -700,18 +752,6 @@ class Table extends HTMLTableElement{
     }
 
 
-    /**
-     * Установка ширины колонок по умолчанию, определенных в атрибуте widht элемента col
-     */
-    setDefaultColWidth() {
-        let colData = document.querySelector(".col-data");
-        if ( colData )  {
-            let colArray = colData.childNodes;
-            colArray.forEach(col => {
-                col.setAttribute("width", this.#colWidthArray[col.getAttribute("index")]);
-            });
-        }
-    }
 
    /**
      * Обработка нажатий на клавиши стрелок
