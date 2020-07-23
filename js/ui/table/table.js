@@ -323,7 +323,6 @@ class Table extends HTMLTableElement{
      */
     async setStartCell(cellName) {
         this.setAttribute("start-cell", cellName);
-        // if ( this.#isCacheStart ) await this.#tableData.asyncSetStartCellName(cellName);
     }
 
     /**
@@ -439,13 +438,13 @@ class Table extends HTMLTableElement{
         // направление перемещения курсора по горизонтали
         let colCourse = (newColNum > oldColNum) ? Course.RIGHT : ( (newColNum < oldColNum) ? Course.LEFT : Course.STOP );
         
-        // на сколько колонок нужно переместить курсор
+        // число, ширина и код последней полностью видимой колонки
         let fullVisibleCols = this.getFullVisibleCols(startCell.name, this.getDataWidth(), colCourse);
 
         // конечная колонка курсора
         let endColNum = startCell.colNumber + fullVisibleCols.cols - 1;
 
-        // начальная колонка курсора
+        // начальная видимая колонка
         let newStartCol = startColNum;
 
         // если при движении курсора вправо новая колонка выходит за крайнюю правую видимую колонку, 
