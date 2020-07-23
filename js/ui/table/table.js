@@ -394,6 +394,7 @@ class Table extends HTMLTableElement{
 
         if ( colCount > 0 ) newColNum += Math.min(colCount, this.#params.colCount-newColNum);
         else newColNum += Math.max(colCount, 1-newColNum);
+
         if ( rowCount > 0 ) newRowNum += Math.min(rowCount, this.#params.rowCount-newRowNum);
         else newRowNum += Math.max(rowCount, 1-newRowNum);
 
@@ -442,11 +443,8 @@ class Table extends HTMLTableElement{
         // направление перемещения курсора по горизонтали
         let colCourse = (newColNum > oldColNum) ? Course.RIGHT : ( (newColNum < oldColNum) ? Course.LEFT : Course.STOP );
         
-        // console.log("oldColNum: "+oldColNum+", newColNum: "+newColNum+", colCourse: "+colCourse);
-        
         // на сколько колонок нужно переместить курсор
         let fullVisibleCols = this.getFullVisibleCols(startCell.name, this.getDataWidth(), colCourse);
-        // console.log(fullVisibleCols);
 
         // конечная колонка курсора
         let endColNum = startCell.colNumber + fullVisibleCols.cols - 1;
@@ -456,9 +454,8 @@ class Table extends HTMLTableElement{
 
         // если при движении курсора вправо новая колонка выходит за крайнюю правую видимую колонку, 
         // то стартовая колонока увеличивается на разницу между новой колонкой и видимой крайней правой
-        if ( colCourse == Course.RIGHT && newColNum > endColNum ) {
-            let delta = ( newColNum == this.#params.colCount ) ? 1 : 0;
-            newStartCol = startColNum + newColNum - endColNum - delta;
+        if ( colCourse == Course.RIGHT && newColNum > endColNum && endColNum != this.#params.colCount ) {
+            newStartCol = startColNum + newColNum - endColNum;
         }
         // псли при движении курсора влево новая колонка выходит за крайнюю левую видимую колонку,
         // то новая колонка становится новой стартовой колонкой
@@ -537,12 +534,12 @@ class Table extends HTMLTableElement{
         console.log(fullVisibleCols);
 
         // определение ширины крайней правой колонки
-        let rightColWidth = visibleWidth - fullVisibleCols.width;
+        let rightColName = CellData.getColName(fullVisibleCols.lastNum + 1);
+        let rightColWidth = Math.min( visibleWidth - fullVisibleCols.width, this.getColWidth(rightColName));
 
         // если ширина крайней правой колонки больше 0
         if (rightColWidth > 0) {
             visibleCols = fullVisibleCols.cols + 1;
-            let rightColName = CellData.getColName(fullVisibleCols.lastNum + 1);
             this.setRightColWidth(rightColName, rightColWidth);
         }
         else {
@@ -619,7 +616,7 @@ class Table extends HTMLTableElement{
         return {
             cols: totalColCount, 
             width: totalColWidth,
-            lastNum: startColNum + totalColCount - 1
+            lastNum: startColNum + totalColCount-1
         };
     }
 
