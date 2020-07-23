@@ -182,8 +182,7 @@ class Table extends HTMLTableElement{
         for (let i = 0; i < this.#params.colCount; i++) {
             let letter = CellData.getColName(i+1);
             this.headers.push(letter);
-            // this.createHeader(hRow, ["cell-header"], {col:letter}, letter);
-            this.createHeader(hRow, ["cell-header"], {col:letter}, letter+" "+(i+1));
+            this.createHeader(hRow, ["cell-header"], {col:letter}, letter);
         }
         this.append(tHead);
 
@@ -264,9 +263,6 @@ class Table extends HTMLTableElement{
      * @param {String} colName - имя колонки таблицы
      */
     getColWidth(colName) {
-        // let col = document.querySelector(".cell-header[col="+colName+"]");
-        // console.log(parseFloat(getComputedStyle(col).width));
-        // return parseFloat(getComputedStyle(col).width);
         return Number(this.#colMap.get(colName).getAttribute("width"));
     }
 
@@ -478,8 +474,6 @@ class Table extends HTMLTableElement{
             newStartRow = newRowNum;
         }
 
-        // console.log("R"+startRowNum+":C"+startColNum+" -> R"+newStartRow+":C"+newStartCol);
-        
         // установить новую стартовую ячейку, при изменени которой срабатывает attributeChangedCallback,
         // вызывающий updateVisibleCells
         this.setStartCell(CellData.getCellName(newStartRow, newStartCol));
@@ -490,8 +484,6 @@ class Table extends HTMLTableElement{
      * @see attributeChangedCallback - обработчик изменения значений наблюдаемых атрибутов таблицы 
      */
     updateVisibleCells() {
-        // console.log("************************************************************");
-        // console.log("updateVisibleCells from start cell "+this.getStartCell().data.name);
         let startCell = this.getStartCell().data;
 
         // обновление числа видимых строк и колонок
@@ -531,7 +523,6 @@ class Table extends HTMLTableElement{
 
         // определение числа и общей ширины полностью видимых колонок начиная со стартовой ячейки
         let fullVisibleCols = this.getFullVisibleCols(startCellName, visibleWidth, course);
-        console.log(fullVisibleCols);
 
         // определение ширины крайней правой колонки
         let rightColName = CellData.getColName(fullVisibleCols.lastNum + 1);
@@ -593,8 +584,6 @@ class Table extends HTMLTableElement{
             // количестов колонок справа от стартовой
             let rightColCount = this.#params.colCount - startColNum ;
 
-            // console.log("#params.colCount: "+this.#params.colCount+", startColNum: "+startColNum+", rightColCount: "+rightColCount);
-
             for (let deltaCol = 0; deltaCol < rightColCount; deltaCol++) {
                 let colName = this.getColName(startColName, deltaCol);
                 let colWidth = this.getDefaultColWidth(colName);
@@ -602,7 +591,6 @@ class Table extends HTMLTableElement{
                 if ( (totalColWidth + colWidth ) > visibleWidth ) break;
                 totalColWidth += colWidth;
                 totalColCount++;
-                // console.log("width col "+CellData.getColNumber(colName)+"  = "+colWidth+", totalColWidth = "+totalColWidth);
             }
         }
         else if ( course == Course.LEFT ) {
@@ -638,7 +626,6 @@ class Table extends HTMLTableElement{
      */
     setRightColWidth(rightColName, rightColWidth) {
         let rightCol = this.#colMap.get(rightColName);
-        console.log("rightColName: "+rightColName+", rightColWidth: "+rightColWidth);
         if (rightCol) rightCol.setAttribute("width", rightColWidth);
     }
 
