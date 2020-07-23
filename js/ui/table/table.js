@@ -123,17 +123,11 @@ class Table extends HTMLTableElement{
      * @param {String} newValue - новое значение атрибута
      */
     async attributeChangedCallback(name, oldValue, newValue) {
-        if (name == "view-width" || name == "view-height" ) {
-            let startCellName = this.getStartCell().data.name;
-            let visibleCols = this.getVisibleCols(startCellName, Course.RIGHT);
-            let visibleRows = this.getVisibleRows(startCellName, Course.BOTTOM);
-            this.viewFromCell(startCellName, visibleRows, visibleCols);
+        if ( ( name == "view-width" || name == "view-height" ) && oldValue != newValue ) {
+            this.updateVisibleCells();
         }
         else if ( name == "start-cell" && oldValue != newValue ) {
-            let startCellName = this.getStartCell().data.name;
-            let visibleCols = this.getVisibleCols(startCellName, Course.RIGHT);
-            let visibleRows = this.getVisibleRows(startCellName, Course.BOTTOM);
-            this.viewFromCell(startCellName, visibleRows, visibleCols);
+            this.updateVisibleCells();
         }
         else if ( name == "cursor-cell" ) {
             if ( !this.#isCacheCursor ) {
@@ -360,6 +354,25 @@ class Table extends HTMLTableElement{
     }
 
     /**
+     * Перемещение курсора со сдвигом на количество строк и колонок относительно текущей позиции
+     * @param {Number} rowCount - количество строк смещения 
+     * @param {Number} colCount - количество колонок смещения
+     * @param {String} cellName - имя ячейки, относительно которой производится перемещение курсора
+     */
+    moveCursor(rowCount, colCount, initCellName) {
+        let currentCell = initCellName ? this.getCell(initCellName) : this.cursor.cell;
+        let newColNum = currentCell.data.colNumber;
+        let newRow = currentCell.data.rowNumber;
+
+        if ( rowCount > 0 ) newRow += Math.min(rowCount, this.#params.rowCount-newRow);
+        else newRow += Math.max(rowCount, 1-newRow);
+        if ( colCount > 0 ) newColNum += Math.min(colCount, this.#params.colCount-newColNum);
+        else newColNum += Math.max(colCount, 1-newColNum);
+
+        this.setCursor(CellData.getCellName(newRow, newColNum));
+    }
+
+    /**
      * Установление курсора в позицию ячейки с именем cellName
      * @param {String} cellName имя ячейки в формате А1
      */
@@ -385,25 +398,6 @@ class Table extends HTMLTableElement{
     }
 
     /**
-     * Перемещение курсора со сдвигом на количество строк и колонок относительно текущей позиции
-     * @param {Number} rowCount - количество строк смещения 
-     * @param {Number} colCount - количество колонок смещения
-     * @param {String} cellName - имя ячейки, относительно которой производится перемещение курсора
-     */
-    moveCursor(rowCount, colCount, initCellName) {
-        let currentCell = initCellName ? this.getCell(initCellName) : this.cursor.cell;
-        let newColNum = currentCell.data.colNumber;
-        let newRow = currentCell.data.rowNumber;
-
-        if ( rowCount > 0 ) newRow += Math.min(rowCount, this.#params.rowCount-newRow);
-        else newRow += Math.max(rowCount, 1-newRow);
-        if ( colCount > 0 ) newColNum += Math.min(colCount, this.#params.colCount-newColNum);
-        else newColNum += Math.max(colCount, 1-newColNum);
-
-        this.setCursor(CellData.getCellName(newRow, newColNum));
-    }
-
-    /**
      * Выделение положения курсора на панели заголовков строк и колонок
      * @param {Object} oldCell - объект ячейки, где находился курсор
      * @param {Object} endCell - объект ячейки, куда перемещается курсор
@@ -426,6 +420,23 @@ class Table extends HTMLTableElement{
     }
 
     /**
+     * Обновление ячеек видимой части таблицы
+     * @see attributeChangedCallback - обработчик изменения значений наблюдаемых атрибутов таблицы 
+     */
+    updateVisibleCells() {
+        let startCell = this.getStartCell().data;
+        let colCount = this.getVisibleCols(startCell.name, Course.RIGHT);
+        let rowCount = this.getVisibleRows(startCell.name, Course.BOTTOM);
+
+        let beginRow = startCell.rowNumber-1;
+        let beginCol = startCell.colNumber;
+        let endRow = beginRow+rowCount+1;
+        let endCol = beginCol+colCount+1;
+
+        this.setCssText(beginRow, beginCol, endRow, endCol);
+    }
+
+    /**
      * Установка видимости колонок
      * @param {Number} beginRow - номер начальной видимой строки
      * @param {Number} initCol - номер начальнок видимой колонки
@@ -444,20 +455,6 @@ class Table extends HTMLTableElement{
             + ".cell-data[col]:nth-child(n+" + endCol + ")" + // колонки данных после конечной колонки
             "{display: none;}";
         this.#tableStyle.innerHTML = cssText;
-    }
-
-    /**
-     * Установка видимой части таблицы
-     * @param {String} initCellName - левая верхняя видимая ячейка таблицы
-     * @param {Strinhg} endCellName - правая нижняя видимая ячейка таблицы
-     */
-    viewFromCell(startCellName, rowCount, colCount) {
-        let beginCell = this.getCellData(startCellName);
-        let beginRow = beginCell.rowNumber-1;
-        let beginCol = beginCell.colNumber;
-        let endRow = beginRow+rowCount+1;
-        let endCol = beginCol+colCount+1;
-        this.setCssText(beginRow, beginCol, endRow, endCol);
     }
 
     /**
@@ -515,7 +512,7 @@ class Table extends HTMLTableElement{
         console.log("R"+startRowNum+":C"+startColNum+" -> R"+newStartRow+":C"+newStartCol);
         
         // установить новую стартовую ячейку, при изменени которой срабатывает attributeChangedCallback,
-        // вызывающий viewFromCell
+        // вызывающий updateVisibleCells
         this.setStartCell(CellData.getCellName(newStartRow, newStartCol));
     }    
 
@@ -573,7 +570,6 @@ class Table extends HTMLTableElement{
      */
     getDefaultColWidth(colName) {
         let colIndex = this.#colMap.get(colName).getAttribute("index");
-        // console.log("index col "+colName+" = "+colIndex+", width = "+this.#colWidthArray[colIndex]);
         return this.#colWidthArray[colIndex];
     }    
 
