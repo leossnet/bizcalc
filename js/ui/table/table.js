@@ -429,6 +429,7 @@ class Table extends HTMLTableElement{
      */
     updateStartCell(beginCell, endCell) {
         let startCell = this.getStartCell().data;
+        console.log(startCell);
 
         // определение стартовой, исходной и конечной колонок
         let oldColNum = beginCell ? beginCell.data.colNumber : startCell.colNumber;
@@ -446,17 +447,20 @@ class Table extends HTMLTableElement{
 
         // начальная видимая колонка
         let newStartCol = startColNum;
+        
+        console.log("newColNum: "+newColNum+", startColNum: "+startColNum+", newStartCol: "+newStartCol);
 
         // если при движении курсора вправо новая колонка выходит за крайнюю правую видимую колонку, 
         // то стартовая колонока увеличивается на разницу между новой колонкой и видимой крайней правой
         if ( colCourse == Course.RIGHT && newColNum > endColNum && endColNum != this.#params.colCount ) {
             newStartCol = startColNum + newColNum - endColNum;
         }
-        // псли при движении курсора влево новая колонка выходит за крайнюю левую видимую колонку,
+        // если при движении курсора влево новая колонка выходит за крайнюю левую видимую колонку,
         // то новая колонка становится новой стартовой колонкой
         else if ( colCourse == Course.LEFT && newColNum < startColNum ) {
             newStartCol = newColNum;
         }
+        console.log("newColNum: "+newColNum+", startColNum: "+startColNum+", newStartCol: "+newStartCol);
 
         // определение новой стартовой строки
         let oldRowNum = beginCell ? beginCell.data.rowNumber : startCell.rowNumber;
