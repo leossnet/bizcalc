@@ -60,11 +60,7 @@ class Table extends HTMLTableElement{
         this.addEventListener("click", this.handlerClickCell);
         
         window.addEventListener("load", () => this.#tableData.asyncRefreshData() );
-        window.addEventListener("resize", () => { 
-            this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
-            this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
-        });
-    }
+     }
 
     /**
      * Возврат объекта приложения 
@@ -104,6 +100,7 @@ class Table extends HTMLTableElement{
         this.setCursor("A1", false);
 
         if ( this.#params.isFocus ) this.focus();
+        console.log(getComputedStyle(this.parentElement).height);
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
         this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
     }
@@ -429,7 +426,7 @@ class Table extends HTMLTableElement{
      */
     updateStartCell(beginCell, endCell) {
         let startCell = this.getStartCell().data;
-        console.log(startCell);
+        // console.log(startCell);
 
         // определение стартовой, исходной и конечной колонок
         let oldColNum = beginCell ? beginCell.data.colNumber : startCell.colNumber;
@@ -474,7 +471,7 @@ class Table extends HTMLTableElement{
         let fullVisibleRows = this.getFullVisibleRows(startCell.name, this.getDataHeight(), rowCourse);
         
         // конечная строка курсора
-        let endRowNum = startCell.rowNumber + fullVisibleRows.rows - 1; 
+        let endRowNum = startCell.rowNumber + fullVisibleRows.rows - 2; 
         
         // начальная видимая строка
         let newStartRow = startRowNum;
@@ -557,6 +554,28 @@ class Table extends HTMLTableElement{
 
 
     /**
+     * Определение видимых на экране строк таблицы
+     * @param {String} startCellName 
+     * @param {String} course - одной из значений атрибута объекта Course - BOTTOM или TOP
+     */
+    updateVisibleRows(startCellName, course) {
+        let visibleRows = this.#params.rowCount;
+        let visibleHeight = this.getDataHeight();
+
+        let fullVisibleRows = this.getFullVisibleRows(startCellName, visibleHeight, course);
+        console.log(fullVisibleRows);
+        let bottomRowHeight = visibleHeight - fullVisibleRows.height;
+
+        if (bottomRowHeight > 0) {
+            visibleRows = fullVisibleRows.rows + 1;
+        }
+        else {
+            visibleRows = fullVisibleRows.rows;
+        }
+        return visibleRows;
+    }    
+
+    /**
      * Установка ширины колонок по умолчанию, определенных в атрибуте widht элемента col
      */
     setDefaultColWidth() {
@@ -577,6 +596,15 @@ class Table extends HTMLTableElement{
         // разница между видимой шириной экрана и шириной колонки с номерами строк
         let dataWidth = parseInt(this.getAttribute("view-width")) - headerWidth;
         return dataWidth;
+    }
+
+    /**
+     * Получение видимой высоты ячеек данных таблицы
+     */
+    getDataHeight() {
+        let headHeight = parseFloat(getComputedStyle(document.querySelector(".table-head")).height);
+        return parseInt(this.getAttribute("view-height")) - headHeight;
+        // return parseFloat(getComputedStyle(document.querySelector("div.flex-row")).height); 
     }
 
     /**
@@ -615,12 +643,56 @@ class Table extends HTMLTableElement{
                 let colWidth = this.getDefaultColWidth(colName);
                 if ( ( totalColWidth + colWidth ) > visibleWidth ) break;
                 totalColWidth += colWidth;
+                totalColCount++;
             }
         }
         return {
             cols: totalColCount, 
             width: totalColWidth,
             lastNum: startColNum + totalColCount-1
+        };
+    }
+
+    /**
+     * Получение объекта смещения для определения высоты видимой области и пикселях и количесте строк
+     * @param {String} startCellName стартовая ячейка (самая верхняя или самая нижняя в видимой области ячеек)
+     * @param {Number} visibleHeight - видимая вытота ячеек данных таблицы
+     * @param {String} course - одной из значений атрибута объекта Course
+     */
+    getFullVisibleRows(startCellName, visibleHeight, course) {
+        let startCell = this.#tableData.getCellData(startCellName);
+        let startRowNum = startCell.rowNumber;
+        let startRowName = startCell.rowName;
+        let totalRowHeight = 0;
+        let totalRowCount = 0;
+
+        if ( course == Course.BOTTOM ) {
+            let bottomRowCount = this.#params.rowCount - startRowNum;
+
+            for (let deltaRow = 0; deltaRow < bottomRowCount; deltaRow++) {
+                let rowName = this.getRowName(startRowName, deltaRow);
+                let rowHeight = this.getDefaultRowHeight(rowName);
+                // console.log("rowName: "+rowName+", rowHeight: "+rowHeight);
+
+                if ( (totalRowHeight + rowHeight ) > visibleHeight ) break;
+                totalRowHeight += rowHeight;
+                totalRowCount++;
+            }
+        }
+        else if ( course == Course.TOP ) {
+            for (let deltaRow = startRowNum; deltaRow>0; deltaRow--) {
+                let rowName = this.getRowName(startRowNum, 1-deltaRow);
+                let rowHeight = this.getDefaultRowHeight(rowName);
+
+                if ( ( totalRowHeight + rowHeight ) > visibleHeight ) break;
+                totalRowHeight += rowHeight;
+                totalRowCount++;
+            }
+        }
+        return {
+            rows: totalRowCount, 
+            height: totalRowHeight,
+            lastNum: startRowNum + totalRowCount-1
         };
     }
 
@@ -656,73 +728,9 @@ class Table extends HTMLTableElement{
         return this.#colMap.get(colName).id;
     }
 
-    /**
-     * Определение видимых на экране строк таблицы
-     * @param {String} startCellName 
-     * @param {String} course - одной из значений атрибута объекта Course - BOTTOM или TOP
-     */
-    updateVisibleRows(startCellName, course) {
-        let visibleRows = this.#params.rowCount;
-        let visibleHeight = this.getDataHeight();
-        // this.setDefaultRowHeight();
-        let offsetRows = this.getFullVisibleRows(startCellName, visibleHeight, course);
-        let bottomRowHeight = visibleHeight - offsetRows.height;
-
-        if (bottomRowHeight > 0) {
-            visibleRows = offsetRows.rows + 1;
-            // this.setBottomRowHeight(visibleCols, startCellName, bottomRowHeight);
-        }
-        else {
-            visibleRows = offsetRows.rows;
-        }
-        return visibleRows;
-    }
-
-    /**
-     * Получение видимой высоты ячеек данных таблицы
-     */
-    getDataHeight() {
-        let headHeight = parseFloat(getComputedStyle(document.querySelector(".table-head")).height);
-        return parseInt(this.getAttribute("view-height")) - headHeight;
-        // return parseFloat(getComputedStyle(document.querySelector("div.flex-row")).height); 
-    }
 
 
-    /**
-     * Получение объекта смещения для определения высоты видимой области и пикселях и количесте строк
-     * @param {String} startCellName стартовая ячейка (самая верхняя или самая нижняя в видимой области ячеек)
-     * @param {Number} visibleCellsHeight - видимая вытота ячеек данных таблицы
-     * @param {String} course - одной из значений атрибута объекта Course
-     */
-    getFullVisibleRows(startCellName, visibleCellsHeight, course) {
-        let startCell = this.#tableData.getCellData(startCellName);
-        let startRowNum = startCell.rowNumber;
-        let startRowName = startCell.rowName;
-        let rowHeight = 0;
-        let rowCount = 0;
 
-        if ( course == Course.BOTTOM ) {
-            let bottomRowCount = this.#params.rowCount - startRowNum;
-            for (rowCount = 0; rowCount < bottomRowCount; rowCount++) {
-                let newRowName = this.getRowName(startRowName, rowCount);
-                let newRowHeight = this.getDefaultRowHeight(newRowName);
-                if ( (rowHeight + newRowHeight ) > visibleCellsHeight ) break;
-                rowHeight += newRowHeight;
-            }
-        }
-        else if ( course == Course.TOP ) {
-            for (rowCount = startRowNum; rowCount>0; rowCount--) {
-                let newRowName = this.getRowName(startRowNum, 1-rowCount);
-                let newRowHeight = this.getDefaultRowHeight(newRowName);
-                if ( ( rowHeight + newRowHeight ) > visibleCellsHeight ) break;
-                rowHeight += newRowHeight;
-            }
-        }
-        return {
-            rows: rowCount, 
-            height: rowHeight 
-        };
-    }
 
 
     
