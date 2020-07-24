@@ -448,7 +448,7 @@ class Table extends HTMLTableElement{
         // начальная видимая колонка
         let newStartCol = startColNum;
         
-        console.log("newColNum: "+newColNum+", startColNum: "+startColNum+", newStartCol: "+newStartCol+", endColNum: "+endColNum);
+        // console.log("newColNum: "+newColNum+", startColNum: "+startColNum+", newStartCol: "+newStartCol+", endColNum: "+endColNum);
 
         // если при движении курсора вправо новая колонка выходит за крайнюю правую видимую колонку, 
         // то стартовая колонока увеличивается на разницу между новой колонкой и видимой крайней правой
@@ -460,20 +460,33 @@ class Table extends HTMLTableElement{
         else if ( colCourse == Course.LEFT && newColNum < startColNum ) {
             newStartCol = newColNum;
         }
-        console.log("newColNum: "+newColNum+", startColNum: "+startColNum+", newStartCol: "+newStartCol+", endColNum: "+endColNum);
+        // console.log("newColNum: "+newColNum+", startColNum: "+startColNum+", newStartCol: "+newStartCol+", endColNum: "+endColNum);
 
         // определение новой стартовой строки
         let oldRowNum = beginCell ? beginCell.data.rowNumber : startCell.rowNumber;
         let newRowNum = endCell.data.rowNumber ;
         let startRowNum = startCell.rowNumber;
+        
+        // определние направления движения курсора
         let rowCourse = (newRowNum > oldRowNum) ? Course.BOTTOM : ( (newRowNum < oldRowNum) ? Course.TOP : Course.STOP );
-        let offsetRows = this.getOffsetRows(startCell.name, this.getDataHeight(), rowCourse);
-        let endRowNum = startCell.rowNumber + offsetRows.rows - 2;
+        
+        // определение количества полностью видимых строк
+        let fullVisibleRows = this.getFullVisibleRows(startCell.name, this.getDataHeight(), rowCourse);
+        
+        // конечная строка курсора
+        let endRowNum = startCell.rowNumber + fullVisibleRows.rows - 1; 
+        
+        // начальная видимая строка
         let newStartRow = startRowNum;
-        if ( rowCourse == Course.BOTTOM && newRowNum > endRowNum ) {
+
+        // если курсор двигается вниз и новое положение курсора больше номера строки,
+        // то стартовая строка увеличивается на разницу между новой строкой и видимой крайней нижней
+        if ( rowCourse == Course.BOTTOM && newRowNum > endRowNum+1 ) {
             newStartRow = startRowNum + newRowNum - endRowNum;
         }
-        else if ( rowCourse == Course.TOP && newRowNum < endRowNum ) {
+        // при движении курсора ввех и при если новая строка становится меньше самой вехней видимой,
+        // то новая строка становится новой стартовой строкой
+        else if ( rowCourse == Course.TOP && newRowNum < startRowNum ) {
             newStartRow = newRowNum;
         }
 
@@ -652,7 +665,7 @@ class Table extends HTMLTableElement{
         let visibleRows = this.#params.rowCount;
         let visibleHeight = this.getDataHeight();
         // this.setDefaultRowHeight();
-        let offsetRows = this.getOffsetRows(startCellName, visibleHeight, course);
+        let offsetRows = this.getFullVisibleRows(startCellName, visibleHeight, course);
         let bottomRowHeight = visibleHeight - offsetRows.height;
 
         if (bottomRowHeight > 0) {
@@ -681,7 +694,7 @@ class Table extends HTMLTableElement{
      * @param {Number} visibleCellsHeight - видимая вытота ячеек данных таблицы
      * @param {String} course - одной из значений атрибута объекта Course
      */
-    getOffsetRows(startCellName, visibleCellsHeight, course) {
+    getFullVisibleRows(startCellName, visibleCellsHeight, course) {
         let startCell = this.#tableData.getCellData(startCellName);
         let startRowNum = startCell.rowNumber;
         let startRowName = startCell.rowName;
