@@ -60,7 +60,11 @@ class Table extends HTMLTableElement{
         this.addEventListener("click", this.handlerClickCell);
         
         window.addEventListener("load", () => this.#tableData.asyncRefreshData() );
-     }
+        window.addEventListener("resize", () => { 
+            this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
+            this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+        });
+    }
 
     /**
      * Возврат объекта приложения 
@@ -100,7 +104,10 @@ class Table extends HTMLTableElement{
         this.setCursor("A1", false);
 
         if ( this.#params.isFocus ) this.focus();
-        console.log(getComputedStyle(this.parentElement).height);
+        console.log("table height: "+getComputedStyle(this.parentElement).height);
+        let main = document.querySelector("div.flex-row");
+        console.log("flex-row height: "+getComputedStyle(main).height);
+
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
         this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
     }
