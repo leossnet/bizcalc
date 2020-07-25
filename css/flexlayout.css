@@ -1,19 +1,25 @@
 .flex-layout {
     padding: 0;
     margin: 0;
+    min-height: 100vh;
+    max-height: 100vh;    
     display: flex;
     flex-direction: column;
 }
 .flex-row {
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
+    flex-direction: row;
+    min-height: 100%;
+    max-height: 100%;
+/*     flex: 1 1 auto;    */ 
 }
 main.flex-item {
-    flex: 2 2 25em; 
+    flex: 1 1 10em; 
 }
 nav.flex-item,
 aside.flex-item {
-    flex: 1;
+    flex: 1 1 5em;
 }
 nav.flex-item {
     order: -1;
@@ -25,7 +31,7 @@ footer.flex-item {
 .flex-item:empty {
     display: none;
 }
-@media screen and (min-width: 600px) {
+/* @media screen and (min-width: 600px) {
     .flex-layout {
         min-height: 100vh;
         max-height: 100vh;
@@ -36,4 +42,4 @@ footer.flex-item {
         max-height: 100%;
         flex: 1 1 auto;
     }
-}
+} */
