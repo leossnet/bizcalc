@@ -59,7 +59,12 @@
 th.cursor-col,
 th.cursor-row {
     background-color: #ddd;
+}
+th.cursor-col {
     border-bottom: 1px solid green;
+}
+th.cursor-row {
+    border-right: 1px solid green;
 }
 .cell-header[row] {
     cursor: vertical-text;

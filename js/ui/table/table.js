@@ -476,14 +476,14 @@ class Table extends HTMLTableElement{
         let fullVisibleRows = this.getFullVisibleRows(startCell.name, this.getDataHeight(), rowCourse);
         
         // конечная строка курсора
-        let endRowNum = startCell.rowNumber + fullVisibleRows.rows - 2; 
+        let endRowNum = startCell.rowNumber + fullVisibleRows.rows - 1; 
         
         // начальная видимая строка
         let newStartRow = startRowNum;
 
         // если курсор двигается вниз и новое положение курсора больше номера строки,
         // то стартовая строка увеличивается на разницу между новой строкой и видимой крайней нижней
-        if ( rowCourse == Course.BOTTOM && newRowNum > endRowNum+1 ) {
+        if ( rowCourse == Course.BOTTOM && newRowNum > endRowNum ) {
             newStartRow = startRowNum + newRowNum - endRowNum;
         }
         // при движении курсора ввех и при если новая строка становится меньше самой вехней видимой,
@@ -678,7 +678,7 @@ class Table extends HTMLTableElement{
             for (let deltaRow = 0; deltaRow < bottomRowCount; deltaRow++) {
                 let rowName = this.getRowName(startRowName, deltaRow);
                 let rowHeight = this.getDefaultRowHeight(rowName);
-                // console.log("rowName: "+rowName+", rowHeight: "+rowHeight);
+                console.log("rowName: "+rowName+", rowHeight: "+rowHeight);
 
                 if ( (totalRowHeight + rowHeight ) > visibleHeight ) break;
                 totalRowHeight += rowHeight;
