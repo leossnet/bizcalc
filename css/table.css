@@ -3,24 +3,17 @@
     border-collapse: collapse;  
     background-color: #eee;
     user-select: none;
+    font-size: 13px;
 }
-.table:focus {
+.table:focus,
+.table-cursor:focus {
     outline: none;
 }
-.col-header {
-    width: 40px;
-}
-.col-data {
-    width: 80px;
-}
-.row-header {
-    height: 20px;
-}
+.row-header,
 .row-data {
     height: 20px;
 }
 .cell-header {
-    font-size: 14px;
     border: 1px solid #ccc;
     background-color: var(--bg-color);
     color: #555;
@@ -30,7 +23,6 @@
 .cell-data {
     border: 1px solid #ccc;
     background-color: white;    
-    font-size: 13px;
     height: 20px;
     margin: 0px;
     padding: 0px 2px;
@@ -48,12 +40,6 @@
     color: black;
     text-align: left;
 }
-.table-editor {
-    font-size: 16px;
-}
-.table-editor:focus {
-    outline: none;
-}
 .table-cursor {
     border: 1px solid green;
     background-color: white;
@@ -68,20 +54,10 @@
 .table-cursor-edit {
     background-color: rgb(242, 253, 242);
 }
-
-.table-cursor:focus {
-    outline: none;
-}
-:root {
-    --cursor-col: "C";
-}
-th.cursor-col {
-    background-color: #ddd;
-    border-bottom: 1px solid green;
-}
+th.cursor-col,
 th.cursor-row {
     background-color: #ddd;
-    border-right: 1px solid green;
+    border-bottom: 1px solid green;
 }
 .cell-header[row] {
     cursor: vertical-text;
@@ -89,9 +65,7 @@ th.cursor-row {
 .cell-header[col] {
     cursor: text;
 }
-td.change-value {
-    background-color: rgb(255, 241, 243);
-}
-.change-value>.table-cursor {
+td.change-value,
+td.change-value>.table-cursor {
     background-color: rgb(255, 241, 243);
 }
