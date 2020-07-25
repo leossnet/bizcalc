@@ -1,8 +1,10 @@
 #info-bar {
+/*     position: inherit; */
     background-color: #eee;
-    font-size: 12px;
+    font-size: 13px;
     color: rgb(63, 63, 63);
     padding: 3px;
     border: 1px solid lightgrey;
     user-select: none;
+    height: 100%;
 }

@@ -1,4 +1,6 @@
 .table {
+    position: inherit;
+    size: inherit;
     table-layout: fixed ;
     border-collapse: collapse;  
     background-color: #eee;

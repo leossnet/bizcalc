@@ -15,11 +15,11 @@
 /*     flex: 1 1 auto;    */ 
 }
 main.flex-item {
-    flex: 1 1 10em; 
+    flex: 1 1 15em; 
 }
 nav.flex-item,
 aside.flex-item {
-    flex: 1 1 5em;
+    flex: 0 0 auto;
 }
 nav.flex-item {
     order: -1;
@@ -27,6 +27,9 @@ nav.flex-item {
 header.flex-item,
 footer.flex-item {
     flex: 0 0 1em;
+}
+footer.flex-item {
+    height: 1.5em;
 }
 .flex-item:empty {
     display: none;

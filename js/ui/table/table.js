@@ -62,7 +62,8 @@ class Table extends HTMLTableElement{
         window.addEventListener("load", () => this.#tableData.asyncRefreshData() );
         window.addEventListener("resize", () => { 
             this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
-            this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+            // this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+            this.setAttribute("view-height", document.querySelector(".flex-layout").mainHeight); 
         });
     }
 
@@ -104,12 +105,9 @@ class Table extends HTMLTableElement{
         this.setCursor("A1", false);
 
         if ( this.#params.isFocus ) this.focus();
-        console.log("table height: "+getComputedStyle(this.parentElement).height);
-        let main = document.querySelector("div.flex-row");
-        console.log("flex-row height: "+getComputedStyle(main).height);
-
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
-        this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+        // this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
+        this.setAttribute("view-height", document.querySelector(".flex-layout").mainHeight); 
     }
 
     /**
@@ -570,6 +568,7 @@ class Table extends HTMLTableElement{
         let visibleHeight = this.getDataHeight();
 
         let fullVisibleRows = this.getFullVisibleRows(startCellName, visibleHeight, course);
+
         console.log(fullVisibleRows);
         let bottomRowHeight = visibleHeight - fullVisibleRows.height;
 
@@ -580,7 +579,7 @@ class Table extends HTMLTableElement{
             visibleRows = fullVisibleRows.rows;
         }
         return visibleRows;
-    }    
+    }
 
     /**
      * Установка ширины колонок по умолчанию, определенных в атрибуте widht элемента col

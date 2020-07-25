@@ -66,6 +66,27 @@ class FlexLayout extends HTMLDivElement {
         this.#component.get(space).append(component);
     }
 
+    get(space) {
+        return this.#component.get(space);
+    }
+
+    /**
+     * Возвращает высоту центральной части FlexLayout
+     * @returns {Number} - число пикселей
+     */
+    get mainHeight() {
+        let container = Number.parseFloat(getComputedStyle(this).height);
+        let navbar = Number.parseFloat(getComputedStyle(this.get(Space.TOP)).height);
+        let infobar = Number.parseFloat(getComputedStyle(this.get(Space.BOTTOM)).height);
+        let main = container - navbar - infobar;
+
+        // console.log("container: "+container+", navbar: "+navbar+", infobar: "+infobar+", main: "+main);
+        // let calcMain = Number.parseFloat(getComputedStyle(document.querySelector("main.flex-item")).height);
+        // console.log("calcMain: "+calcMain);
+
+        return main;
+    }      
+
 }
 
 // регистрация нового html-элемента
