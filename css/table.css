@@ -3,7 +3,7 @@
     size: inherit;
     table-layout: fixed ;
     border-collapse: collapse;  
-    background-color: #eee;
+    background-color: rgb(145, 145, 145);
     user-select: none;
     font-size: 13px;
 }
@@ -12,7 +12,8 @@
     outline: none;
 }
 .row-header,
-.row-data {
+.row-data,
+.row-empty {
     height: 20px;
 }
 .cell-header {

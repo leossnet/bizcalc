@@ -206,6 +206,9 @@ class Table extends HTMLTableElement{
                 row.append(cell);
             }
         }
+        let row = tBody.insertRow(-1);
+        row.classList.add("row-empty");
+
         this.append(tBody);
     }
 
@@ -481,6 +484,8 @@ class Table extends HTMLTableElement{
         // начальная видимая строка
         let newStartRow = startRowNum;
 
+        console.log("newStartRow: "+newStartRow+", startRowNum: "+startRowNum+", newRowNum: "+newRowNum+", endRowNum: "+endRowNum);
+
         // если курсор двигается вниз и новое положение курсора больше номера строки,
         // то стартовая строка увеличивается на разницу между новой строкой и видимой крайней нижней
         if ( rowCourse == Course.BOTTOM && newRowNum > endRowNum ) {
@@ -491,6 +496,7 @@ class Table extends HTMLTableElement{
         else if ( rowCourse == Course.TOP && newRowNum < startRowNum ) {
             newStartRow = newRowNum;
         }
+        console.log("newStartRow: "+newStartRow+", startRowNum: "+startRowNum+", newRowNum: "+newRowNum+", endRowNum: "+endRowNum);
 
         // установить новую стартовую ячейку, при изменени которой срабатывает attributeChangedCallback,
         // вызывающий updateVisibleCells
