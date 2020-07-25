@@ -678,7 +678,6 @@ class Table extends HTMLTableElement{
             for (let deltaRow = 0; deltaRow < bottomRowCount; deltaRow++) {
                 let rowName = this.getRowName(startRowName, deltaRow);
                 let rowHeight = this.getDefaultRowHeight(rowName);
-                console.log("rowName: "+rowName+", rowHeight: "+rowHeight);
 
                 if ( (totalRowHeight + rowHeight ) > visibleHeight ) break;
                 totalRowHeight += rowHeight;
