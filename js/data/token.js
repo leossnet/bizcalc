@@ -131,7 +131,7 @@ class Token {
                 tokens.push ( new Token ( Types.Function, tokenCode.toLowerCase() ));
             else if ( tokenCode.match(/^\d+[.]?\d*/g) !== null ) 
                 tokens.push ( new Token ( Types.Number, Number(tokenCode) )); 
-            else if ( tokenCode.match(/^[A-Z]+[1-9]+/g) !== null )
+            else if ( tokenCode.match(/^[A-Z]+[1-9][0-9]*/g) !== null )
                 tokens.push ( new Token ( Types.Cell, tokenCode ));
         });
         return tokens;
