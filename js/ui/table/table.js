@@ -484,7 +484,7 @@ class Table extends HTMLTableElement{
         // начальная видимая строка
         let newStartRow = startRowNum;
 
-        console.log("newStartRow: "+newStartRow+", startRowNum: "+startRowNum+", newRowNum: "+newRowNum+", endRowNum: "+endRowNum);
+        // console.log("newStartRow: "+newStartRow+", startRowNum: "+startRowNum+", newRowNum: "+newRowNum+", endRowNum: "+endRowNum);
 
         // если курсор двигается вниз и новое положение курсора больше номера строки,
         // то стартовая строка увеличивается на разницу между новой строкой и видимой крайней нижней
@@ -496,7 +496,7 @@ class Table extends HTMLTableElement{
         else if ( rowCourse == Course.TOP && newRowNum < startRowNum ) {
             newStartRow = newRowNum;
         }
-        console.log("newStartRow: "+newStartRow+", startRowNum: "+startRowNum+", newRowNum: "+newRowNum+", endRowNum: "+endRowNum);
+        // console.log("newStartRow: "+newStartRow+", startRowNum: "+startRowNum+", newRowNum: "+newRowNum+", endRowNum: "+endRowNum);
 
         // установить новую стартовую ячейку, при изменени которой срабатывает attributeChangedCallback,
         // вызывающий updateVisibleCells
@@ -575,7 +575,7 @@ class Table extends HTMLTableElement{
 
         let fullVisibleRows = this.getFullVisibleRows(startCellName, visibleHeight, course);
 
-        console.log(fullVisibleRows);
+        // console.log(fullVisibleRows);
         let bottomRowHeight = visibleHeight - fullVisibleRows.height;
 
         if (bottomRowHeight > 0) {
