@@ -27,7 +27,7 @@
 
 .flex-header,
 .flex-footer {
-    flex: 0 0 5em;
+    flex: 0 0 20px;
     background-color: #37474f;
 }
 .flex-nav:empty,

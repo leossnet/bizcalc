@@ -30,7 +30,7 @@ class FlexLayout extends HTMLDivElement {
 
     createSpace(root, space, childNodes) {
         let elem = document.createElement(space);
-        this.#components.set(Space.CENTER, elem);
+        this.#components.set(space, elem);
         elem.classList.add("flex-" + space);
         if (childNodes) childNodes.forEach(childSpace => {
             let child = document.createElement(childSpace);
