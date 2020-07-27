@@ -1,0 +1,70 @@
+ub<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Flexbox в CSS3</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            font-family: verdana, arial, sans-serif;
+        }
+        td {
+            background-color: white;
+            width: 80px;
+            height: 20px;
+            border: 1px solid red;
+            padding: 0;
+            margin: 0;
+
+        }
+    </style>
+    <link rel="stylesheet" href="css/flexlayout.css">
+    <script src="js/flexlayout.js"></script>
+</head>
+
+<body>
+    <div id="testflextable"></div>
+    <script>
+        class App {
+            #root;
+            #layout;
+
+            constructor(root) {
+                this.#root = root;
+                this.#layout = new FlexLayout(root);
+                this.#root.append(this.#layout);
+            }
+
+            add(elem, space) {
+                this.#layout.add(elem, space);
+            }
+
+        }
+
+        let root = document.querySelector("#testflextable");
+        let app = new App(root);
+        let table = document.createElement("table");
+
+        let tBody = document.createElement("tBody");
+        for (let i = 0; i < 20; i++) {
+            let row = tBody.insertRow(-1);
+            for (let j = 1; j <= 30; j++) {
+                let cell = document.createElement("td");
+                row.append(cell);
+            }
+        }
+        table.append(tBody);        
+
+        app.add(table, Space.MAIN);
+    </script>
+</body>
+
+</html>
