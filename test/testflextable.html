@@ -15,21 +15,21 @@
             padding: 0;
             margin: 0;
             font-family: verdana, arial, sans-serif;
+            overflow: hidden;
         }
         table {
-            border-collapse: collapse;  
+            left: 0;
+            border-collapse: collapse;
+          }
+        tr {
+            max-height: 20px;
         }
         td {
             background-color: white;
-            width: 80px;
-            height: 20px;
+            min-width: 80px;
+            max-height: 20px;
             border: 1px solid #aaa;
-            padding: 0;
-            margin: 0;
-        }
-        .info-panel{
-            width: 100%;
-            height: 100px;
+            color: black;
         }
     </style>
     <link rel="stylesheet" href="css/flexlayout.css">
@@ -53,22 +53,39 @@
                 this.#layout.add(elem, space);
             }
 
+            get root() {
+                return this.#root;
+            }
+
         }
 
         let root = document.querySelector("#testflextable");
         let app = new App(root);
 
         let table = document.createElement("table");
+        table.classList.add("table");
+        let tableParam = {
+            colCount: 50,
+            rowCount: 50
+        };
         let tBody = document.createElement("tBody");
-        for (let i = 0; i < 20; i++) {
+        for (let i = 1; i <= tableParam.rowCount; i++) {
             let row = tBody.insertRow(-1);
-            for (let j = 1; j <= 30; j++) {
+            for (let j = 1; j <= tableParam.colCount; j++) {
                 let cell = document.createElement("td");
+                cell.onclick = (event) => {console.log(event)};
+                cell.contentEditable=true;
+                cell.innerHTML = i+":"+j;
                 row.append(cell);
             }
         }
         table.append(tBody);        
         app.add(table, Space.MAIN);
+
+        let menu = document.createElement("label");
+        menu.classList.add("menu-panel");
+        menu.innerHTML="Меню";
+        app.add(menu, Space.TOP);
 
         let info = document.createElement("label");
         info.classList.add("info-panel");
