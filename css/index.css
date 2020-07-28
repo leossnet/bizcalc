@@ -10,10 +10,10 @@ body {
     background-color: rgb(145, 145, 145);
     overflow: hidden;
   }
-.header > h2 {
-    padding-left: 1%;
-    background-color: lightgray;
-    margin-top: 0px;
-    margin-bottom: 0px;
+#app-header {
+    min-height: 155.5px;
+}
+#info-bar {
+    min-height: 24px;
 }
 

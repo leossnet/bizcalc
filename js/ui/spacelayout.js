@@ -105,23 +105,6 @@ class SpaceLayout extends HTMLDivElement {
         }
     }
 
-    getStyle(space) {
-        return getComputedStyle(this.#components.get(space));
-    }
-
-
-
-    mainHeight() {
-        let h = Number.parseFloat(getComputedStyle(this.parentElement).height);
-        let ht = Number.parseFloat(getStyle(Space.TOP).height);
-        let hb = Number.parseFloat(getStyle(Space.BOTTOM).height);
-        return h - ht - hb;
-    }
-
-    get height() {
-        return Number.parseFloat(getComputedStyle(this.parentElement).height);
-    }
-
     /**
      * Обрабочик, вызываемой после добавления компонента в документ
      * @returns {undefined}

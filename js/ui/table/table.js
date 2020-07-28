@@ -63,7 +63,7 @@ class Table extends HTMLTableElement{
         window.addEventListener("resize", () => { 
             this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
             // this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
-            this.setAttribute("view-height", document.querySelector(".flex-layout").mainHeight); 
+            this.setAttribute("view-height", document.querySelector(".space-layout").mainHeight); 
         });
     }
 
@@ -107,7 +107,8 @@ class Table extends HTMLTableElement{
         if ( this.#params.isFocus ) this.focus();
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
         // this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
-        this.setAttribute("view-height", document.querySelector(".flex-layout").mainHeight); 
+        // this.setAttribute("view-height", document.querySelector(".space-layout").mainHeight); 
+        this.setAttribute("view-height", this.parentElement.height); 
     }
 
     /**

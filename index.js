@@ -21,8 +21,9 @@ class App {
         this.#fileName = 'filename.json';
 
         // добавление менеджеров размещения компонентов на интерфейсе (компоновщиков)
-        this.#flayout = new FlexLayout(this.#root);
+        this.#flayout = new SpaceLayout(this.#root);
         this.#tlayout = new GridLayout(this.#root, 3, 1);
+        this.#tlayout.id = "app-header";
         this.#flayout.add(this.#tlayout, Space.TOP);
 
         // настройка кнопочной панели
@@ -89,7 +90,7 @@ class App {
         this.#tlayout.add(this.getComponent("editor"), 2, 0);
         
         // this.#flayout.add(this.getComponent("tablePanel"), Space.CENTER);
-        this.#flayout.add(this.getComponent("table"), Space.CENTER);
+        this.#flayout.add(this.getComponent("table"), Space.MAIN);
         // this.#flayout.add("Просто текст", Space.CENTER);
 
         this.#flayout.add(this.getComponent("infobar"), Space.BOTTOM);

@@ -1,7 +1,4 @@
 .table {
-    position: inherit;
-    size: inherit;
-    table-layout: fixed ;
     border-collapse: collapse;  
     background-color: rgb(145, 145, 145);
     user-select: none;
