@@ -20,15 +20,23 @@
         }
         .menu-panel{
             min-height: 60px;
+            background-color: #37474f;
+            color: white;
         }
         .info-panel {
             min-height: 30px;
+            background-color: #37474f;
+            color: white;
         }
         .file-panel {
             min-width: 180px;
+            background-color: #455a64;
+            color: white;
         }
         .setup-panel {
-            min-width: 120px;
+            min-width: 180px;
+            background-color: #455a64;
+            color: white;
         }
     </style>
     <link rel="stylesheet" href="css/spacelayout.css">
@@ -65,7 +73,7 @@
         let app = new App(document.querySelector("#testspacelayout"));
 
         let tableParams = {
-            colCount: 50,
+            colCount: 20,
             rowCount: 50
         };
         let table = new Table(app, tableParams);
