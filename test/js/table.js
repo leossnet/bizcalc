@@ -16,13 +16,12 @@ class Table extends HTMLTableElement {
             let row = tBody.insertRow(-1);
             for (let j = 1; j <= this.#params.colCount; j++) {
                 let cell = document.createElement("td");
-                cell.onclick = (event) => {console.log(event)};
                 cell.contentEditable=true;
                 cell.innerHTML = i+":"+j;
                 row.append(cell);
             }
         }
-        this.append(tBody);       
+        this.append(tBody);
     }
 }
 

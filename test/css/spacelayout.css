@@ -1,29 +1,46 @@
 .space-layout {
     color: #fff;
-    font-size: 1.1em;
+    width: 100%;
+    height: 100%;
 }
-
 .space-nav,
 .space-aside {
     background-color: #455a64;
+    position: absolute;
+    padding: 2px;
+}
+.space-nav {
+    left: 0;
+    top: var(--header-height);
+    bottom: var(--footer-height);
+    width: var(--nav-width);
+}
+.space-aside {
+    right: 0;
+    top: var(--header-height);
+    bottom: var(--footer-height);
+    width: var(--aside-width);
 }
 .space-header,
 .space-footer {
     background-color: #37474f;
     position: absolute;
-    min-height: 20px;
     width: 100%;
+    padding: 2px;
 }
 .space-header {
     top: 0;
-    height: 40px;
+    left: 0;
+    height: var(--header-height);
 }
 .space-footer {
     bottom: 0;
-    height: 20px;
+    left: 0;
+    height: var(--footer-height);
 }
 .space-main {
     background-color: #546e7a;
-    position: relative;
-    top: 0px;
+    position: absolute;
+    left: var( --nav-width);
+    top: var(--header-height);
 }

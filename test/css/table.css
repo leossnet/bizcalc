@@ -1,5 +1,4 @@
 table {
-    left: 0;
     border-collapse: collapse;
   }
 tr {
@@ -8,7 +7,9 @@ tr {
 td {
     background-color: white;
     min-width: 80px;
+    max-width: 80px;
     max-height: 20px;
     border: 1px solid #aaa;
     color: black;
+    outline: none;
 }

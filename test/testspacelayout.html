@@ -10,7 +10,6 @@
         * {
             box-sizing: border-box;
         }
-
         html,
         body {
             padding: 0;
@@ -19,7 +18,18 @@
             font-size: 14px;
             overflow: hidden;
         }
-
+        .menu-panel{
+            min-height: 60px;
+        }
+        .info-panel {
+            min-height: 30px;
+        }
+        .file-panel {
+            min-width: 180px;
+        }
+        .setup-panel {
+            min-width: 120px;
+        }
     </style>
     <link rel="stylesheet" href="css/spacelayout.css">
     <link rel="stylesheet" href="css/table.css">
@@ -28,7 +38,7 @@
 </head>
 
 <body>
-    <div id="testflextable"></div>
+    <div id="testspacelayout"></div>
     <script>
         class App {
             #root;
@@ -36,54 +46,35 @@
 
             constructor(root) {
                 this.#root = root;
-                this.#layout = new FlexLayout(root);
+                this.#layout = new SpaceLayout(root);
                 this.#root.append(this.#layout);
             }
 
-            add(elem, space) {
+            addElement(elem, space) {
                 this.#layout.add(elem, space);
             }
 
+            createElement(elemName, className, label, space) {
+                let elem = document.createElement(elemName);
+                elem.classList.add(className);
+                elem.innerHTML=label;
+                this.addElement(elem, space);
+            }
         }
 
-        let root = document.querySelector("#testflextable");
-        let app = new App(root);
-
-        // let table = document.createElement("table");
-        // table.classList.add("table");
-        // let tableParam = {
-        //     colCount: 50,
-        //     rowCount: 50
-        // };
-        // let tBody = document.createElement("tBody");
-        // for (let i = 1; i <= tableParam.rowCount; i++) {
-        //     let row = tBody.insertRow(-1);
-        //     for (let j = 1; j <= tableParam.colCount; j++) {
-        //         let cell = document.createElement("td");
-        //         cell.onclick = (event) => {console.log(event)};
-        //         cell.contentEditable=true;
-        //         cell.innerHTML = i+":"+j;
-        //         row.append(cell);
-        //     }
-        // }
-        // table.append(tBody);
+        let app = new App(document.querySelector("#testspacelayout"));
 
         let tableParams = {
             colCount: 50,
             rowCount: 50
         };
         let table = new Table(app, tableParams);
-        app.add(table, Space.MAIN);
+        app.addElement(table, Space.MAIN);
+        app.createElement("label", "menu-panel", "Меню", Space.TOP);
+        app.createElement("label", "info-panel", "Справочная информация", Space.BOTTOM);
+        app.createElement("label", "file-panel", "Файлы", Space.LEFT);
+        app.createElement("label", "setup-panel", "Настройки", Space.RIGHT);
 
-        let menu = document.createElement("div");
-        menu.classList.add("menu-panel");
-        menu.innerHTML="Меню";
-        app.add(menu, Space.TOP);
-
-        let info = document.createElement("div");
-        info.classList.add("info-panel");
-        info.innerHTML="Справочная информация..."
-        app.add(info, Space.BOTTOM);
 
     </script>
 </body>
