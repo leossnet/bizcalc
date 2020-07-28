@@ -2,11 +2,11 @@
   * Места расположения компонентов в контейнере
   */
 const Space = {
-    TOP: "flex-header",
-    BOTTOM: "flex-footer",
-    LEFT: "flex-nav",
-    RIGHT: "flex-aside",
-    MAIN: "flex-main"
+    TOP: "space-header",
+    BOTTOM: "space-footer",
+    LEFT: "space-nav",
+    RIGHT: "space-aside",
+    MAIN: "space-main"
 };
 
 class FlexLayout extends HTMLDivElement {
@@ -16,7 +16,7 @@ class FlexLayout extends HTMLDivElement {
     constructor(root) {
         super();
         this.#components = new Map();
-        this.classList.add("flex-layout");
+        this.classList.add("space-layout");
         root.append(this);
     }
 

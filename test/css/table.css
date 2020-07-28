@@ -1,0 +1,14 @@
+table {
+    left: 0;
+    border-collapse: collapse;
+  }
+tr {
+    max-height: 20px;
+}
+td {
+    background-color: white;
+    min-width: 80px;
+    max-height: 20px;
+    border: 1px solid #aaa;
+    color: black;
+}

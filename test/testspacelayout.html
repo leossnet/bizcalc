@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Flexbox в CSS3</title>
+    <link rel="icon" href="favicon.ico"><link>
     <style>
         * {
             box-sizing: border-box;
@@ -15,25 +16,15 @@
             padding: 0;
             margin: 0;
             font-family: verdana, arial, sans-serif;
+            font-size: 14px;
             overflow: hidden;
         }
-        table {
-            left: 0;
-            border-collapse: collapse;
-          }
-        tr {
-            max-height: 20px;
-        }
-        td {
-            background-color: white;
-            min-width: 80px;
-            max-height: 20px;
-            border: 1px solid #aaa;
-            color: black;
-        }
+
     </style>
-    <link rel="stylesheet" href="css/flexlayout.css">
-    <script src="js/flexlayout.js"></script>
+    <link rel="stylesheet" href="css/spacelayout.css">
+    <link rel="stylesheet" href="css/table.css">
+    <script src="js/spacelayout.js"></script>
+    <script src="js/table.js"></script>
 </head>
 
 <body>
@@ -53,41 +44,43 @@
                 this.#layout.add(elem, space);
             }
 
-            get root() {
-                return this.#root;
-            }
-
         }
 
         let root = document.querySelector("#testflextable");
         let app = new App(root);
 
-        let table = document.createElement("table");
-        table.classList.add("table");
-        let tableParam = {
+        // let table = document.createElement("table");
+        // table.classList.add("table");
+        // let tableParam = {
+        //     colCount: 50,
+        //     rowCount: 50
+        // };
+        // let tBody = document.createElement("tBody");
+        // for (let i = 1; i <= tableParam.rowCount; i++) {
+        //     let row = tBody.insertRow(-1);
+        //     for (let j = 1; j <= tableParam.colCount; j++) {
+        //         let cell = document.createElement("td");
+        //         cell.onclick = (event) => {console.log(event)};
+        //         cell.contentEditable=true;
+        //         cell.innerHTML = i+":"+j;
+        //         row.append(cell);
+        //     }
+        // }
+        // table.append(tBody);
+
+        let tableParams = {
             colCount: 50,
             rowCount: 50
         };
-        let tBody = document.createElement("tBody");
-        for (let i = 1; i <= tableParam.rowCount; i++) {
-            let row = tBody.insertRow(-1);
-            for (let j = 1; j <= tableParam.colCount; j++) {
-                let cell = document.createElement("td");
-                cell.onclick = (event) => {console.log(event)};
-                cell.contentEditable=true;
-                cell.innerHTML = i+":"+j;
-                row.append(cell);
-            }
-        }
-        table.append(tBody);        
+        let table = new Table(app, tableParams);
         app.add(table, Space.MAIN);
 
-        let menu = document.createElement("label");
+        let menu = document.createElement("div");
         menu.classList.add("menu-panel");
         menu.innerHTML="Меню";
         app.add(menu, Space.TOP);
 
-        let info = document.createElement("label");
+        let info = document.createElement("div");
         info.classList.add("info-panel");
         info.innerHTML="Справочная информация..."
         app.add(info, Space.BOTTOM);
