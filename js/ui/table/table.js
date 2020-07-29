@@ -62,8 +62,7 @@ class Table extends HTMLTableElement{
         window.addEventListener("load", () => this.#tableData.asyncRefreshData() );
         window.addEventListener("resize", () => { 
             this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
-            // this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
-            this.setAttribute("view-height", document.querySelector(".space-layout").mainHeight); 
+            this.setAttribute("view-height", document.documentElement.clientHeight - 155.5 - 24); 
         });
     }
 
@@ -108,7 +107,9 @@ class Table extends HTMLTableElement{
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width); 
         // this.setAttribute("view-height", getComputedStyle(this.parentElement).height); 
         // this.setAttribute("view-height", document.querySelector(".space-layout").mainHeight); 
-        this.setAttribute("view-height", this.parentElement.height); 
+        this.setAttribute("view-height", document.documentElement.clientHeight - 155.5 - 24); 
+        console.log(document.documentElement.clientHeight);
+
     }
 
     /**
