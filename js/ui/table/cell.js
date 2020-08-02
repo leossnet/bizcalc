@@ -52,15 +52,7 @@ class Cell extends HTMLTableCellElement {
     }
 
     refresh() {
-        if ( this.childElementCount == 0 ) {
-            this.innerHTML = this.data.value;
-        }
-        else {
-            // console.log(this.innerHTML);
-            console.log(this.innerText);
-            // this.innerHTML = this.data.value;
-            // this.firstChild.value = this.data.value;
-        }
+        this.textContent = this.data.value;
     }
 
     /**

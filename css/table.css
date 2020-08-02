@@ -82,7 +82,6 @@ th.cursor-row {
 .cell-header[col] {
     cursor: text;
 }
-td.change-value,
-td.change-value>.table-cursor {
+td.change-value {
     background-color: rgb(255, 241, 243);
 }
