@@ -14,8 +14,6 @@ class Cursor extends HTMLElement{
 
     #app;
     #cell;
-    // #editValue;
-    // #initValue;
     #table;
     #isEdit;
     #editor; // поле редактирования содержимого ячейки над таблицей
@@ -74,7 +72,6 @@ class Cursor extends HTMLElement{
      */
     set value (value) {
         this.#cell.data.value = value;
-        // this.innerHTML = value;
     }
 
     /**
@@ -110,7 +107,7 @@ class Cursor extends HTMLElement{
      */    
     clearValue() {
         this.#table.tableData.pushBuffer(this.#cell.data);
-        this.#cell.data.value = undefined;
+        this.value = undefined;
         this.#editor.value = "";
     }
 
@@ -148,6 +145,8 @@ class Cursor extends HTMLElement{
      */
     beginInput() {
         this.isEdit = true;
+        // this.value = undefined;
+        this.#editor.value = "";
         this.#cell.focus();
     }
 
@@ -157,8 +156,8 @@ class Cursor extends HTMLElement{
     endEditing() {
         this.isEdit = false;
         if ( String(this.value) !== this.#cell.firstChild.textContent ) {
-            this.value = this.#cell.firstChild.textContent;
             this.#table.tableData.pushBuffer(this.#cell.data);
+            this.value = this.#cell.firstChild.textContent;
         }
         this.#table.focus();
     }
