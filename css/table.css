@@ -4,10 +4,11 @@
     user-select: none;
     font-size: 13px;
 }
-/* .table:focus,
+.table:focus,
+.cell-cursor:focus,
 .table-cursor:focus {
     outline: none;
-} */
+}
 .row-header,
 .row-data,
 .row-empty {
@@ -31,16 +32,13 @@
 }
 .cell-cursor {
     border-color: green;
-/*     z-index: 10; */
 }
 .top-cell-cursor {
     border-bottom-color: green;
-    /* z-index: 10; */
 }
 .left-cell-cursor {
     border-right-color: green;
-/*     z-index: 10;
- */}
+}
 .cell-data[type="number"] {
     color: darkgreen;
     text-align: right;
