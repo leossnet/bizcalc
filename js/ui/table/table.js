@@ -61,7 +61,7 @@ class Table extends HTMLTableElement{
         
         window.addEventListener("load", () => this.#tableData.asyncRefreshData() );
         window.addEventListener("resize", () => { 
-            updates.updateViewSize();
+            this.updateViewSize();
         });
     }
 
