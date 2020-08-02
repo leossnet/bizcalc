@@ -129,7 +129,7 @@ class Editor extends HTMLDivElement {
                 break;
             case "Escape" : 
                 cursor.cell = cursor.cell;
-                cursor.focus();
+                cursor.cell.focus();
                 break;
         }
     }
@@ -150,7 +150,7 @@ class Editor extends HTMLDivElement {
                 break;
             case "btEscape" :
                 cursor.cell = cursor.cell;
-                cursor.focus();
+                cursor.cell.focus();
                 break;
         }
     }

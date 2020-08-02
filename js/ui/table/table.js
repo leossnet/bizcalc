@@ -323,6 +323,32 @@ class Table extends HTMLTableElement{
     }
 
     /**
+     * Получить левую ячейку относительно текущей
+     * @param {Cell} currentCell - текущая ячейка 
+     */
+    getLeftCell(currentCell) {
+        let rowNum = currentCell.data.rowNumber;
+        let colNum = currentCell.data.colNumber;
+        let cellName = CellData.getCellName(rowNum, Math.max(1, colNum-1));
+        // console.log("getLeftCell: "+cellName+", rowNum: "+rowNum+", colNum: "+colNum);
+        let cell = this.#tableData.getCell(cellName);
+        return cell;
+    }
+
+    /**
+     * Получить верхнюю ячейку относительно текущей
+     * @param {Cell} currentCell - текущая ячейка
+     */
+    getTopCell(currentCell) {
+        let rowNum = currentCell.data.rowNumber;
+        let colNum = currentCell.data.colNumber;
+        let cellName = CellData.getCellName(Math.max(1, rowNum-1), colNum);
+        // console.log("getTopCell: "+cellName+", rowNum: "+rowNum+", colNum: "+colNum);
+        let cell = this.#tableData.getCell(cellName);
+        return cell;
+    }
+
+    /**
      * Получение данных ячейки
      * @param {String} cellName - имя ячейки
      */
@@ -431,7 +457,7 @@ class Table extends HTMLTableElement{
             beginCell.refresh();
         }
         this.updateStartCell(beginCell, endCell);
-        this.cursor.focus();
+        this.cursor.cell.focus();
     }
 
 
@@ -791,19 +817,17 @@ class Table extends HTMLTableElement{
                 break;
             case "ArrowLeft" :
                 // переход на первую колонку при нажатой клавише Ctrl
-                if ( this.cursor.isEdit ) this.cursor.endEditing();
                 if ( event.ctrlKey )
                     colCount = 1 - currentCell.colNumber;
                 else colCount -= 1;
-                this.moveCursor(rowCount, colCount);
+                if ( !this.cursor.isEdit) this.moveCursor(rowCount, colCount);
                 break;
             case "ArrowRight" :
-                if ( this.cursor.isEdit ) this.cursor.endEditing();
                 // переход на последнюю колонку при нажатой клавише Ctrl
                 if ( event.ctrlKey)
                     colCount = this.#params.colCount - currentCell.colNumber;
                 else colCount += 1;
-                this.moveCursor(rowCount, colCount);
+                if ( !this.cursor.isEdit) this.moveCursor(rowCount, colCount);
                 break;
             case "Home" :
                 if ( this.cursor.isEdit ) this.cursor.endEditing();
@@ -855,15 +879,15 @@ class Table extends HTMLTableElement{
                 this.cursor.clearValue();
                 this.setCursor(currentCellName);
                 break;
-            case "Backspace" :
-                if ( this.cursor.isEdit ) {
-                    this.cursor.removeLastKey();
-                }
-                break;
+            // case "Backspace" :
+            //     if ( this.cursor.isEdit ) {
+            //         this.cursor.removeLastKey();
+            //     }
+            //     break;
             default: 
                 if ( this.cursor.isPrintKey(keyEvent.keyCode) && !keyEvent.ctrlKey ) {
                     if ( !this.cursor.isEdit ) this.cursor.beginInput();
-                    this.cursor.addKey(keyEvent);
+                    // this.cursor.addKey(keyEvent);
                 }
                 break;
         }

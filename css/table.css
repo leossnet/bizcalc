@@ -4,10 +4,10 @@
     user-select: none;
     font-size: 13px;
 }
-.table:focus,
+/* .table:focus,
 .table-cursor:focus {
     outline: none;
-}
+} */
 .row-header,
 .row-data,
 .row-empty {
@@ -27,7 +27,20 @@
     margin: 0px;
     padding: 0px 2px;
     cursor: cell;
+    position: relative;
 }
+.cell-cursor {
+    border-color: green;
+/*     z-index: 10; */
+}
+.top-cell-cursor {
+    border-bottom-color: green;
+    /* z-index: 10; */
+}
+.left-cell-cursor {
+    border-right-color: green;
+/*     z-index: 10;
+ */}
 .cell-data[type="number"] {
     color: darkgreen;
     text-align: right;
@@ -41,15 +54,14 @@
     text-align: left;
 }
 .table-cursor {
-    border: 1px solid green;
-    background-color: white;
-    margin-left: -2px;
-    margin-right: -2px;
-    padding: 1px 1px 0 1px;
-    min-width: calc(100% + 4px);
-    min-height: 100%;
-    height: 100%;
-    float: left;
+    background-color: green;
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 4px;
+    height: 4px;
+    z-index: 10;
+    cursor: crosshair;
 }
 .table-cursor-edit {
     background-color: rgb(242, 253, 242);

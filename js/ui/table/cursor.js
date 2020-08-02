@@ -14,8 +14,8 @@ class Cursor extends HTMLElement{
 
     #app;
     #cell;
-    #editValue;
-    #initValue;
+    // #editValue;
+    // #initValue;
     #table;
     #isEdit;
     #editor; // поле редактирования содержимого ячейки над таблицей
@@ -38,13 +38,22 @@ class Cursor extends HTMLElement{
      * Присвоение курсору нового объекта ячейки Cell
      */
     set cell(cell){
+        if ( this.#cell ) {
+            this.#cell.classList.remove("cell-cursor");
+            this.#table.getLeftCell(this.#cell).classList.remove("left-cell-cursor")
+            this.#table.getTopCell(this.#cell).classList.remove("top-cell-cursor")
+        }
         this.#cell = cell;
-        this.#cell.innerHTML = "";
-        this.value = cell.data.value;
+        // this.#cell.innerHTML = "";
+        // this.value = cell.data.value;
         this.setEditableValue(this.#editor);
         this.#editor.cellName = this.#cell.data.name;
         this.#cell.append(this);
-    }
+
+        this.#cell.classList.add("cell-cursor");
+        this.#table.getLeftCell(this.#cell).classList.add("left-cell-cursor");
+        this.#table.getTopCell(this.#cell).classList.add("top-cell-cursor");
+}
 
 
     /**
@@ -58,15 +67,15 @@ class Cursor extends HTMLElement{
      * Получение значения ячейки, на которой расположен курсов
      */
     get value() {
-        return this.#editValue;
+        return this.#cell.data.value;
     }
 
     /**
      * Установление нового значения курсора
      */
     set value (value) {
-        this.#editValue = value;
-        this.innerHTML = value;
+        this.#cell.data.value = value;
+        // this.innerHTML = value;
     }
 
     /**
@@ -82,11 +91,10 @@ class Cursor extends HTMLElement{
     set isEdit(isEdit) {
         this.#isEdit = isEdit;
         if ( isEdit ) {
-            this.classList.add("table-cursor-edit");
+            this.#cell.setAttribute("contenteditable", true);
         }
         else {
-            this.classList.remove("table-cursor-edit");
-            // this.#table.focus();
+            this.#cell.removeAttribute("contenteditable");
         }
     }
 
@@ -102,45 +110,47 @@ class Cursor extends HTMLElement{
      * Добавление символа к значению текущей ячейки таблицы
      * @param {EventKey} keyEvent 
      */
-    addKey(keyEvent) {
-        if ( this.isPrintKey(keyEvent.keyCode) ) {
-            this.value += keyEvent.key;
-        }
-        this.setEditableValue(this.#editor);
-        this.#editor.value = this.value;
-    }
+    // addKey(keyEvent) {
+    //     if ( this.isPrintKey(keyEvent.keyCode) ) {
+    //         this.value += keyEvent.key;
+    //     }
+    //     this.setEditableValue(this.#editor);
+    //     this.#editor.value = this.value;
+    // }
 
     /**
      * Удаление крайнего справа символа значения ячейки
      */
-    removeLastKey() {
-        let strValue = String(this.value);
-        if ( strValue.length ) {
-            this.value = strValue.substring(0, strValue.length-1);
-        }
-        this.setEditableValue(this.#editor);
-        this.#editor.value = this.value;
-    }
+    // removeLastKey() {
+    //     let strValue = String(this.value);
+    //     if ( strValue.length ) {
+    //         this.value = strValue.substring(0, strValue.length-1);
+    //     }
+    //     this.setEditableValue(this.#editor);
+    //     this.#editor.value = this.value;
+    // }
 
     /**
      * Удаление содержимого текущей ячейки 
      */    
     clearValue() {
-        this.value = "";
+        // this.value = "";
         this.#table.tableData.pushBuffer(this.#cell.data);
         this.#cell.data.value = undefined;
         this.setEditableValue(this.#editor);
-        this.#editor.value = this.value;
+        this.#editor.value = "";
     }
 
     /**
      * Начало редактирования содержимого курсора ячейки
      */
     beginEditing() {
+        console.log("begin editing");
         this.isEdit = true;
-        this.#initValue = this.#editValue;
-        this.setEditableValue(this);
-        this.focus();
+        // this.#initValue = this.#editValue;
+        this.setEditableValue(this.#cell);
+        // this.#cell.setAttribute("contenteditable", true);
+        this.#cell.focus();
     }
 
     /**
@@ -169,9 +179,9 @@ class Cursor extends HTMLElement{
      */
     beginInput() {
         this.isEdit = true;
-        this.#initValue = this.#editValue;
-        this.value = "";
-        this.focus();
+        // this.#initValue = this.#editValue;
+        // this.value = "";
+        this.#cell.focus();
     }
 
     /**
@@ -183,6 +193,7 @@ class Cursor extends HTMLElement{
             this.#table.tableData.pushBuffer(this.#cell.data);
             this.#cell.data.value = this.value;
         }
+        // this.#cell.removeAttribute("contenteditable");
         this.#table.focus();
     }
 
@@ -191,7 +202,8 @@ class Cursor extends HTMLElement{
      */    
     escapeEditing() {
         this.isEdit = false;
-        this.value = this.#initValue;
+        // this.value = this.#initValue;
+        // this.#cell.removeAttribute("contenteditable");
         this.#table.focus();
     }
 

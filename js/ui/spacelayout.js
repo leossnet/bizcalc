@@ -46,7 +46,7 @@ class SpaceLayout extends HTMLDivElement {
      * @param {Event} event - событие добавления в компоновщик нового элемента
      */
     handlerLayout(event) {
-        console.log(event);
+        // console.log(event);
         for (let elem of this.#components.values()) {
             if ( elem.updateViewSize ) elem.updateViewSize();
         }        
