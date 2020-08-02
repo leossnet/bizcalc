@@ -5,8 +5,8 @@ class App {
     #root;
     #components;
     #btPanel;
-    #flayout;
-    #tlayout;
+    #spaceLayout;
+    #tableLayout;
     #fileName;
 
     /**
@@ -21,10 +21,10 @@ class App {
         this.#fileName = 'filename.json';
 
         // добавление менеджеров размещения компонентов на интерфейсе (компоновщиков)
-        this.#flayout = new SpaceLayout(this.#root);
-        this.#tlayout = new GridLayout(this.#root, 3, 1);
-        this.#tlayout.id = "app-header";
-        this.#flayout.add(this.#tlayout, Space.TOP);
+        this.#spaceLayout = new SpaceLayout(this.#root);
+        this.#tableLayout = new GridLayout(this.#root, 3, 1);
+        this.#tableLayout.id = "app-header";
+        this.#spaceLayout.add(this.#tableLayout, Space.TOP);
 
         // настройка кнопочной панели
         const buttons = {
@@ -85,21 +85,24 @@ class App {
         this.addComponent("infobar", new Infobar(this, {}));
 
         // размещение компонентов на интерфейсе
-        this.#tlayout.add(this.#btPanel, 1, 0);
-        this.#tlayout.add(this.getComponent("navbar"), 0, 0);
-        this.#tlayout.add(this.getComponent("editor"), 2, 0);
-        
-        // this.#flayout.add(this.getComponent("tablePanel"), Space.CENTER);
-        this.#flayout.add(this.getComponent("table"), Space.MAIN);
-        // this.#flayout.add("Просто текст", Space.CENTER);
+        this.#tableLayout.add(this.#btPanel, 1, 0);
+        this.#tableLayout.add(this.getComponent("navbar"), 0, 0);
+        this.#tableLayout.add(this.getComponent("editor"), 2, 0);
 
-        this.#flayout.add(this.getComponent("infobar"), Space.BOTTOM);
+        this.#spaceLayout.add(this.getComponent("infobar"), Space.BOTTOM);
+        
+        // this.#spaceLayout.add(this.getComponent("tablePanel"), Space.CENTER);
+        this.#spaceLayout.add(this.getComponent("table"), Space.MAIN);
+        // this.#spaceLayout.add("Просто текст", Space.CENTER);
+
 
         // this.getComponent("tablePanel").currentTable.focus();
         this.getComponent("table").focus();
 
         console.timeEnd("app");
         window.addEventListener("keydown", this.handlerKeyDown);
+        document.addEventListener("layout", (event) => console.log("layout event"));
+
     }
 
     /**
@@ -138,6 +141,10 @@ class App {
      */
     getComponent(componentName) {
         return this.#components.get(componentName);
+    }
+
+    handlerLayout(event) {
+        console.log(event);
     }
 
     /**
