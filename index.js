@@ -89,12 +89,12 @@ class App {
         this.#tableLayout.add(this.getComponent("navbar"), 0, 0);
         this.#tableLayout.add(this.getComponent("editor"), 2, 0);
 
-        this.#spaceLayout.add(this.getComponent("infobar"), Space.BOTTOM);
         
         // this.#spaceLayout.add(this.getComponent("tablePanel"), Space.CENTER);
         this.#spaceLayout.add(this.getComponent("table"), Space.MAIN);
         // this.#spaceLayout.add("Просто текст", Space.CENTER);
 
+        this.#spaceLayout.add(this.getComponent("infobar"), Space.BOTTOM);
 
         // this.getComponent("tablePanel").currentTable.focus();
         this.getComponent("table").focus();

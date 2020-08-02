@@ -37,7 +37,19 @@ class SpaceLayout extends HTMLDivElement {
                 this.updateStyle(this.#components.get(space), space);
             }
         });
+        this.addEventListener("layout", this.handlerLayout);
         root.append(this);
+    }
+
+    /**
+     * Обработчик события добавления в компоновщик нового компонента
+     * @param {Event} event - событие добавления в компоновщик нового элемента
+     */
+    handlerLayout(event) {
+        console.log(event);
+        for (let elem of this.#components.values()) {
+            if ( elem.updateViewSize ) elem.updateViewSize();
+        }        
     }
 
     /**
@@ -50,6 +62,7 @@ class SpaceLayout extends HTMLDivElement {
         this.#components.set(space, elem);
         this.append(elem);
         this.updateStyle(elem, space);
+        elem.dispatchEvent(new Event("layout", {bubbles: true}));
     }
 
     /**

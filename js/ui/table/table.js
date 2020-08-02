@@ -61,11 +61,14 @@ class Table extends HTMLTableElement{
         
         window.addEventListener("load", () => this.#tableData.asyncRefreshData() );
         window.addEventListener("resize", () => { 
-            this.setViewSize();
+            updates.updateViewSize();
         });
     }
 
-    setViewSize() {
+    /**
+     * Функция обновления размера компонента, вызываемая компоновщиком при добавлении нового компонента
+     */
+    updateViewSize() {
         this.setAttribute("view-width", getComputedStyle(this.parentElement).width);
         let headerHeight = this.parentElement.getAttribute("header-height");
         let footerHeight = this.parentElement.getAttribute("footer-height");
@@ -112,7 +115,7 @@ class Table extends HTMLTableElement{
         this.setCursor("A1", false);
 
         if ( this.#params.isFocus ) this.focus();
-        this.setViewSize();
+        this.updateViewSize();
     }
 
     /**
