@@ -6,6 +6,7 @@ class Cell extends HTMLTableCellElement {
     #tableData;
     #cellData;
     #cell = {};
+    #buffer = "";
 
     /**
      * Конструктор ячейки таблицы
@@ -21,6 +22,11 @@ class Cell extends HTMLTableCellElement {
         this.addEventListener("click", this.handlerClick );
     }
 
+    /**
+     * Установка внешнего вида и атрибутов ячейки
+     * @param {String} colName - имя колоноки
+     * @param {Strig} rowName - имя строки
+     */
     generateCell(colName, rowName) {
         this.classList.add("cell-data");
         this.setAttribute("cell", this.data.name);
@@ -29,12 +35,36 @@ class Cell extends HTMLTableCellElement {
         this.setAttribute("type", this.data.type);
     }
 
+    /**
+     * Получение данных ячейки
+     */
     get data() {
         return this.#cellData;
     }
 
+    /**
+     * Получение имени ячейки
+     */
     get name() {
         return this.#cellData.name;
+    }
+
+    get editor() {
+        return this.#table.editor;
+    }
+
+    /**
+     * Получение вводимого значния ячейки
+     */
+    get buffer() {
+        return this.#buffer;
+    }
+
+    /**
+     * Установление вводимого значения ячейки
+     */
+    set buffer(value) {
+        this.#buffer = value;
     }
 
     /**
@@ -44,13 +74,19 @@ class Cell extends HTMLTableCellElement {
         this.generateCell(this.#cell.colName, this.#cell.rowName);
     }    
 
+    /**
+     * Обновление значения ячейки
+     */
     refreshValue() {
         if ( this.data.type == ValueTypes.Formula ) {
             this.data.value = this.#tableData.getTokens(this.data.name);
         }
         this.refresh();
     }
-
+    
+    /**
+     * Обновление содержимого ячейки
+     */
     refresh() {
         this.textContent = this.data.value;
     }

@@ -52,7 +52,6 @@ class Cursor extends HTMLElement{
         this.#table.getTopCell(this.#cell).classList.add("top-cell-cursor");
     }
 
-
     /**
      * Получение объекта ячейки Cell, на которой расположен курсор
      */
@@ -88,9 +87,11 @@ class Cursor extends HTMLElement{
         this.#isEdit = isEdit;
         if ( isEdit ) {
             this.#cell.setAttribute("contenteditable", true);
+            this.#cell.addEventListener("input", this.handlerInput);
         }
         else {
             this.#cell.removeAttribute("contenteditable");
+            this.#cell.removeEventListener("input", this.handlerInput);
         }
     }
 
@@ -116,6 +117,7 @@ class Cursor extends HTMLElement{
      */
     beginEditing() {
         this.isEdit = true;
+        this.#cell.buffer = this.value;
         this.#cell.focus();
     }
 
@@ -145,8 +147,9 @@ class Cursor extends HTMLElement{
      */
     beginInput() {
         this.isEdit = true;
-        // this.value = undefined;
         this.#editor.value = "";
+        this.#cell.firstChild.textContent = "";
+        this.#cell.buffer = "";
         this.#cell.focus();
     }
 
@@ -155,9 +158,9 @@ class Cursor extends HTMLElement{
      */
     endEditing() {
         this.isEdit = false;
-        if ( String(this.value) !== this.#cell.firstChild.textContent ) {
+        if ( String(this.value) !== this.#cell.buffer ) {
             this.#table.tableData.pushBuffer(this.#cell.data);
-            this.value = this.#cell.firstChild.textContent;
+            this.value = this.#cell.buffer;
         }
         this.#table.focus();
     }
@@ -169,6 +172,15 @@ class Cursor extends HTMLElement{
         this.isEdit = false;
         this.#cell.firstChild.textContent = this.value;
         this.#table.focus();
+    }
+
+    /**
+     * Обработка нажатия клавиш
+     * @param {KeyEvent} keyEvent - событие нажатия клавиш
+     */
+    handlerInput(keyEvent) {
+        this.buffer += keyEvent.data;
+        this.editor.value = this.buffer;
     }
 
 }
