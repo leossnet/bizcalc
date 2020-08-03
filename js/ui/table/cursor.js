@@ -2,16 +2,6 @@
  * Класс, реализующий курсор активной ячейки таблицы
  */
 class Cursor extends HTMLElement{
-    #printKeyCodes = new Set ([
-        48,49,50,51,52,53,54,55,56,57, // цифры основной клавиатуры
-        65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,  // латинские буквы
-        96,97,98,99,100,101,102,103,104,105, // цифры цифрового блока
-        106,107,109,110,111, // прочие символы цифрового блока
-        186,187,188,189,190,191,192, // прочие символы и русские буквы
-        219,220,221,222, // прочие символы и русские буквы
-        32 // пробел
-    ]);
-
     #app;
     #cell;
     #table;
@@ -96,14 +86,6 @@ class Cursor extends HTMLElement{
     }
 
     /**
-     * Проверка на вхождение кода символа в перечень печатаемых символов
-     * @param {Number} keyCode 
-     */
-    isPrintKey(keyCode) {
-        return this.#printKeyCodes.has(keyCode);
-    }
-
-    /**
      * Удаление содержимого текущей ячейки 
      */    
     clearValue() {
@@ -175,11 +157,11 @@ class Cursor extends HTMLElement{
     }
 
     /**
-     * Обработка нажатия клавиш
-     * @param {KeyEvent} keyEvent - событие нажатия клавиш
+     * Обработка вводимых символов
+     * @param {InputEvent} inputEvent - событие нажатия клавиш
      */
-    handlerInput(keyEvent) {
-        this.buffer += keyEvent.data;
+    handlerInput(inputEvent) {
+        this.buffer += inputEvent.data;
         this.editor.value = this.buffer;
     }
 
