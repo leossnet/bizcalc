@@ -161,7 +161,7 @@ class Cursor extends HTMLElement{
      * @param {InputEvent} inputEvent - событие нажатия клавиш
      */
     handlerInput(inputEvent) {
-        this.buffer += inputEvent.data;
+        this.buffer = inputEvent.target.innerText;
         this.editor.value = this.buffer;
     }
 
