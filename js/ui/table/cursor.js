@@ -152,7 +152,7 @@ class Cursor extends HTMLElement{
      */    
     escapeEditing() {
         this.isEdit = false;
-        this.#cell.firstChild.textContent = this.value;
+        this.value = this.value;
         this.#table.focus();
     }
 

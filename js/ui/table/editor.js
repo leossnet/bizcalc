@@ -129,8 +129,9 @@ class Editor extends HTMLDivElement {
                 cursor.cell.buffer = event.target.value;
                 cursor.endEditing();
                 break;
-            case "Escape" : 
-                cursor.cell = cursor.cell;
+            case "Escape" :
+                cursor.value = cursor.value;
+                cursor.isEdit = false;
                 table.focus();
                 break;
         }
@@ -151,7 +152,8 @@ class Editor extends HTMLDivElement {
                 cursor.endEditing();
                 break;
             case "btEscape" :
-                cursor.cell = cursor.cell;
+                cursor.value = cursor.value;
+                cursor.isEdit = false;
                 table.focus();
                 break;
         }
