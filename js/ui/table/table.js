@@ -881,15 +881,11 @@ class Table extends HTMLTableElement{
                     this.setCursor(currentCellName);
                 }
                 break;
-            // case "Backspace" :
-            //     if ( this.cursor.isEdit ) {
-            //         this.cursor.removeLastKey();
-            //     }
-            //     break;
             default: 
                 if ( this.cursor.isPrintKey(keyEvent.keyCode) && !keyEvent.ctrlKey ) {
-                    if ( !this.cursor.isEdit ) this.cursor.beginInput();
-                    // this.cursor.addKey(keyEvent);
+                    if ( !this.cursor.isEdit ) {
+                        this.cursor.beginInput();
+                    }
                 }
                 break;
         }
