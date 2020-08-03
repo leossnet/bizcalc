@@ -18,6 +18,7 @@ class App {
         console.time("app");
         this.#root = document.querySelector(appSelector);
         this.#components = new Map();
+        this.#root.id = "app";
         this.#fileName = 'filename.json';
 
         // добавление менеджеров размещения компонентов на интерфейсе (компоновщиков)
