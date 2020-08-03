@@ -22,15 +22,15 @@
 .space-footer {
     position: absolute;
     width: 100%;
+    left: 0;
+    right: 0;
 }
 .space-header {
     top: 0;
-    left: 0;
     height: var(--header-height);
 }
 .space-footer {
     bottom: 0;
-    left: 0;
     height: var(--footer-height);
 }
 .space-main {
