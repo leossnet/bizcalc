@@ -365,6 +365,8 @@ class TableData {
             this.getCellData(cellName).setValue(tokenArray, false);
         }
         this.calcAllCells();
+
+        await this.asyncRefreshCursorCell();
     }
 
     /**
