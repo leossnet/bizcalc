@@ -20,6 +20,8 @@ class Editor extends HTMLDivElement {
         this.generateEditor();
         this.tabIndex = -1;
         this.addEventListener("keydown", this.handlerKeyDown);
+        this.addEventListener("input", this.handlerInput);
+        this.addEventListener("focus", this.handlerFocus, true);
     }
     
     /**
@@ -117,19 +119,19 @@ class Editor extends HTMLDivElement {
 
     /**
      * Обработка нажатия кнопок в строке формул
-     * @param {KeyboardEvent} Event - событие нажатия клавиши
+     * @param {KeyboardEvent} event - событие нажатия клавиши
      */
     handlerKeyDown(event) {
-        let cursor = this.#app.getComponent("table").cursor;
+        let table = this.#app.getComponent("table");
+        let cursor = table.cursor;
         switch(event.key) {
             case "Enter" :
-                cursor.value = this.value;
+                cursor.cell.buffer = event.target.value;
                 cursor.endEditing();
-                cursor.cell = cursor.cell;
                 break;
             case "Escape" : 
                 cursor.cell = cursor.cell;
-                cursor.cell.focus();
+                table.focus();
                 break;
         }
     }
@@ -141,18 +143,36 @@ class Editor extends HTMLDivElement {
     handlerClickButton(event) {
         let button = event.path.filter( item => item.localName == "button").map(item => item.id)[0];
         let editor = document.querySelector(".table-editor");
-        let cursor = editor.app.getComponent("table").cursor;
+        let table = editor.app.getComponent("table");
+        let cursor = table.cursor;
         switch(button) {
             case "btEnter" :
-                cursor.value = editor.value;
+                cursor.cell.buffer = editor.value;
                 cursor.endEditing();
-                cursor.cell = cursor.cell;
                 break;
             case "btEscape" :
                 cursor.cell = cursor.cell;
-                cursor.cell.focus();
+                table.focus();
                 break;
         }
+    }
+
+    /**
+     * Обработка получения фокуса панели формул
+     * @param {FocusEvent} focusEvent - событие получения фокуса
+     */
+    handlerFocus(focusEvent) {
+        this.#app.getComponent("table").cursor.cell.buffer = this.value;
+    }
+
+    /**
+     * Обработка вводимых символов
+     * @param {InputEvent} inputEvent - событие нажатия клавиш
+     */
+    handlerInput(inputEvent) {
+        let cell = this.#app.getComponent("table").cursor.cell;
+        this.buffer = inputEvent.target.value;
+        cell.firstChild.textContent = this.buffer;
     }
 
 }
