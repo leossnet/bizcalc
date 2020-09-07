@@ -12,7 +12,6 @@ const ValueTypes = {
  * Класс, реализующий функционал ячейки таблицы
  */
 class CellData { 
-    #table;
     #tableData;
     #value = {};
     #param = {};
@@ -23,9 +22,8 @@ class CellData {
      * @param {String|Number} rowName имя строки ячейки
      * @param {String} colName имя колонки ячейки
      */
-    constructor(table, rowName, colName) {
-        this.#table = table;
-        this.#tableData = this.#table.tableData;
+    constructor(tableData, rowName, colName) {
+        this.#tableData = tableData;
 
         this.#param = {
             name: colName+String(rowName),

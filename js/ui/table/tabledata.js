@@ -1,74 +1,18 @@
 /**
  * Класс, реализующий поддержку расчетов ячеек по формулам
  */
-class TableData {
+class TableData extends CalcData {
     #app;           // объект приложения
     #table;         // компонент таблицы
     #idb;           // локальная база данных IndexedDB
-    #cellMap;       // видимые ячейки таблицы
-    #cellDataMap;   // данные видимых ячеек таблицы
-    #tokenMap;      // массивы токенов ячеек с формулами
-    #valueMap;      // числовые значения ячеек с числами
-    #stringMap;     // строковые значения ячеек со строками
     #bufferArray;   // стек измененных ячеек
-    #calculator;    // расчетчик
 
-    /**
-     * Конструктор модели данных таблицы
-     */
     constructor(app, table) {
+        super();
         this.#app = app;
         this.#table = table;
         this.#idb = new LocalDB(app);
-        this.initTableData();
-    }
-
-    /**
-     * Инициализация переменных модели данных таблицы
-     */
-    initTableData() {
-        this.#cellMap = new Map();
-        this.#cellDataMap = new Map();
-        this.#tokenMap = new Map();
-        this.#valueMap = new Map();
-        this.#stringMap = new Map();
         this.#bufferArray = [];
-        this.#calculator = new Calculator(this);
-    }
-
-    /**
-     * Пересчет значений формульных ячеек таблицы
-     */
-    calcAllCells() {
-        for (let cellName of this.#tokenMap.keys()) {
-            this.getCell(cellName.toUpperCase()).refreshValue();
-        }
-    }
-
-    /**
-     * Расчет значения ячейки, содержащей формулу
-     * @param {String} cellName - имя ячейки
-     */
-    calcCell (cellName) {
-        return this.#calculator.calc(this.getTokens(cellName.toUpperCase()));
-    }
-
-    /**
-     * Добавление ячейки в модель данных таблицы
-     * @param {String} cellName - имя ячейки
-     * @param {Object} cell - объект ячейки
-     */
-    setCell (cellName, cell) {
-        this.#cellMap.set(cellName.toUpperCase(), cell);
-    }
-    
-    /**
-     * Установка модели данных ячейки
-     * @param {String} cellName - имя ячейки
-     * @param {Object} cellData - объект данных ячейки CellData
-     */
-    setCellData (cellName, cellData) {
-        this.#cellDataMap.set(cellName.toUpperCase(), cellData);
     }
 
     /**
@@ -79,16 +23,16 @@ class TableData {
 
         let cell = cellName.toUpperCase();
         let store = "";
-        if (this.#valueMap.has(cell)) {
-            this.#valueMap.delete(cell);
+        if (this.valueMap.has(cell)) {
+            this.valueMap.delete(cell);
             store = "values";
         }
-        else if (this.#stringMap.has(cell)) {
-            this.#stringMap.delete(cell);
+        else if (this.stringMap.has(cell)) {
+            this.stringMap.delete(cell);
             store = "strings";
         }
-        else if (this.#tokenMap.has(cell)) {
-            this.#tokenMap.delete(cell);
+        else if (this.tokenMap.has(cell)) {
+            this.tokenMap.delete(cell);
             store = "tokens";
         }
 
@@ -113,72 +57,15 @@ class TableData {
     } 
 
     /**
-     * Получение объекта ячейки по имени ячейки
-     * @param {String} cellName - имя ячейки
-     */
-    getCell (cellName) {
-        return this.#cellMap.get(cellName.toUpperCase());
-    }
-
-    getCellData (cellName) {
-        return this.#cellDataMap.get(cellName.toUpperCase());
-    }
-
-    /**
-     * Содержит ли ячейка число
-     * @param {String} cellName - имя ячейки
-     */
-    isNumber(cellName) {
-        return this.#valueMap.has(cellName.toUpperCase());
-    }
-
-    /**
-     * Содержит ли ячейка формулу
-     * @param {String} cellName - имя ячейки
-     */
-    isFormula(cellName) {
-        return this.#tokenMap.has(cellName.toUpperCase());
-    }
-
-    /**
-     * Содержил ли ячейка строку
-     * @param {String} cellName - имя ячейки
-     */
-    isString(cellName) {
-        return this.#stringMap.has(cellName.toUpperCase());
-    }
-
-    /**
-     * Преобразование токена ячейки в токен его значения
-     * @param {Object} token объект токена 
-     */
-    getNumberToken (token) {
-        return new Token (Types.Number, this.getValue(token.value) );
-    }
-
-    /**
-     * Получение массива токенов формулы для ячейки
-     * @param {Strgin} cellName  - имя ячейки
-     */
-    getTokens(cellName) {
-        return this.#tokenMap.get(cellName.toUpperCase());
-    }
-
-    /**
      * Добавление в модель таблицы разобранную на токены формулу ячейки
      * @param {String} cellName 
      * @param {Array} formula 
      */
     async setTokens(cellName, formula) {
-        if ( Array.isArray(formula) ) {
-            this.#tokenMap.set(cellName.toUpperCase(), formula);
-        }
-        else {
-            let f = formula.substring(1).toUpperCase();
-            this.#tokenMap.set(cellName.toUpperCase(), Token.getTokens(f));
-        }
+        super.setTokens(cellName, formula);
+
         let db = await this.#idb.connect();        
-        await this.#idb.put(db, "tokens", cellName, JSON.stringify(this.#tokenMap.get(cellName)));
+        await this.#idb.put(db, "tokens", cellName, JSON.stringify(this.tokenMap.get(cellName)));
     }
 
     /**
@@ -187,19 +74,12 @@ class TableData {
      * @param {Number} value 
      */
     async setValue(cellName, value) {
-        this.#valueMap.set(cellName.toUpperCase(), value);
+        super.setValue(cellName, value);
 
         let db = await this.#idb.connect();        
-        await this.#idb.put(db, "values", cellName, JSON.stringify(this.#valueMap.get(cellName)));
+        await this.#idb.put(db, "values", cellName, JSON.stringify(this.valueMap.get(cellName)));
     }
 
-    /**
-     * Получение числового значения первичной ячейки
-     * @param {String} cellName 
-     */
-    getValue(cellName) {
-        return this.#valueMap.get(cellName.toUpperCase());;
-    }
 
     /**
      * Добавление в модель данных текстового значения
@@ -207,18 +87,10 @@ class TableData {
      * @param {String} string 
      */
     async setString(cellName, string) {
-        this.#stringMap.set(cellName.toUpperCase(), string);
+        super.setString(cellName, string);
 
         let db = await this.#idb.connect();        
-        await this.#idb.put(db, "strings", cellName, this.#stringMap.get(cellName));
-    }
-
-    /**
-     * Получение текстового значения ячейки
-     * @param {String} cellName 
-     */
-    getString(cellName) {
-        return this.#stringMap.get(cellName.toUpperCase());
+        await this.#idb.put(db, "strings", cellName, this.stringMap.get(cellName));
     }
 
     /**
@@ -247,28 +119,6 @@ class TableData {
      */
     hasBuffer() {
         return this.#bufferArray.length;
-    }
-
-    /**
-     * Подготавливает данные для сохранения в файл формата JSON
-     */
-    saveData() {
-		let table = this.#app.getComponent("table");
-		let tokens = {};
-		this.#tokenMap.forEach( (value, key, map) => { 
-			tokens[key] = [];
-			this.getTokens(key).forEach( ( token ) => {
-				tokens[key].push({
-                    [token.type]: token.value   
-				});
-			}) 
-		} );
-        let data = {
-            strings:Object.fromEntries(this.#stringMap.entries()), 
-			values: Object.fromEntries(this.#valueMap.entries()),
-			tokens: tokens
-        };
-        return JSON.stringify(data, null, 2);
     }
 
     /**
@@ -321,18 +171,18 @@ class TableData {
     async asyncIndexedData() {
         let db = await this.#idb.connect();
 
-        for (let cellName of this.#stringMap.keys()) {
-            let value = this.#stringMap.get(cellName);
+        for (let cellName of this.stringMap.keys()) {
+            let value = this.stringMap.get(cellName);
             await this.#idb.put(db, "strings", cellName, value);
         }
 
-        for (let cellName of this.#valueMap.keys()) {
-            let value = this.#valueMap.get(cellName);
+        for (let cellName of this.valueMap.keys()) {
+            let value = this.valueMap.get(cellName);
             await this.#idb.put(db, "values", cellName, value);
         }
 
-        for (let cellName of this.#tokenMap.keys()) {
-            let tokenArray = this.#tokenMap.get(cellName);
+        for (let cellName of this.tokenMap.keys()) {
+            let tokenArray = this.tokenMap.get(cellName);
             tokenArray.map((item, index, array) => {
                 array[index] = new Token(item.type, item.value)
             });
@@ -387,23 +237,23 @@ class TableData {
      */
     clearData() {
         // очистка модели данных и содержимого таблицы от старых значений 
-        for (let cellName of this.#valueMap.keys()){
+        for (let cellName of this.valueMap.keys()){
             this.getCellData(cellName).initCell();
             this.getCell(cellName).refresh();
         }
-        for (let cellName of this.#tokenMap.keys()){
+        for (let cellName of this.tokenMap.keys()){
             this.getCellData(cellName).initCell();
             this.getCell(cellName).refresh();
         }
-        for (let cellName of this.#stringMap.keys()){
+        for (let cellName of this.stringMap.keys()){
             this.getCellData(cellName).initCell();
             this.getCell(cellName).refresh();
         }
 
         // очистка хешей
-        this.#stringMap.clear();
-        this.#valueMap.clear();
-        this.#tokenMap.clear();
+        this.stringMap.clear();
+        this.valueMap.clear();
+        this.tokenMap.clear();
 
         this.#table.setStartCell("A1");
         this.#table.setCursor("A1");        
@@ -419,4 +269,27 @@ class TableData {
         await this.#idb.clear(db, "values");
         await this.#idb.clear(db, "tokens");
     }
+
+    /**
+     * Подготавливает данные для сохранения в файл формата JSON
+     */
+    saveData() {
+		let table = this.#app.getComponent("table");
+		let tokens = {};
+		this.tokenMap.forEach( (value, key, map) => { 
+			tokens[key] = [];
+			this.getTokens(key).forEach( ( token ) => {
+				tokens[key].push({
+                    [token.type]: token.value   
+				});
+			}) 
+		} );
+        let data = {
+            strings:Object.fromEntries(this.stringMap.entries()), 
+			values: Object.fromEntries(this.valueMap.entries()),
+			tokens: tokens
+        };
+        return JSON.stringify(data, null, 2);
+    }
+
 }

@@ -237,7 +237,7 @@ class Table extends HTMLTableElement{
         for (let i = 1; i < this.#params.rowCount + 1; i++) {
             for (let j = 1; j <= this.#params.colCount; j++) {
                 let letter = CellData.getColName(j);
-                let cellData = new CellData(this, i, letter);
+                let cellData = new CellData(this.#tableData, i, letter);
                 this.#tableData.setCellData(letter + i, cellData);
             }
         }
