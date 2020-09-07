@@ -34,6 +34,29 @@ class CalcData {
         return this.#stringMap;
     }
 
+
+    /**
+     * Удаляет значение ячейки
+     * @param {String} cellName - имя удаляемой ячейки
+     */
+    deleteCellValue(cellName) {
+        let cell = cellName.toUpperCase();
+        let store = "";
+        if (this.valueMap.has(cell)) {
+            this.valueMap.delete(cell);
+            store = "values";
+        }
+        else if (this.stringMap.has(cell)) {
+            this.stringMap.delete(cell);
+            store = "strings";
+        }
+        else if (this.tokenMap.has(cell)) {
+            this.tokenMap.delete(cell);
+            store = "tokens";
+        }
+        return store;
+    }
+
     /**
      * Пересчет значений формульных ячеек таблицы
      */

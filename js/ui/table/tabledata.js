@@ -20,21 +20,7 @@ class TableData extends CalcData {
      * @param {String} cellName - имя удаляемой ячейки
      */
     async asyncDeleteCellValue(cellName) {
-
-        let cell = cellName.toUpperCase();
-        let store = "";
-        if (this.valueMap.has(cell)) {
-            this.valueMap.delete(cell);
-            store = "values";
-        }
-        else if (this.stringMap.has(cell)) {
-            this.stringMap.delete(cell);
-            store = "strings";
-        }
-        else if (this.tokenMap.has(cell)) {
-            this.tokenMap.delete(cell);
-            store = "tokens";
-        }
+        let store = deleteCellValue(cellName);
 
         let db = await this.#idb.connect();
         await this.#idb.delete(db, store, cell);
@@ -65,7 +51,7 @@ class TableData extends CalcData {
         super.setTokens(cellName, formula);
 
         let db = await this.#idb.connect();        
-        await this.#idb.put(db, "tokens", cellName, JSON.stringify(this.tokenMap.get(cellName)));
+        await this.#idb.put(db, "tokens", cellName, JSON.stringify(this.getToken(cellName)));
     }
 
     /**
@@ -77,7 +63,7 @@ class TableData extends CalcData {
         super.setValue(cellName, value);
 
         let db = await this.#idb.connect();        
-        await this.#idb.put(db, "values", cellName, JSON.stringify(this.valueMap.get(cellName)));
+        await this.#idb.put(db, "values", cellName, JSON.stringify(this.getValue(cellName)));
     }
 
 
@@ -90,7 +76,7 @@ class TableData extends CalcData {
         super.setString(cellName, string);
 
         let db = await this.#idb.connect();        
-        await this.#idb.put(db, "strings", cellName, this.stringMap.get(cellName));
+        await this.#idb.put(db, "strings", cellName, this.getString(cellName));
     }
 
     /**
