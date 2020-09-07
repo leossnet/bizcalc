@@ -51,7 +51,7 @@ class TableData extends CalcData {
         super.setTokens(cellName, formula);
 
         let db = await this.#idb.connect();        
-        await this.#idb.put(db, "tokens", cellName, JSON.stringify(this.getToken(cellName)));
+        await this.#idb.put(db, "tokens", cellName, JSON.stringify(this.getTokens(cellName)));
     }
 
     /**
