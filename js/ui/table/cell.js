@@ -68,6 +68,24 @@ class Cell extends HTMLTableCellElement {
     }
 
     /**
+     * Установка нового значения ячейки
+     */    
+    set value(value) {
+        this.setValue(value, true);
+    }
+
+    /**
+     * Установка нового значения ячейки таблицы
+     * @param {any} value - новое значение ячейки таблицы
+     * @param {Boolean} isCalcAllCells - нужно ли пересчитывать все ячейки таблицы после обновления текущей ячейки
+     */
+    setValue (value, isCalcAllCells) {
+        this.#cellData.setValue(value, isCalcAllCells);
+        this.setAttribute("type", this.#cellData.type);
+        this.refresh();        
+    }
+
+    /**
      * Обрабочик, вызываемой после добавления компонента в документ
      */
     connectedCallback() { 
@@ -79,7 +97,7 @@ class Cell extends HTMLTableCellElement {
      */
     refreshValue() {
         if ( this.data.type == ValueTypes.Formula ) {
-            this.data.value = this.#tableData.getTokens(this.data.name);
+            this.value = this.#tableData.getTokens(this.data.name);
         }
         this.refresh();
     }

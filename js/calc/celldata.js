@@ -12,7 +12,7 @@ const ValueTypes = {
  * Класс, реализующий функционал ячейки таблицы
  */
 class CellData { 
-    #tableData;
+    #calcData;
     #value = {};
     #param = {};
 
@@ -22,8 +22,8 @@ class CellData {
      * @param {String|Number} rowName имя строки ячейки
      * @param {String} colName имя колонки ячейки
      */
-    constructor(tableData, rowName, colName) {
-        this.#tableData = tableData;
+    constructor(calcData, rowName, colName) {
+        this.#calcData = calcData;
 
         this.#param = {
             name: colName+String(rowName),
@@ -53,7 +53,7 @@ class CellData {
      * Получение ссылки на объект ячейки из объекта TableData
      */
     get cell() {
-        return this.#tableData.getCell(this.#param.name);
+        return this.#calcData.getCell(this.#param.name);
     }
 
     /**
@@ -118,13 +118,6 @@ class CellData {
     }
 
     /**
-     * Установка нового значения ячейки
-     */
-    set value(value){
-        this.setValue(value, true);
-    }
-
-    /**
      * Установка нового значения ячейки таблицы
      * @param {any} value - новое значение ячейки таблицы
      * @param {Boolean} isCalcAllCells - нужно ли пересчитывать все ячейки таблицы после обновления текущей ячейки
@@ -133,43 +126,41 @@ class CellData {
         let cellName = this.#param.name;
         if ( value === undefined ) {
             this.initCell();
-            this.#tableData.asyncDeleteCellValue(cellName);
-            if( isCalcAllCells ) this.#tableData.calcAllCells();
+            this.#calcData.asyncDeleteCellValue(cellName);
+            if( isCalcAllCells ) this.#calcData.calcAllCells();
         }
         else if ( Number(value) === 0 ) {
             this.#value.type = ValueTypes.Number;
             this.#value.number = 0;
-            this.#tableData.setValue(cellName, this.#value.number);
+            this.#calcData.setValue(cellName, this.#value.number);
             this.#value.html = 0;
-            if( isCalcAllCells ) this.#tableData.calcAllCells();
+            if( isCalcAllCells ) this.#calcData.calcAllCells();
         }
         else if ( Number(value) ) {
             this.#value.type = ValueTypes.Number;
             this.#value.number = Number(value);
-            this.#tableData.setValue(cellName, this.#value.number);
+            this.#calcData.setValue(cellName, this.#value.number);
             this.#value.html = value;
-            if( isCalcAllCells ) this.#tableData.calcAllCells();
+            if( isCalcAllCells ) this.#calcData.calcAllCells();
         }
         else if ( String(value).charAt(0) === '=' ) {
             this.#value.type = ValueTypes.Formula;
             this.#value.formula = value;
-            this.#tableData.setTokens(cellName, this.#value.formula);
-            if( isCalcAllCells ) this.#tableData.calcAllCells();
+            this.#calcData.setTokens(cellName, this.#value.formula);
+            if( isCalcAllCells ) this.#calcData.calcAllCells();
         }
         else if ( Array.isArray(value) ) {
             this.#value.type = ValueTypes.Formula;
             this.#value.formula = "="+value.map( item => item.value ).join("");
-            this.#tableData.setTokens(cellName, value);
-            this.#value.html = this.#tableData.calcCell(cellName);
+            this.#calcData.setTokens(cellName, value);
+            this.#value.html = this.#calcData.calcCell(cellName);
         }
         else {
             this.#value.type = ValueTypes.String;
             this.#value.string = value;
             this.#value.html = value;
-            this.#tableData.setString(cellName, value);
+            this.#calcData.setString(cellName, value);
         }
-        this.cell.setAttribute("type", this.#value.type);
-        this.cell.refresh();
     }
 
     /**

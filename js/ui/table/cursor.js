@@ -60,7 +60,7 @@ class Cursor extends HTMLElement{
      * Установление нового значения курсора
      */
     set value (value) {
-        this.#cell.data.value = value;
+        this.#cell.value = value;
     }
 
     /**

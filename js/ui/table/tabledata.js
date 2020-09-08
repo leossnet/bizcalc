@@ -127,14 +127,14 @@ class TableData extends CalcData {
         if ( parseJson.strings ) {
             let strings = new Map(Object.entries(parseJson.strings));
             for (let cellName of strings.keys()){
-                this.getCellData(cellName).setValue(strings.get(cellName), false);
+                this.getCell(cellName).setValue(strings.get(cellName), false);
             }
         }
         // обновление первичных данных
         if ( parseJson.values ) {
             let values = new Map(Object.entries(parseJson.values));
             for (let cellName of values.keys()){
-                this.getCellData(cellName).setValue(values.get(cellName), false);
+                this.getCell(cellName).setValue(values.get(cellName), false);
             }
         }        
         // обновление формул
@@ -145,7 +145,7 @@ class TableData extends CalcData {
                 tokenArray.map( (item, index, array) => {
                     for (let type in item) array[index] = new Token(type, item[type]);
                 });
-                this.getCellData(cellName).setValue(tokenArray, false);
+                this.getCell(cellName).setValue(tokenArray, false);
             }
         }
         this.calcAllCells();
@@ -185,20 +185,20 @@ class TableData extends CalcData {
         let stringMap = await this.#idb.get(db, "strings");
         for (let cellName of stringMap.keys()) {
             let value = stringMap.get(cellName);
-            this.getCellData(cellName).setValue(value, false);
+            this.getCell(cellName).setValue(value, false);
         }
 
         let valueMap = await this.#idb.get(db, "values");
         for (let cellName of valueMap.keys()) {
             let value = valueMap.get(cellName);
-            this.getCellData(cellName).setValue(value, false);
+            this.getCell(cellName).setValue(value, false);
         }
 
         let tokenMap = await this.#idb.get(db, "tokens");
         for (let cellName of tokenMap.keys()) {
             let tokenArray = JSON.parse(tokenMap.get(cellName));
             tokenArray.map( (item, index, array) => array[index] = new Token(item.type, item.value) );
-            this.getCellData(cellName).setValue(tokenArray, false);
+            this.getCell(cellName).setValue(tokenArray, false);
         }
         this.calcAllCells();
 
