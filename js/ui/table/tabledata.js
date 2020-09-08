@@ -16,18 +16,7 @@ class TableData extends CalcData {
     }
 
     /**
-     * Удаляет значение ячейки
-     * @param {String} cellName - имя удаляемой ячейки
-     */
-    async asyncDeleteCellValue(cellName) {
-        let store = deleteCellValue(cellName);
-
-        let db = await this.#idb.connect();
-        await this.#idb.delete(db, store, cell);
-    }
-
-    /**
-     * Записть позации курсора в базу данных
+     * Записть позиции курсора в базу данных
      */
     async asyncSetCursorCellName(cellName) {
         let db = await this.#idb.connect();
@@ -35,7 +24,7 @@ class TableData extends CalcData {
     } 
 
     /**
-     * Запись стартовой позизции в базу данных
+     * Запись стартовой позиции таблицы в базу данных
      */
     async asyncSetStartCellName(cellName) {
         let db = await this.#idb.connect();
@@ -77,6 +66,17 @@ class TableData extends CalcData {
 
         let db = await this.#idb.connect();        
         await this.#idb.put(db, "strings", cellName, this.getString(cellName));
+    }
+
+    /**
+     * Удаляет значение ячейки
+     * @param {String} cellName - имя удаляемой ячейки
+     */
+    async asyncDeleteCellValue(cellName) {
+        let store = super.deleteCellValue(cellName);
+
+        let db = await this.#idb.connect();
+        await this.#idb.delete(db, store, cellName);
     }
 
     /**
@@ -157,18 +157,18 @@ class TableData extends CalcData {
     async asyncIndexedData() {
         let db = await this.#idb.connect();
 
-        for (let cellName of this.stringMap.keys()) {
-            let value = this.stringMap.get(cellName);
+        for (let cellName of super.stringMap.keys()) {
+            let value = super.stringMap.get(cellName);
             await this.#idb.put(db, "strings", cellName, value);
         }
 
-        for (let cellName of this.valueMap.keys()) {
-            let value = this.valueMap.get(cellName);
+        for (let cellName of super.valueMap.keys()) {
+            let value = super.valueMap.get(cellName);
             await this.#idb.put(db, "values", cellName, value);
         }
 
-        for (let cellName of this.tokenMap.keys()) {
-            let tokenArray = this.tokenMap.get(cellName);
+        for (let cellName of super.tokenMap.keys()) {
+            let tokenArray = super.tokenMap.get(cellName);
             tokenArray.map((item, index, array) => {
                 array[index] = new Token(item.type, item.value)
             });
@@ -222,25 +222,7 @@ class TableData extends CalcData {
      * Очистка данных текущей таблицы
      */
     clearData() {
-        // очистка модели данных и содержимого таблицы от старых значений 
-        for (let cellName of this.valueMap.keys()){
-            this.getCellData(cellName).initCell();
-            this.getCell(cellName).refresh();
-        }
-        for (let cellName of this.tokenMap.keys()){
-            this.getCellData(cellName).initCell();
-            this.getCell(cellName).refresh();
-        }
-        for (let cellName of this.stringMap.keys()){
-            this.getCellData(cellName).initCell();
-            this.getCell(cellName).refresh();
-        }
-
-        // очистка хешей
-        this.stringMap.clear();
-        this.valueMap.clear();
-        this.tokenMap.clear();
-
+        super.clearData();
         this.#table.setStartCell("A1");
         this.#table.setCursor("A1");        
     }

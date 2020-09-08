@@ -3,14 +3,14 @@
  * Аргументы функций указываются в круглых скобках, разделяемые точкой с запятой.
  */
 class Calculator {
-    #tdata;
+    #calcData;
 
     /**
      * Конструктор калькулятора
-     * @param {Map} cells хеш ячеек, содержащих формулы, в которых другие ячейки ссылаются на первичные значения
+     * @param {CalcData} calcData - объект с данными ячеек, содержащих как формулы, так и первичные значения
      */
-    constructor(tableData) {
-        this.#tdata = tableData;
+    constructor(calcData) {
+        this.#calcData = calcData;
     }
 
     /**
@@ -32,16 +32,8 @@ class Calculator {
                     operands.push(token);
                     break;
                 case Types.Cell :
-                    if ( this.#tdata.isNumber(token.value) ) {
-                        operands.push(this.#tdata.getNumberToken(token));
-                    }
-                    else if ( this.#tdata.isFormula(token.value) ) {
-                        let formula = this.#tdata.getTokens(token.value);
-                        operands.push(new Token(Types.Number, this.calc(formula)));
-                    }
-                    else {
-                        operands.push(new Token(Types.Number, 0));
-                    }
+                    if (! this.#calcData ) throw new Error("Для калькулятора не определен источник данных ячеек");
+                    operands.push(this.#calcData.getNumberToken(token));
                     break;
                 case Types.Function :
                     funcs.push(token);

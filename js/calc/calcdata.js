@@ -34,6 +34,22 @@ class CalcData {
         return this.#stringMap;
     }
 
+    /**
+     * Возвращает числовой токен, соответствующий значению токена ячейки
+     * @param {Token} cellToken - токен ячейки
+     */
+    getNumberToken(cellToken) {
+        if ( this.isNumber(cellToken.value) ) {
+            return new Token (Types.Number, this.getValue(cellToken.value) );
+        }
+        else if ( this.isFormula(cellToken.value) ) {
+            let formula = this.getTokens(cellToken.value);
+            return new Token(Types.Number, this.#calculator.calc(formula));
+        }
+        else {
+            return new Token(Types.Number, 0);
+        }        
+    }
 
     /**
      * Удаляет значение ячейки
@@ -129,14 +145,6 @@ class CalcData {
     }
 
     /**
-     * Преобразование токена ячейки в токен его значения
-     * @param {Object} token объект токена 
-     */
-    getNumberToken (token) {
-        return new Token (Types.Number, this.getValue(token.value) );
-    }
-
-    /**
      * Получение массива токенов формулы для ячейки
      * @param {Strgin} cellName  - имя ячейки
      */
@@ -194,6 +202,31 @@ class CalcData {
      */
     setString(cellName, string) {
         this.#stringMap.set(cellName.toUpperCase(), string);
+    }
+
+    
+    /**
+     * Очистка данных текущей таблицы
+     */
+    clearData() {
+        // очистка модели данных и содержимого таблицы от старых значений 
+        for (let cellName of this.#valueMap.keys()){
+            this.getCellData(cellName).initCell();
+            this.getCell(cellName).refresh();
+        }
+        for (let cellName of this.#tokenMap.keys()){
+            this.getCellData(cellName).initCell();
+            this.getCell(cellName).refresh();
+        }
+        for (let cellName of this.#stringMap.keys()){
+            this.getCellData(cellName).initCell();
+            this.getCell(cellName).refresh();
+        }
+
+        // очистка хешей
+        this.#stringMap.clear();
+        this.#valueMap.clear();
+        this.#tokenMap.clear();
     }
 
 }
