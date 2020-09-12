@@ -40,14 +40,14 @@ class CalcData {
      */
     getNumberToken(cellToken) {
         if ( this.isNumber(cellToken.value) ) {
-            return new Token (Types.Number, this.getValue(cellToken.value) );
+            return new Token (Token.Types.Number, this.getValue(cellToken.value) );
         }
         else if ( this.isFormula(cellToken.value) ) {
             let formula = this.getTokens(cellToken.value);
-            return new Token(Types.Number, this.#calculator.calc(formula));
+            return new Token(Token.Types.Number, this.#calculator.calc(formula));
         }
         else {
-            return new Token(Types.Number, 0);
+            return new Token(Token.Types.Number, 0);
         }        
     }
 

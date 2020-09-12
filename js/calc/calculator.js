@@ -28,35 +28,35 @@ class Calculator {
         let params = new Map();
         tokens.forEach( token => {
             switch(token.type) {
-                case Types.Number : 
+                case Token.Types.Number : 
                     operands.push(token);
                     break;
-                case Types.Cell :
+                case Token.Types.Cell :
                     if (! this.#calcData ) throw new Error("Для калькулятора не определен источник данных ячеек");
                     operands.push(this.#calcData.getNumberToken(token));
                     break;
-                case Types.Function :
+                case Token.Types.Function :
                     funcs.push(token);
                     params.set(token, []);
                     operators.push(token);             
                     break;
-                case Types.Semicolon :
+                case Token.Types.Semicolon :
                     this.calcExpression(operands, operators, 1);
                     let funcToken = operators[operators.length-2];  // получить имя функции из стека операторов
                     params.get(funcToken).push(operands.pop());     // извлечь из стека последний операнд и добавить его в параметы функции
                     break;
-                case Types.Operator :
+                case Token.Types.Operator :
                     this.calcExpression(operands, operators, token.priority);
                     operators.push(token);
                     break;
-                case Types.LeftBracket :
+                case Token.Types.LeftBracket :
                     operators.push(token);
                     break;
-                case Types.RightBracket :
+                case Token.Types.RightBracket :
                     this.calcExpression(operands, operators, 1);
                     operators.pop();
                     // если последний оператор в стеке является функцией
-                    if (operators.length && operators[operators.length-1].type == Types.Function ) {
+                    if (operators.length && operators[operators.length-1].type == Token.Types.Function ) {
                         let funcToken = operators.pop();        // получить имя функции из стека операторов
                         let funcArgs = params.get(funcToken);   // получить массив токенов аргументов функции
                         let paramValues = [];
@@ -89,7 +89,7 @@ class Calculator {
             let operator = operators.pop();
             let result = operator.calc(leftOperand, rightOperand);
             if ( isNaN(result) || !isFinite(result) ) result = 0;
-            operands.push(new Token ( Types.Number, result ));
+            operands.push(new Token ( Token.Types.Number, result ));
         }
     }
 
@@ -99,7 +99,7 @@ class Calculator {
      * @param  {...Number} params - массив числовых значений аргументов
      */
     calcFunction(calc, ...params) {
-        return new Token(Types.Number, calc(...params));
+        return new Token(Token.Types.Number, calc(...params));
     }
 }
 

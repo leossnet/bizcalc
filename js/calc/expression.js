@@ -14,7 +14,6 @@ const Operators = {
 
 const Functions = {
     ["random"]: {priority: 4, calc: () => Math.random() },
-    // ["round"]:  {priority: 4, calc: (a) => Math.round(a) },
     ["round"]:  {priority: 4, calc: round },
     ["round1"]: {priority: 4, calc: (a) => Math.round(a * 10) / 10 },
     ["round2"]: {priority: 4, calc: (a) => Math.round(a * 100) / 100 },
